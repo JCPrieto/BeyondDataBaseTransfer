@@ -6,11 +6,15 @@ import javax.swing.*;
 
 public class MainUI extends JFrame {
 
-    private final Configuracion configuracion;
+    private Configuracion configuracion;
+
+    public MainUI() {
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
 
     public MainUI(Configuracion configuracion) {
+        this();
         this.configuracion = configuracion;
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     public Configuracion getConfiguracion() {

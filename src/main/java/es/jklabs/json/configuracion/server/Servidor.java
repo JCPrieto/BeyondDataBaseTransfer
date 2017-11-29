@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Servidor {
 
+    int id;
     String nombre;
     String ip;
     Integer puerto;
@@ -18,10 +19,19 @@ public class Servidor {
     String keyUrl;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String keyValue;
-    List<ServidorBBDD> servidoresBBDD;
+    ServidorBBDD servidorBBDD;
     List<Esquema> servidor;
 
-    public Servidor() {
+    public Servidor(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -88,12 +98,12 @@ public class Servidor {
         this.keyValue = keyValue;
     }
 
-    public List<ServidorBBDD> getServidoresBBDD() {
-        return servidoresBBDD;
+    public ServidorBBDD getServidorBBDD() {
+        return servidorBBDD;
     }
 
-    public void setServidoresBBDD(List<ServidorBBDD> servidoresBBDD) {
-        this.servidoresBBDD = servidoresBBDD;
+    public void setServidorBBDD(ServidorBBDD servidorBBDD) {
+        this.servidorBBDD = servidorBBDD;
     }
 
     public List<Esquema> getServidor() {
@@ -102,5 +112,25 @@ public class Servidor {
 
     public void setServidor(List<Esquema> servidor) {
         this.servidor = servidor;
+    }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Servidor)) return false;
+
+        Servidor servidor = (Servidor) o;
+
+        return getId() == servidor.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return getId();
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Carpeta {
 
+    int id;
     String nombre;
     boolean sistema;
     List<Carpeta> carpetas;
@@ -15,10 +16,24 @@ public class Carpeta {
         servidores = new ArrayList<>();
     }
 
-    public Carpeta(String nombre, boolean sistema) {
+    public Carpeta(String nombre, boolean sistema, int id) {
         this();
+        this.id = id;
         this.nombre = nombre;
         this.sistema = sistema;
+    }
+
+    public Carpeta(int id) {
+        this();
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -37,11 +52,39 @@ public class Carpeta {
         this.sistema = sistema;
     }
 
+    public List<Carpeta> getCarpetas() {
+        return carpetas;
+    }
+
+    public void setCarpetas(List<Carpeta> carpetas) {
+        this.carpetas = carpetas;
+    }
+
     public List<Servidor> getServidores() {
         return servidores;
     }
 
     public void setServidores(List<Servidor> servidores) {
         this.servidores = servidores;
+    }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Carpeta)) return false;
+
+        Carpeta carpeta = (Carpeta) o;
+
+        return getId() == carpeta.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return getId();
     }
 }

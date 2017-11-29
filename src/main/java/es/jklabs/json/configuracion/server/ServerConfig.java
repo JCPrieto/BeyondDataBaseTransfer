@@ -1,22 +1,38 @@
 package es.jklabs.json.configuracion.server;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ServerConfig {
 
-    List<Carpeta> carpetas;
+    Carpeta raiz;
+    int indexCarpeta;
+    int indexServidor;
 
     public ServerConfig() {
-        carpetas = new ArrayList<>();
-        carpetas.add(new Carpeta("Raiz", true));
+        raiz = new Carpeta("Raiz", true, 1);
+        indexCarpeta = 1;
+        indexServidor = 1;
     }
 
-    public List<Carpeta> getCarpetas() {
-        return carpetas;
+    public Carpeta getRaiz() {
+        return raiz;
     }
 
-    public void setCarpetas(List<Carpeta> carpetas) {
-        this.carpetas = carpetas;
+    public void setRaiz(Carpeta raiz) {
+        this.raiz = raiz;
+    }
+
+    public int getIndexCarpeta() {
+        return indexCarpeta;
+    }
+
+    public void setIndexCarpeta(int indexCarpeta) {
+        this.indexCarpeta = indexCarpeta;
+    }
+
+    public int getIndexServidor() {
+        return indexServidor;
+    }
+
+    public void setIndexServidor(int indexServidor) {
+        this.indexServidor = indexServidor;
     }
 }

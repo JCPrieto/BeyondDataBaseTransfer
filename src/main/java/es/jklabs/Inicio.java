@@ -7,6 +7,7 @@ import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 
 import javax.swing.*;
+import java.text.ParseException;
 
 public class Inicio {
 
@@ -17,8 +18,10 @@ public class Inicio {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             Configuracion configuracion = UtilidadesConfiguracion.loadConfig();
             if (configuracion == null) {
-                ConfiguracionUI configuracionUI = new ConfiguracionUI(true);
+                MainUI mainUI = new MainUI();
+                ConfiguracionUI configuracionUI = new ConfiguracionUI(mainUI, true);
                 configuracionUI.setVisible(true);
+                mainUI.setVisible(true);
             } else {
                 MainUI mainUI = new MainUI(configuracion);
                 mainUI.setVisible(true);
@@ -26,6 +29,8 @@ public class Inicio {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                 UnsupportedLookAndFeelException e) {
             LOG.error("Cargar el LookAndFeel del S.O", e);
+        } catch (ParseException e) {
+            LOG.error("Cargar interfaz grafica", e);
         }
     }
 }
