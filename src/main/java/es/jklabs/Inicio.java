@@ -7,7 +7,6 @@ import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 
 import javax.swing.*;
-import java.text.ParseException;
 
 public class Inicio {
 
@@ -30,8 +29,6 @@ public class Inicio {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                 UnsupportedLookAndFeelException e) {
             LOG.error("Cargar el LookAndFeel del S.O", e);
-        } catch (ParseException e) {
-            LOG.error("Cargar interfaz grafica", e);
         }
     }
 }

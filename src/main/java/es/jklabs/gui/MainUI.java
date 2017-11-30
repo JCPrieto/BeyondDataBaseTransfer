@@ -1,15 +1,17 @@
 package es.jklabs.gui;
 
 import es.jklabs.gui.configuracion.ConfiguracionUI;
+import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
-import es.jklabs.utilidades.Logger;
+import es.jklabs.utilidades.UtilidadesConfiguracion;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
-import java.text.ParseException;
+import java.io.File;
+import java.util.Objects;
 
 public class MainUI extends JFrame {
 
-    private static final Logger LOG = Logger.getLogger();
     private static final long serialVersionUID = 4591514658240490883L;
 
     private Configuracion configuracion;
@@ -42,16 +44,22 @@ public class MainUI extends JFrame {
     }
 
     private void exportarServidores() {
-        //ToDo
+        JFileChooser fc = new JFileChooser();
+        fc.addChoosableFileFilter(new JSonFilter());
+        fc.setAcceptAllFileFilterUsed(false);
+        int retorno = fc.showSaveDialog(this);
+        if (retorno == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            if (!Objects.equals(FilenameUtils.getExtension(file.getName()), "json")) {
+                file = new File(file.toString() + ".json");
+            }
+            UtilidadesConfiguracion.guardarServidores(configuracion.getServerConfig(), file);
+        }
     }
 
     private void abrirConfiguracion() {
-        try {
-            ConfiguracionUI configuracionUI = new ConfiguracionUI(this, configuracion);
-            configuracionUI.setVisible(true);
-        } catch (ParseException e) {
-            LOG.error("Cargar dialogo configuración", e);
-        }
+        ConfiguracionUI configuracionUI = new ConfiguracionUI(this, configuracion);
+        configuracionUI.setVisible(true);
     }
 
     public MainUI(Configuracion configuracion) {

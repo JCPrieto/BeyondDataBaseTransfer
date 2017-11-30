@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class UtilidadesConfiguracion {
 
-    private static Logger LOG = Logger.getLogger();
+    private static final Logger LOG = Logger.getLogger();
 
     private UtilidadesConfiguracion() {
 
@@ -29,6 +29,15 @@ public class UtilidadesConfiguracion {
         return configuracion;
     }
 
+    public static void guardarConfiguracion(Configuracion configuracion) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writeValue(new File("config.json"), configuracion);
+        } catch (IOException e) {
+            LOG.error("Guardar configuracion", e);
+        }
+    }
+
     public static int getIdCarpeta(Configuracion configuracion) {
         ServerConfig serverConfig = configuracion.getServerConfig();
         int retorno = serverConfig.getIndexCarpeta();
@@ -41,5 +50,14 @@ public class UtilidadesConfiguracion {
         int retorno = serverConfig.getIndexServidor();
         serverConfig.setIndexServidor(retorno + 1);
         return retorno;
+    }
+
+    public static void guardarServidores(ServerConfig serverConfig, File file) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writeValue(file, serverConfig);
+        } catch (IOException e) {
+            LOG.error("Guardar servidores", e);
+        }
     }
 }

@@ -1,6 +1,5 @@
 package es.jklabs.gui.configuracion;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import es.jklabs.gui.MainUI;
 import es.jklabs.gui.utilidades.filtro.PuertoDocumentoFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -8,7 +7,6 @@ import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.json.configuracion.server.ServidorBBDD;
 import es.jklabs.json.utilidades.enumeradores.MetodoLoggin;
-import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 import es.jklabs.utilidades.UtilidadesEncryptacion;
 
@@ -19,8 +17,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +26,6 @@ public class ConfiguracionUI extends JDialog {
 
     private static final String SELECCIONAR_ARCHIVO = "Seleccionar archivo...";
     private static final long serialVersionUID = -5947416101394804262L;
-    private static final Logger LOG = Logger.getLogger();
     private Configuracion configuracion;
     private JTree arbol;
     private JButton btnAceptar;
@@ -54,13 +49,13 @@ public class ConfiguracionUI extends JDialog {
     private JPanel panelBotoneraArbol;
     private DefaultMutableTreeNode raizArbol;
 
-    public ConfiguracionUI(MainUI mainUI, Configuracion configuracion) throws ParseException {
+    public ConfiguracionUI(MainUI mainUI, Configuracion configuracion) {
         super(mainUI, "Servidores", true);
         this.configuracion = configuracion;
         cargarPantalla();
     }
 
-    private void cargarPantalla() throws ParseException {
+    private void cargarPantalla() {
         this.setLayout(new BorderLayout());
         this.add(cargarPanelCentral(), BorderLayout.CENTER);
         this.add(cargarPanelDerecho(), BorderLayout.EAST);
@@ -132,7 +127,7 @@ public class ConfiguracionUI extends JDialog {
             }
             servidorBBDD.setUsuario(txBbddUser.getText());
             servidorBBDD.setPassword(UtilidadesEncryptacion.encrypt(String.valueOf(txBbddPasword.getPassword())));
-            guardarConfiguracion();
+            UtilidadesConfiguracion.guardarConfiguracion(configuracion);
             setEnableArbol(true);
             setEnableFormularioServidor(false);
             expandAllNodes(arbol, 0, arbol.getRowCount());
@@ -319,7 +314,7 @@ public class ConfiguracionUI extends JDialog {
         }
         expandAllNodes(arbol, 0, arbol.getRowCount());
         SwingUtilities.updateComponentTreeUI(arbol);
-        guardarConfiguracion();
+        UtilidadesConfiguracion.guardarConfiguracion(configuracion);
     }
 
     private void eliminarServidor(Servidor servidor) {
@@ -411,7 +406,7 @@ public class ConfiguracionUI extends JDialog {
             }
             expandAllNodes(arbol, 0, arbol.getRowCount());
             SwingUtilities.updateComponentTreeUI(arbol);
-            guardarConfiguracion();
+            UtilidadesConfiguracion.guardarConfiguracion(configuracion);
         }
     }
 
@@ -448,7 +443,7 @@ public class ConfiguracionUI extends JDialog {
             addCarpeta(parentNode, nuevaCarpeta);
             expandAllNodes(arbol, 0, arbol.getRowCount());
             SwingUtilities.updateComponentTreeUI(arbol);
-            guardarConfiguracion();
+            UtilidadesConfiguracion.guardarConfiguracion(configuracion);
         }
     }
 
@@ -458,15 +453,6 @@ public class ConfiguracionUI extends JDialog {
         }
         if (tree.getRowCount() != rowCount) {
             expandAllNodes(tree, rowCount, tree.getRowCount());
-        }
-    }
-
-    private void guardarConfiguracion() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            mapper.writeValue(new File("config.json"), configuracion);
-        } catch (IOException e) {
-            LOG.error("Guardar configuracion", e);
         }
     }
 
