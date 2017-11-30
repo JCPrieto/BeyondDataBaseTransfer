@@ -18,8 +18,9 @@ public class Inicio {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             Configuracion configuracion = UtilidadesConfiguracion.loadConfig();
             if (configuracion == null) {
-                MainUI mainUI = new MainUI();
-                ConfiguracionUI configuracionUI = new ConfiguracionUI(mainUI, true);
+                configuracion = new Configuracion();
+                MainUI mainUI = new MainUI(configuracion);
+                ConfiguracionUI configuracionUI = new ConfiguracionUI(mainUI, configuracion);
                 configuracionUI.setVisible(true);
                 mainUI.setVisible(true);
             } else {

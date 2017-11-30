@@ -7,20 +7,26 @@ import java.util.List;
 
 public class Servidor {
 
-    int id;
-    String nombre;
-    String ip;
-    Integer puerto;
-    MetodoLoggin metodoLoggin;
-    String usuario;
+    private int id;
+    private String nombre;
+    private String ip;
+    private Integer puerto;
+    private MetodoLoggin metodoLoggin;
+    private String usuario;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private
     String password;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private
     String keyUrl;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private
     String keyValue;
-    ServidorBBDD servidorBBDD;
-    List<Esquema> servidor;
+    private ServidorBBDD servidorBBDD;
+    private List<Esquema> servidor;
+
+    public Servidor() {
+    }
 
     public Servidor(int id) {
         this.id = id;

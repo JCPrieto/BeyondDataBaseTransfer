@@ -28,10 +28,9 @@ import java.util.Objects;
 
 public class ConfiguracionUI extends JDialog {
 
-    public static final String SELECCIONAR_ARCHIVO = "Seleccionar archivo...";
+    private static final String SELECCIONAR_ARCHIVO = "Seleccionar archivo...";
     private static final long serialVersionUID = -5947416101394804262L;
     private static final Logger LOG = Logger.getLogger();
-    private boolean crearConfiguracion;
     private Configuracion configuracion;
     private JTree arbol;
     private JButton btnAceptar;
@@ -55,10 +54,9 @@ public class ConfiguracionUI extends JDialog {
     private JPanel panelBotoneraArbol;
     private DefaultMutableTreeNode raizArbol;
 
-    public ConfiguracionUI(MainUI mainUI, boolean crearConfiguracion) throws ParseException {
+    public ConfiguracionUI(MainUI mainUI, Configuracion configuracion) throws ParseException {
         super(mainUI, "Servidores", true);
-        this.crearConfiguracion = crearConfiguracion;
-        configuracion = new Configuracion();
+        this.configuracion = configuracion;
         cargarPantalla();
     }
 
@@ -69,7 +67,7 @@ public class ConfiguracionUI extends JDialog {
         this.pack();
     }
 
-    private JPanel cargarPanelDerecho() throws ParseException {
+    private JPanel cargarPanelDerecho() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(cargarFormulario(), BorderLayout.CENTER);
         panel.add(cargarBotoneraFormulario(), BorderLayout.SOUTH);
@@ -103,7 +101,7 @@ public class ConfiguracionUI extends JDialog {
         if (parentNode.getUserObject() instanceof Carpeta) {
             servidor = new Servidor(UtilidadesConfiguracion.getIdServidor(configuracion));
             ((Carpeta) parentNode.getUserObject()).getServidores().add(servidor);
-            addServidor(parentNode, servidor);
+            parentNode.add(new DefaultMutableTreeNode(servidor));
         } else if (parentNode.getUserObject() instanceof Servidor) {
             servidor = (Servidor) parentNode.getUserObject();
         }
@@ -114,12 +112,16 @@ public class ConfiguracionUI extends JDialog {
             servidor.setUsuario(txSshUser.getText());
             MetodoLoggin metodo = (MetodoLoggin) cbLoginMethod.getSelectedItem();
             servidor.setMetodoLoggin(metodo);
-            if (Objects.equals(metodo, MetodoLoggin.CONTRASENA)) {
-                servidor.setPassword(UtilidadesEncryptacion.encrypt(String.valueOf(txSshPasword.getPassword())));
-            } else if (Objects.equals(metodo, MetodoLoggin.KEY_FILE)) {
-                servidor.setKeyUrl(rsaKeyFIle.getAbsolutePath());
-            } else if (Objects.equals(metodo, MetodoLoggin.KEY_VALUE)) {
-                servidor.setKeyValue(txSshKeyValue.getText());
+            switch (metodo) {
+                case CONTRASENA:
+                    servidor.setPassword(UtilidadesEncryptacion.encrypt(String.valueOf(txSshPasword.getPassword())));
+                    break;
+                case KEY_FILE:
+                    servidor.setKeyUrl(rsaKeyFIle.getAbsolutePath());
+                    break;
+                case KEY_VALUE:
+                    servidor.setKeyValue(txSshKeyValue.getText());
+                    break;
             }
             ServidorBBDD servidorBBDD;
             if (servidor.getServidorBBDD() != null) {
@@ -143,7 +145,7 @@ public class ConfiguracionUI extends JDialog {
         Arrays.stream(panelBotoneraArbol.getComponents()).forEach(c -> c.setEnabled(enable));
     }
 
-    private JPanel cargarFormulario() throws ParseException {
+    private JPanel cargarFormulario() {
         panelFormularioServidor = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         JLabel lbNombre = new JLabel("Nombre");
@@ -396,9 +398,10 @@ public class ConfiguracionUI extends JDialog {
                         break;
                     case KEY_FILE:
                         lbRsaUrlFile.setText(servidor.getKeyUrl());
+                        rsaKeyFIle = new File(servidor.getKeyUrl());
                         break;
                     case KEY_VALUE:
-                        txSshKeyValue.setText(servidor.getKeyUrl());
+                        txSshKeyValue.setText(servidor.getKeyValue());
                         break;
                 }
                 txBbddUser.setText(servidor.getServidorBBDD().getUsuario());
@@ -472,6 +475,7 @@ public class ConfiguracionUI extends JDialog {
         arbol = new JTree(raizArbol);
         arbol.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
+        expandAllNodes(arbol, 0, arbol.getRowCount());
         return new JScrollPane(arbol);
     }
 
@@ -481,23 +485,15 @@ public class ConfiguracionUI extends JDialog {
         addElementos(carpetaRaiz, raizArbol);
     }
 
-    private void addElementos(Carpeta carpetaRaiz, DefaultMutableTreeNode raiz) {
-        carpetaRaiz.getCarpetas().forEach(c -> addCarpeta(raiz, c));
-        carpetaRaiz.getServidores().forEach(s -> addServidor(raiz, s));
+    private void addElementos(Carpeta carpetaRaiz, DefaultMutableTreeNode padre) {
+        carpetaRaiz.getCarpetas().forEach(c -> addCarpeta(padre, c));
+        carpetaRaiz.getServidores().forEach(s -> padre.add(new DefaultMutableTreeNode(s)));
     }
 
     private void addCarpeta(DefaultMutableTreeNode padre, Carpeta carpeta) {
         DefaultMutableTreeNode hijo = new DefaultMutableTreeNode(carpeta);
-        padre.add(new DefaultMutableTreeNode(carpeta));
+        padre.add(hijo);
         addElementos(carpeta, hijo);
-    }
-
-    private void addServidor(DefaultMutableTreeNode raiz, Servidor servidor) {
-        raiz.add(new DefaultMutableTreeNode(servidor));
-    }
-
-    public boolean isCrearConfiguracion() {
-        return crearConfiguracion;
     }
 
     public Configuracion getConfiguracion() {
