@@ -40,7 +40,15 @@ public class MainUI extends JFrame {
     }
 
     private void importarServidores() {
-        //ToDO
+        JFileChooser fc = new JFileChooser();
+        fc.addChoosableFileFilter(new JSonFilter());
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int retorno = fc.showOpenDialog(this);
+        if (retorno == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            UtilidadesConfiguracion.loadServidores(configuracion, file);
+        }
     }
 
     private void exportarServidores() {

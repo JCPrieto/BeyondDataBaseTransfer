@@ -5,11 +5,11 @@ import java.util.List;
 
 public class Carpeta {
 
-    int id;
-    String nombre;
-    boolean sistema;
-    List<Carpeta> carpetas;
-    List<Servidor> servidores;
+    private int id;
+    private String nombre;
+    private boolean sistema;
+    private List<Carpeta> carpetas;
+    private List<Servidor> servidores;
 
     public Carpeta() {
         carpetas = new ArrayList<>();
@@ -26,6 +26,10 @@ public class Carpeta {
     public Carpeta(int id) {
         this();
         this.id = id;
+    }
+
+    public Carpeta(int id, Carpeta origen) {
+        this(origen.getNombre(), false, id);
     }
 
     public int getId() {

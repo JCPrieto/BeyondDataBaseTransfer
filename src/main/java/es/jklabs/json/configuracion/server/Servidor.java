@@ -29,7 +29,28 @@ public class Servidor {
     }
 
     public Servidor(int id) {
+        this();
         this.id = id;
+    }
+
+    public Servidor(int id, Servidor s) {
+        this(id);
+        this.nombre = s.getNombre();
+        this.ip = s.getIp();
+        this.puerto = s.getPuerto();
+        this.metodoLoggin = s.getMetodoLoggin();
+        switch (metodoLoggin) {
+            case CONTRASENA:
+                this.password = s.getPassword();
+                break;
+            case KEY_FILE:
+                this.keyUrl = s.getKeyUrl();
+                break;
+            case KEY_VALUE:
+                this.keyValue = s.getKeyValue();
+                break;
+        }
+        this.servidorBBDD = s.getServidorBBDD();
     }
 
     public int getId() {
