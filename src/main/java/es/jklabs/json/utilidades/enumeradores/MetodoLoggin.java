@@ -3,8 +3,7 @@ package es.jklabs.json.utilidades.enumeradores;
 public enum MetodoLoggin {
 
     CONTRASENA("Contraseña"),
-    KEY_FILE("Archivo de clave rsa"),
-    KEY_VALUE("Clave RSA");
+    KEY_FILE("Archivo de clave rsa");
 
     private final String descripcion;
 

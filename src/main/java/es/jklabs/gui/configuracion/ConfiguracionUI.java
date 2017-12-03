@@ -38,13 +38,10 @@ public class ConfiguracionUI extends JDialog {
     private JTextField txBbddUser;
     private JPasswordField txBbddPasword;
     private JPasswordField txSshPasword;
-    private JTextArea txSshKeyValue;
     private JLabel lbRsaUrlFile;
     private JLabel lbSshPassword;
     private JLabel lbRsaFile;
-    private JLabel lbSshKeyValue;
     private JPanel panelFormularioServidor;
-    private JScrollPane scrollTxSshKeyValue;
     private JButton btnRsaFileChooser;
     private File rsaKeyFIle;
     private JPanel panelBotoneraArbol;
@@ -108,16 +105,12 @@ public class ConfiguracionUI extends JDialog {
             servidor.setUsuario(txSshUser.getText());
             MetodoLoggin metodo = (MetodoLoggin) cbLoginMethod.getSelectedItem();
             servidor.setMetodoLoggin(metodo);
-            switch (metodo) {
-                case CONTRASENA:
-                    servidor.setPassword(UtilidadesEncryptacion.encrypt(String.valueOf(txSshPasword.getPassword())));
-                    break;
-                case KEY_FILE:
-                    servidor.setKeyUrl(rsaKeyFIle.getAbsolutePath());
-                    break;
-                case KEY_VALUE:
-                    servidor.setKeyValue(txSshKeyValue.getText());
-                    break;
+            if (metodo == MetodoLoggin.CONTRASENA) {
+                servidor.setPassword(UtilidadesEncryptacion.encrypt(String.valueOf(txSshPasword.getPassword())));
+
+            } else if (metodo == MetodoLoggin.KEY_FILE) {
+                servidor.setKeyUrl(rsaKeyFIle.getAbsolutePath());
+
             }
             ServidorBBDD servidorBBDD;
             if (servidor.getServidorBBDD() != null) {
@@ -223,20 +216,6 @@ public class ConfiguracionUI extends JDialog {
         btnRsaFileChooser.setVisible(false);
         panelFormularioServidor.add(btnRsaFileChooser, c);
 
-        lbSshKeyValue = new JLabel("Clave RSA");
-        c.gridx = 0;
-        c.gridy = 5;
-        c.anchor = GridBagConstraints.FIRST_LINE_START;
-        lbSshKeyValue.setVisible(false);
-        panelFormularioServidor.add(lbSshKeyValue, c);
-        txSshKeyValue = new JTextArea(5, 20);
-        txSshKeyValue.setLineWrap(true);
-        scrollTxSshKeyValue = new JScrollPane(txSshKeyValue);
-        c.gridx = 1;
-        c.gridy = 5;
-        scrollTxSshKeyValue.setVisible(false);
-        panelFormularioServidor.add(scrollTxSshKeyValue, c);
-
         JLabel lbBbddUser = new JLabel("Usuario BBDD");
         c.gridx = 0;
         c.gridy = 7;
@@ -320,7 +299,7 @@ public class ConfiguracionUI extends JDialog {
 
     private void eliminarServidor(Servidor servidor) {
         Iterator<Servidor> it = configuracion.getServerConfig().getRaiz().getServidores().iterator();
-        if (!eliminarServidor(servidor, it)) {
+        if (eliminarServidor(servidor, it)) {
             eliminarServidor(configuracion.getServerConfig().getRaiz().getCarpetas(), servidor);
         }
     }
@@ -334,13 +313,13 @@ public class ConfiguracionUI extends JDialog {
                 enc = true;
             }
         }
-        return enc;
+        return !enc;
     }
 
     private boolean eliminarServidor(List<Carpeta> carpetas, Servidor servidor) {
         boolean enc = false;
         for (Carpeta c : carpetas) {
-            if (!eliminarServidor(servidor, c.getServidores().iterator())) {
+            if (eliminarServidor(servidor, c.getServidores().iterator())) {
                 enc = eliminarServidor(c.getCarpetas(), servidor);
             }
             if (enc) {
@@ -388,17 +367,13 @@ public class ConfiguracionUI extends JDialog {
                 txPuerto.setText(String.valueOf(servidor.getPuerto()));
                 txSshUser.setText(servidor.getUsuario());
                 cbLoginMethod.setSelectedItem(servidor.getMetodoLoggin());
-                switch (servidor.getMetodoLoggin()) {
-                    case CONTRASENA:
-                        txSshPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getPassword()));
-                        break;
-                    case KEY_FILE:
-                        lbRsaUrlFile.setText(servidor.getKeyUrl());
-                        rsaKeyFIle = new File(servidor.getKeyUrl());
-                        break;
-                    case KEY_VALUE:
-                        txSshKeyValue.setText(servidor.getKeyValue());
-                        break;
+                if (servidor.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
+                    txSshPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getPassword()));
+
+                } else if (servidor.getMetodoLoggin() == MetodoLoggin.KEY_FILE) {
+                    lbRsaUrlFile.setText(servidor.getKeyUrl());
+                    rsaKeyFIle = new File(servidor.getKeyUrl());
+
                 }
                 txBbddUser.setText(servidor.getServidorBBDD().getUsuario());
                 txBbddPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
@@ -483,36 +458,22 @@ public class ConfiguracionUI extends JDialog {
     }
 
     private void seleccionarMetodoAutenticacion() {
-        switch ((MetodoLoggin) cbLoginMethod.getSelectedItem()) {
-            case CONTRASENA:
-                lbSshPassword.setVisible(true);
-                txSshPasword.setVisible(true);
-                lbRsaFile.setVisible(false);
-                lbRsaUrlFile.setText(SELECCIONAR_ARCHIVO);
-                lbRsaUrlFile.setVisible(false);
-                btnRsaFileChooser.setVisible(false);
-                lbSshKeyValue.setVisible(false);
-                scrollTxSshKeyValue.setVisible(false);
-                break;
-            case KEY_FILE:
-                lbSshPassword.setVisible(false);
-                txSshPasword.setVisible(false);
-                lbRsaFile.setVisible(true);
-                lbRsaUrlFile.setVisible(true);
-                btnRsaFileChooser.setVisible(true);
-                lbSshKeyValue.setVisible(false);
-                scrollTxSshKeyValue.setVisible(false);
-                break;
-            case KEY_VALUE:
-                lbSshPassword.setVisible(false);
-                txSshPasword.setVisible(false);
-                lbRsaFile.setVisible(false);
-                lbRsaUrlFile.setText(SELECCIONAR_ARCHIVO);
-                lbRsaUrlFile.setVisible(false);
-                btnRsaFileChooser.setVisible(false);
-                lbSshKeyValue.setVisible(true);
-                scrollTxSshKeyValue.setVisible(true);
-                break;
+        MetodoLoggin i = (MetodoLoggin) cbLoginMethod.getSelectedItem();
+        if (i == MetodoLoggin.CONTRASENA) {
+            lbSshPassword.setVisible(true);
+            txSshPasword.setVisible(true);
+            lbRsaFile.setVisible(false);
+            lbRsaUrlFile.setText(SELECCIONAR_ARCHIVO);
+            lbRsaUrlFile.setVisible(false);
+            btnRsaFileChooser.setVisible(false);
+
+        } else if (i == MetodoLoggin.KEY_FILE) {
+            lbSshPassword.setVisible(false);
+            txSshPasword.setVisible(false);
+            lbRsaFile.setVisible(true);
+            lbRsaUrlFile.setVisible(true);
+            btnRsaFileChooser.setVisible(true);
+
         }
         SwingUtilities.updateComponentTreeUI(panelFormularioServidor);
     }

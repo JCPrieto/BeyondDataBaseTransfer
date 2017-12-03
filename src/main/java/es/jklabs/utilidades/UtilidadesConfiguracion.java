@@ -3,12 +3,15 @@ package es.jklabs.utilidades;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
+import es.jklabs.json.configuracion.server.Esquema;
 import es.jklabs.json.configuracion.server.ServerConfig;
 import es.jklabs.json.configuracion.server.Servidor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class UtilidadesConfiguracion {
 
@@ -81,5 +84,41 @@ public class UtilidadesConfiguracion {
             destino.getCarpetas().add(c);
             addServidores(configuracion, nueva, c);
         }
+    }
+
+    public static void addEsquema(Configuracion configuracion, Servidor sOrigen, Servidor sDestino, String esquema) {
+        ServerConfig serverConfig = configuracion.getServerConfig();
+        Esquema e = new Esquema(esquema);
+        Carpeta raiz = serverConfig.getRaiz();
+        addEsquema(raiz, e, sOrigen, false, sDestino, false);
+        guardarConfiguracion(configuracion);
+    }
+
+    private static void addEsquema(Carpeta raiz, Esquema e, Servidor sOrigen, boolean encOrigen, Servidor sDestino, boolean encDestino) {
+        for (Servidor s : raiz.getServidores()) {
+            encOrigen = addEsquema(e, sOrigen, encOrigen, s);
+            encDestino = addEsquema(e, sDestino, encDestino, s);
+            if (encOrigen && encDestino) {
+                break;
+            }
+        }
+        if (!encOrigen || !encDestino) {
+            for (Carpeta c : raiz.getCarpetas()) {
+                addEsquema(c, e, sOrigen, encOrigen, sDestino, encDestino);
+            }
+        }
+    }
+
+    private static boolean addEsquema(Esquema e, Servidor servidor, boolean enc, Servidor s) {
+        if (!enc && Objects.equals(s, servidor)) {
+            enc = true;
+            if (s.getEsquemas() == null || !s.getEsquemas().contains(e)) {
+                if (s.getEsquemas() == null) {
+                    s.setEsquemas(new ArrayList<>());
+                }
+                s.getEsquemas().add(e);
+            }
+        }
+        return enc;
     }
 }

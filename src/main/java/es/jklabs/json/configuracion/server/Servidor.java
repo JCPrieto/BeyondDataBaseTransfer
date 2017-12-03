@@ -19,11 +19,8 @@ public class Servidor {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private
     String keyUrl;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private
-    String keyValue;
     private ServidorBBDD servidorBBDD;
-    private List<Esquema> servidor;
+    private List<Esquema> esquemas;
 
     public Servidor() {
     }
@@ -39,16 +36,12 @@ public class Servidor {
         this.ip = s.getIp();
         this.puerto = s.getPuerto();
         this.metodoLoggin = s.getMetodoLoggin();
-        switch (metodoLoggin) {
-            case CONTRASENA:
-                this.password = s.getPassword();
-                break;
-            case KEY_FILE:
-                this.keyUrl = s.getKeyUrl();
-                break;
-            case KEY_VALUE:
-                this.keyValue = s.getKeyValue();
-                break;
+        if (metodoLoggin == MetodoLoggin.CONTRASENA) {
+            this.password = s.getPassword();
+
+        } else if (metodoLoggin == MetodoLoggin.KEY_FILE) {
+            this.keyUrl = s.getKeyUrl();
+
         }
         this.servidorBBDD = s.getServidorBBDD();
     }
@@ -117,14 +110,6 @@ public class Servidor {
         this.keyUrl = keyUrl;
     }
 
-    public String getKeyValue() {
-        return keyValue;
-    }
-
-    public void setKeyValue(String keyValue) {
-        this.keyValue = keyValue;
-    }
-
     public ServidorBBDD getServidorBBDD() {
         return servidorBBDD;
     }
@@ -133,12 +118,12 @@ public class Servidor {
         this.servidorBBDD = servidorBBDD;
     }
 
-    public List<Esquema> getServidor() {
-        return servidor;
+    public List<Esquema> getEsquemas() {
+        return esquemas;
     }
 
-    public void setServidor(List<Esquema> servidor) {
-        this.servidor = servidor;
+    public void setEsquemas(List<Esquema> esquemas) {
+        this.esquemas = esquemas;
     }
 
     @Override

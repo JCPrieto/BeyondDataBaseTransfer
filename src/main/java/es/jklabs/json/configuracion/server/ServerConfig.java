@@ -2,13 +2,13 @@ package es.jklabs.json.configuracion.server;
 
 public class ServerConfig {
 
-    Carpeta raiz;
-    int indexCarpeta;
-    int indexServidor;
+    private Carpeta raiz;
+    private int indexCarpeta;
+    private int indexServidor;
 
     public ServerConfig() {
         raiz = new Carpeta("Raiz", true, 1);
-        indexCarpeta = 1;
+        indexCarpeta = 2;
         indexServidor = 1;
     }
 

@@ -6,6 +6,7 @@ import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
+import es.jklabs.utilidades.CopySchema;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 import org.apache.commons.io.FilenameUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
@@ -31,6 +32,7 @@ public class MainUI extends JFrame {
     private JProgressBar progressBar;
     private List<String> listaEsquemas;
     private DefaultMutableTreeNode raizArbolDestino;
+    private JButton btnAceptar;
 
     private MainUI() {
         super("BeyondDataBaseTransfer");
@@ -107,49 +109,44 @@ public class MainUI extends JFrame {
     }
 
     private JPanel cargarFormulario() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        JPanel panelFormulario = new JPanel(new BorderLayout(10, 10));
         JLabel lbEsquema = new JLabel("Esquema");
         txEsquema = new JTextField();
         txEsquema.setColumns(10);
         txEsquema.setFocusTraversalKeysEnabled(false);
         listaEsquemas = new ArrayList<>();
         AutoCompleteDecorator.decorate(txEsquema, listaEsquemas, false);
-        JButton btnAceptar = new JButton("Copiar");
+        btnAceptar = new JButton("Copiar");
         btnAceptar.addActionListener(al -> copiarEsquema());
         progressBar = new JProgressBar(0, 6);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
-        panel.add(lbEsquema, BorderLayout.WEST);
-        panel.add(txEsquema, BorderLayout.CENTER);
-        panel.add(btnAceptar, BorderLayout.EAST);
-        panel.add(progressBar, BorderLayout.SOUTH);
-        return panel;
+        panelFormulario.add(lbEsquema, BorderLayout.WEST);
+        panelFormulario.add(txEsquema, BorderLayout.CENTER);
+        panelFormulario.add(btnAceptar, BorderLayout.EAST);
+        panelFormulario.add(progressBar, BorderLayout.SOUTH);
+        return panelFormulario;
     }
 
     private void copiarEsquema() {
         DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
-        DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
+        DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
         if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
                 () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
-            int count = 1;
-            //ToDo Conectar con el servidor de origen
-            progressBar.setValue(count++);
-            SwingUtilities.updateComponentTreeUI(progressBar);
-            //ToDo Crear dump
-            progressBar.setValue(count++);
-            SwingUtilities.updateComponentTreeUI(progressBar);
-            //ToDo Descargar dump
-            progressBar.setValue(count++);
-            SwingUtilities.updateComponentTreeUI(progressBar);
-            //ToDo Subir dump al destino
-            progressBar.setValue(count++);
-            SwingUtilities.updateComponentTreeUI(progressBar);
-            //ToDo Conectar con el serivdor de destino
-            progressBar.setValue(count++);
-            SwingUtilities.updateComponentTreeUI(progressBar);
-            //ToDo restaurar dump
-            progressBar.setValue(count);
-            SwingUtilities.updateComponentTreeUI(progressBar);
+            btnAceptar.setEnabled(false);
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject
+                    (), txEsquema.getText().trim());
+            task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
+            task.execute();
+            UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+            listaEsquemas.add(txEsquema.getText().trim());
+        }
+    }
+
+    private void changeListener(String propertyName, Object newValue) {
+        if (Objects.equals(propertyName, "progress")) {
+            progressBar.setValue((Integer) newValue);
         }
     }
 
@@ -191,8 +188,8 @@ public class MainUI extends JFrame {
 
     private void cargarEsquemas(Servidor servidor) {
         listaEsquemas.clear();
-        if (servidor.getServidor() != null) {
-            servidor.getServidor().forEach(s -> listaEsquemas.add(s.getNombre()));
+        if (servidor.getEsquemas() != null) {
+            servidor.getEsquemas().forEach(s -> listaEsquemas.add(s.getNombre()));
         }
     }
 
@@ -234,4 +231,9 @@ public class MainUI extends JFrame {
     public Configuracion getConfiguracion() {
         return configuracion;
     }
+
+    public JButton getBtnAceptar() {
+        return btnAceptar;
+    }
+
 }
