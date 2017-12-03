@@ -1,6 +1,7 @@
 package es.jklabs.gui.configuracion;
 
 import es.jklabs.gui.MainUI;
+import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.PuertoDocumentoFilter;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
@@ -130,7 +131,7 @@ public class ConfiguracionUI extends JDialog {
             UtilidadesConfiguracion.guardarConfiguracion(configuracion);
             setEnableArbol(true);
             setEnableFormularioServidor(false);
-            expandAllNodes(arbol, 0, arbol.getRowCount());
+            UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
             SwingUtilities.updateComponentTreeUI(arbol);
         }
     }
@@ -312,7 +313,7 @@ public class ConfiguracionUI extends JDialog {
             }
             parentNode.removeFromParent();
         }
-        expandAllNodes(arbol, 0, arbol.getRowCount());
+        UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
         SwingUtilities.updateComponentTreeUI(arbol);
         UtilidadesConfiguracion.guardarConfiguracion(configuracion);
     }
@@ -404,7 +405,7 @@ public class ConfiguracionUI extends JDialog {
                 setEnableArbol(false);
                 setEnableFormularioServidor(true);
             }
-            expandAllNodes(arbol, 0, arbol.getRowCount());
+            UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
             SwingUtilities.updateComponentTreeUI(arbol);
             UtilidadesConfiguracion.guardarConfiguracion(configuracion);
         }
@@ -441,18 +442,9 @@ public class ConfiguracionUI extends JDialog {
             dialogoCarpeta.setVisible(true);
             ((Carpeta) parentNode.getUserObject()).getCarpetas().add(nuevaCarpeta);
             addCarpeta(parentNode, nuevaCarpeta);
-            expandAllNodes(arbol, 0, arbol.getRowCount());
+            UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
             SwingUtilities.updateComponentTreeUI(arbol);
             UtilidadesConfiguracion.guardarConfiguracion(configuracion);
-        }
-    }
-
-    private void expandAllNodes(JTree tree, int startingIndex, int rowCount) {
-        for (int i = startingIndex; i < rowCount; ++i) {
-            tree.expandRow(i);
-        }
-        if (tree.getRowCount() != rowCount) {
-            expandAllNodes(tree, rowCount, tree.getRowCount());
         }
     }
 
@@ -461,7 +453,7 @@ public class ConfiguracionUI extends JDialog {
         arbol = new JTree(raizArbol);
         arbol.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
-        expandAllNodes(arbol, 0, arbol.getRowCount());
+        UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
         return new JScrollPane(arbol);
     }
 
