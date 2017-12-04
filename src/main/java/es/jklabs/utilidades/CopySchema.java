@@ -9,6 +9,7 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.xfer.FileSystemFile;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 
 public class CopySchema extends SwingWorker<Void, Void> {
@@ -19,12 +20,14 @@ public class CopySchema extends SwingWorker<Void, Void> {
     private final Servidor sDestino;
     private final String esquema;
     private final MainUI parent;
+    private final File directorio;
 
-    public CopySchema(MainUI parent, Servidor sOrigen, Servidor sDestino, String esquema) {
+    public CopySchema(MainUI parent, Servidor sOrigen, Servidor sDestino, String esquema, File directorio) {
         this.parent = parent;
         this.sOrigen = sOrigen;
         this.sDestino = sDestino;
         this.esquema = esquema;
+        this.directorio = directorio;
     }
 
     @Override
@@ -33,7 +36,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
         int count = 1;
         try (SSHClient ssh = new SSHClient()) {
             //Conexion
-            ssh.loadKnownHosts();
+            ssh.addHostKeyVerifier((hostname, port, key) -> true);
             ssh.connect(sOrigen.getIp(), sOrigen.getPuerto());
             if (sOrigen.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
                 ssh.authPassword(sOrigen.getUsuario(), UtilidadesEncryptacion.decrypt(sOrigen.getPassword()));
@@ -51,14 +54,14 @@ public class CopySchema extends SwingWorker<Void, Void> {
             LOG.info("Fin de ejecucion del comando " + cmd.getExitStatus());
             setProgress(count++);
             //Descargar dump
-            ssh.newSCPFileTransfer().download(esquema + ".sql", new FileSystemFile("/home/juanky/"));
+            ssh.newSCPFileTransfer().download(esquema + ".sql", new FileSystemFile(directorio));
             setProgress(count++);
         } catch (IOException e) {
             LOG.error("Copiar esquema", e);
         }
         try (SSHClient ssh = new SSHClient()) {
             //Conectar con el destino
-            ssh.loadKnownHosts();
+            ssh.addHostKeyVerifier((hostname, port, key) -> true);
             ssh.connect(sDestino.getIp(), sDestino.getPuerto());
             if (sDestino.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
                 ssh.authPassword(sDestino.getUsuario(), UtilidadesEncryptacion.decrypt(sDestino.getPassword()));
@@ -68,7 +71,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             Session session = ssh.startSession();
             setProgress(count++);
             //Subir dump
-            String src = "/home/juanky/" + esquema + ".sql";
+            String src = directorio.getPath() + System.getProperty("file.separator") + esquema + ".sql";
             ssh.newSCPFileTransfer().upload(new FileSystemFile(src), "/home/" + sDestino.getUsuario() + "/");
             setProgress(count++);
             Session.Command cmd = session.exec("mysqldump -u " + sDestino.getServidorBBDD().getUsuario() + " -p"

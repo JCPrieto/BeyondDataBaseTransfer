@@ -133,14 +133,20 @@ public class MainUI extends JFrame {
         DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
         if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
                 () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
-            btnAceptar.setEnabled(false);
-            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject
-                    (), txEsquema.getText().trim());
-            task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
-            task.execute();
-            UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim());
-            listaEsquemas.add(txEsquema.getText().trim());
+            JFileChooser fc = new JFileChooser();
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int retorno = fc.showSaveDialog(this);
+            if (retorno == JFileChooser.APPROVE_OPTION) {
+                File directorio = fc.getSelectedFile();
+                btnAceptar.setEnabled(false);
+                this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject
+                        (), txEsquema.getText().trim(), directorio);
+                task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
+                task.execute();
+                UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+                listaEsquemas.add(txEsquema.getText().trim());
+            }
         }
     }
 
