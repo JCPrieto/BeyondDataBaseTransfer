@@ -1,6 +1,7 @@
 package es.jklabs.gui;
 
 import es.jklabs.gui.configuracion.ConfiguracionUI;
+import es.jklabs.gui.dialogos.AcercaDe;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -93,10 +94,16 @@ public class MainUI extends JFrame {
         jmArchivo.add(jmiImportar);
         JMenu jmAyuda = new JMenu("Ayuda");
         JMenuItem jmiAcercaDe = new JMenuItem("Acerca de...");
+        jmiAcercaDe.addActionListener(al -> mostrarAcercaDe());
         jmAyuda.add(jmiAcercaDe);
         menu.add(jmArchivo);
         menu.add(jmAyuda);
         super.setJMenuBar(menu);
+    }
+
+    private void mostrarAcercaDe() {
+        AcercaDe acercaDe = new AcercaDe(this);
+        acercaDe.setVisible(true);
     }
 
     private void cargarPantallaPrincipal() {
