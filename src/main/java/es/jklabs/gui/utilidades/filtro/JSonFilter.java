@@ -10,7 +10,7 @@ public class JSonFilter extends FileFilter {
 
     @Override
     public boolean accept(File f) {
-        return Objects.equals(FilenameUtils.getExtension(f.getName()), "json");
+        return f.isDirectory() || Objects.equals(FilenameUtils.getExtension(f.getName()), "json");
     }
 
     @Override

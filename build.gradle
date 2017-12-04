@@ -1,9 +1,12 @@
 group 'es.jklabs.desktop'
-version '0.0.1-SNAPSHOT'
+version '0.0.1'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
+
+mainClassName = "es.jklabs.Inicio"
 
 repositories {
     mavenCentral()
