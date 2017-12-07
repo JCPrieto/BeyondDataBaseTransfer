@@ -125,7 +125,7 @@ public class MainUI extends JFrame {
         AutoCompleteDecorator.decorate(txEsquema, listaEsquemas, false);
         btnAceptar = new JButton("Copiar");
         btnAceptar.addActionListener(al -> copiarEsquema());
-        progressBar = new JProgressBar(0, 6);
+        progressBar = new JProgressBar(0, 8);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
         panelFormulario.add(lbEsquema, BorderLayout.WEST);
