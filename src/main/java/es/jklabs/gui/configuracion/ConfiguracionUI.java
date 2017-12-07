@@ -1,6 +1,7 @@
 package es.jklabs.gui.configuracion;
 
 import es.jklabs.gui.MainUI;
+import es.jklabs.gui.utilidades.ArbolRendered;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.PuertoDocumentoFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -204,7 +205,8 @@ public class ConfiguracionUI extends JDialog {
         lbRsaFile.setVisible(false);
         panelFormularioServidor.add(lbRsaFile, c);
         lbRsaUrlFile = new JLabel(SELECCIONAR_ARCHIVO);
-        lbRsaUrlFile.setIcon(UIManager.getIcon("FileView.fileIcon"));
+        lbRsaUrlFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
+                ("img/icons/key-file.png"))));
         c.gridx = 1;
         c.gridy = 5;
         lbRsaUrlFile.setVisible(false);
@@ -426,6 +428,7 @@ public class ConfiguracionUI extends JDialog {
     private JScrollPane cargarPanelArbol() {
         cargarArbol();
         arbol = new JTree(raizArbol);
+        arbol.setCellRenderer(new ArbolRendered());
         arbol.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());

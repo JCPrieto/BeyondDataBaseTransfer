@@ -14,8 +14,7 @@
 *.jar
 *.war
 *.ear
-*.zip
-*.tar.gz
+.tar.gz
 *.rar
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
@@ -86,6 +85,5 @@ gradlew
 gradlew.bat
 config.json
 src/main/java/es/jklabs/gui/file/
-src/main/resources/
 src/test/
 src/main/main.iml

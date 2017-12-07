@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 public class AcercaDe extends JDialog {
 
@@ -28,7 +29,8 @@ public class AcercaDe extends JDialog {
         panel.setLayout(new GridBagLayout());
         final GridBagConstraints cns = new GridBagConstraints();
         final JLabel etq1 = new JLabel(
-                "<html><h1>" + Constantes.NOMBRE_APP + " " + Constantes.VERSION + "</h1></html>", JLabel.CENTER);
+                "<html><h1>" + Constantes.NOMBRE_APP + " " + Constantes.VERSION + "</h1></html>", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
+                ("img/icons/database.png"))), JLabel.CENTER);
         cns.fill = GridBagConstraints.HORIZONTAL;
         cns.insets = new Insets(10, 0, 10, 0);
         cns.gridx = 0;

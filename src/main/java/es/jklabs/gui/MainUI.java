@@ -2,6 +2,7 @@ package es.jklabs.gui;
 
 import es.jklabs.gui.configuracion.ConfiguracionUI;
 import es.jklabs.gui.dialogos.AcercaDe;
+import es.jklabs.gui.utilidades.ArbolRendered;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -37,6 +38,8 @@ public class MainUI extends JFrame {
 
     private MainUI() {
         super("BeyondDataBaseTransfer");
+        super.setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
+                ("img/icons/database.png"))).getImage());
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         cargarMenu();
         super.pack();
@@ -83,11 +86,14 @@ public class MainUI extends JFrame {
     private void cargarMenu() {
         JMenuBar menu = new JMenuBar();
         JMenu jmArchivo = new JMenu("Archivo");
-        JMenuItem jmiConfiguracion = new JMenuItem("Configuración");
+        JMenuItem jmiConfiguracion = new JMenuItem("Configuración", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("img/icons/settings.png"))));
         jmiConfiguracion.addActionListener(al -> abrirConfiguracion());
-        JMenuItem jmiExportar = new JMenuItem("Exportar Servidores");
+        JMenuItem jmiExportar = new JMenuItem("Exportar Servidores", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("img/icons/download.png"))));
         jmiExportar.addActionListener(al -> exportarServidores());
-        JMenuItem jmiImportar = new JMenuItem("Importar Servidores");
+        JMenuItem jmiImportar = new JMenuItem("Importar Servidores", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("img/icons/upload.png"))));
         jmiImportar.addActionListener(al -> importarServidores());
         jmArchivo.add(jmiConfiguracion);
         jmArchivo.add(jmiExportar);
@@ -167,6 +173,7 @@ public class MainUI extends JFrame {
         Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
         raizArbolDestino = new DefaultMutableTreeNode(carpetaRaiz);
         arbolDestino = new JTree(raizArbolDestino);
+        arbolDestino.setCellRenderer(new ArbolRendered());
         arbolDestino.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
@@ -178,6 +185,7 @@ public class MainUI extends JFrame {
     private JScrollPane cargarPanelArbolOrigen() {
         cargarArbolOrigen();
         arbolOrigen = new JTree(raizArbolOrigen);
+        arbolOrigen.setCellRenderer(new ArbolRendered());
         arbolOrigen.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         arbolOrigen.addTreeSelectionListener(tsl -> selecionarOrigen());
