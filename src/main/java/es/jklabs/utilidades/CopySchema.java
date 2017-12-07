@@ -75,7 +75,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 String src = directorio.getPath() + System.getProperty("file.separator") + esquema + ".sql";
                 ssh.newSCPFileTransfer().upload(new FileSystemFile(src), "/home/" + sDestino.getUsuario() + "/");
                 setProgress(count++);
-                session.exec("mysqldump -u " + sDestino.getServidorBBDD().getUsuario() + " -p"
+                session.exec("mysql -u " + sDestino.getServidorBBDD().getUsuario() + " -p"
                         + UtilidadesEncryptacion.decrypt(sDestino.getServidorBBDD().getPassword()) + " " + esquema + " < " + esquema + ".sql").join();
                 setProgress(count++);
                 session = ssh.startSession();
