@@ -131,7 +131,7 @@ public class MainUI extends JFrame {
         AutoCompleteDecorator.decorate(txEsquema, listaEsquemas, false);
         btnAceptar = new JButton("Copiar");
         btnAceptar.addActionListener(al -> copiarEsquema());
-        progressBar = new JProgressBar(0, 8);
+        progressBar = new JProgressBar(0, 9);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
         panelFormulario.add(lbEsquema, BorderLayout.WEST);
@@ -146,20 +146,15 @@ public class MainUI extends JFrame {
         DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
         if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
                 () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
-            JFileChooser fc = new JFileChooser();
-            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int retorno = fc.showSaveDialog(this);
-            if (retorno == JFileChooser.APPROVE_OPTION) {
-                File directorio = fc.getSelectedFile();
-                btnAceptar.setEnabled(false);
-                this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject
-                        (), txEsquema.getText().trim(), directorio);
-                task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
-                task.execute();
-                UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim());
-                listaEsquemas.add(txEsquema.getText().trim());
-            }
+            btnAceptar.setEnabled(false);
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(),
+                    (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+            task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
+            task.execute();
+            UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(),
+                    (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+            listaEsquemas.add(txEsquema.getText().trim());
         }
     }
 
