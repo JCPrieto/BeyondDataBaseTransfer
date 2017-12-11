@@ -87,3 +87,4 @@ config.json
 src/main/java/es/jklabs/gui/file/
 src/test/
 src/main/main.iml
+src/main/resources/rebel.xml

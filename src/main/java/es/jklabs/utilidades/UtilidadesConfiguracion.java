@@ -53,6 +53,12 @@ public class UtilidadesConfiguracion {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {
+            if (!new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
+                    UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER).exists()) {
+                File carpeta = new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
+                        UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER);
+                carpeta.mkdir();
+            }
             mapper.writeValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
                     UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON), configuracion);
         } catch (IOException e) {
