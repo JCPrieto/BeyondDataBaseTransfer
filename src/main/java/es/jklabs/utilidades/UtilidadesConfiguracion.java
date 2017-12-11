@@ -1,6 +1,7 @@
 package es.jklabs.utilidades;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Esquema;
@@ -50,6 +51,7 @@ public class UtilidadesConfiguracion {
 
     public static void guardarConfiguracion(Configuracion configuracion) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {
             mapper.writeValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
                     UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON), configuracion);
@@ -74,6 +76,7 @@ public class UtilidadesConfiguracion {
 
     public static void guardarServidores(ServerConfig serverConfig, File file) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {
             mapper.writeValue(file, serverConfig);
         } catch (IOException e) {
