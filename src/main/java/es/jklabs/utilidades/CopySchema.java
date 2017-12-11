@@ -8,6 +8,7 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.xfer.FileSystemFile;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.Objects;
 
@@ -83,6 +84,8 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 session = ssh.startSession();
                 session.exec("rm " + esquema + ".sql").join();
                 setProgress(count);
+                parent.getTrayIcon().displayMessage(esquema, "Copia realizada con éxito", TrayIcon
+                        .MessageType.INFO);
             } catch (Exception e) {
                 LOG.error("Copiar esquema", e);
             }

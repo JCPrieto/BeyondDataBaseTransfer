@@ -9,6 +9,7 @@ import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.utilidades.CopySchema;
+import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 import org.apache.commons.io.FilenameUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
@@ -26,6 +27,8 @@ public class MainUI extends JFrame {
 
     private static final long serialVersionUID = 4591514658240490883L;
 
+    private static final Logger LOG = Logger.getLogger();
+
     private Configuracion configuracion;
     private JTree arbolOrigen;
     private DefaultMutableTreeNode raizArbolOrigen;
@@ -35,6 +38,7 @@ public class MainUI extends JFrame {
     private List<String> listaEsquemas;
     private DefaultMutableTreeNode raizArbolDestino;
     private JButton btnAceptar;
+    private TrayIcon trayIcon;
 
     private MainUI() {
         super("BeyondDataBaseTransfer");
@@ -42,7 +46,24 @@ public class MainUI extends JFrame {
                 ("img/icons/database.png"))).getImage());
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         cargarMenu();
+        cargarNotificaciones();
         super.pack();
+    }
+
+    private void cargarNotificaciones() {
+        SystemTray tray = SystemTray.getSystemTray();
+        //Alternative (if the icon is on the classpath):
+        trayIcon = new TrayIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
+                ("img/icons/database.png"))).getImage(), "Tray Demo");
+        //Let the system resizes the image if needed
+        trayIcon.setImageAutoSize(true);
+        //Set tooltip text for the tray icon
+        trayIcon.setToolTip("BeyondDataBaseTransfer");
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e) {
+            LOG.error("Establecer icono del systray", e);
+        }
     }
 
     public MainUI(Configuracion configuracion) {
@@ -252,4 +273,11 @@ public class MainUI extends JFrame {
         return btnAceptar;
     }
 
+    public TrayIcon getTrayIcon() {
+        return trayIcon;
+    }
+
+    public void setTrayIcon(TrayIcon trayIcon) {
+        this.trayIcon = trayIcon;
+    }
 }
