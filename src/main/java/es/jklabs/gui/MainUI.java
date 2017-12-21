@@ -11,6 +11,7 @@ import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.utilidades.CopySchema;
 import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
+import es.jklabs.utilidades.UtilidadesFirebase;
 import org.apache.commons.io.FilenameUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -38,7 +39,7 @@ public class MainUI extends JFrame {
     private List<String> listaEsquemas;
     private DefaultMutableTreeNode raizArbolDestino;
     private JButton btnAceptar;
-    private TrayIcon trayIcon;
+    private transient TrayIcon trayIcon;
 
     private MainUI() {
         super("BeyondDataBaseTransfer");
@@ -120,11 +121,19 @@ public class MainUI extends JFrame {
         jmArchivo.add(jmiExportar);
         jmArchivo.add(jmiImportar);
         JMenu jmAyuda = new JMenu("Ayuda");
-        JMenuItem jmiAcercaDe = new JMenuItem("Acerca de...");
+        JMenuItem jmiAcercaDe = new JMenuItem("Acerca de...", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("img/icons/info.png"))));
         jmiAcercaDe.addActionListener(al -> mostrarAcercaDe());
         jmAyuda.add(jmiAcercaDe);
         menu.add(jmArchivo);
         menu.add(jmAyuda);
+        if (UtilidadesFirebase.existeNuevaVersion()) {
+            menu.add(Box.createHorizontalGlue());
+            JMenuItem jmActualizacion = new JMenuItem("Existe una nueva versión", new ImageIcon(Objects.requireNonNull
+                    (getClass().getClassLoader().getResource("img/icons/update.png"))));
+            jmActualizacion.addActionListener(al -> UtilidadesFirebase.descargaNuevaVersion(this));
+            menu.add(jmActualizacion);
+        }
         super.setJMenuBar(menu);
     }
 
@@ -277,7 +286,4 @@ public class MainUI extends JFrame {
         return trayIcon;
     }
 
-    public void setTrayIcon(TrayIcon trayIcon) {
-        this.trayIcon = trayIcon;
-    }
 }
