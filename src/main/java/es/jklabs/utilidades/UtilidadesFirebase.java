@@ -55,7 +55,7 @@ public class UtilidadesFirebase {
     private static boolean diferenteVersion(String serverVersion, String appVersion) {
         String[] sv = serverVersion.split("\\.");
         String[] av = appVersion.split("\\.");
-        return Integer.parseInt(sv[0]) > Integer.parseInt(av[0]) || Integer.parseInt(sv[1]) > Integer.parseInt(av[1]) || Integer.parseInt(sv[2]) > Integer.parseInt(av[2]);
+        return Integer.parseInt(sv[0]) > Integer.parseInt(av[0]) || Integer.parseInt(sv[0]) == Integer.parseInt(av[0]) && (Integer.parseInt(sv[1]) > Integer.parseInt(av[1]) || Integer.parseInt(sv[1]) == Integer.parseInt(av[1]) && Integer.parseInt(sv[2]) > Integer.parseInt(av[2]));
     }
 
     private static Aplicacion getAplicacion() {
