@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Paths;
 import java.util.Objects;
 
@@ -81,15 +82,14 @@ public class UtilidadesFirebase {
         int retorno = fc.showSaveDialog(ventana);
         if (retorno == JFileChooser.APPROVE_OPTION) {
             File directorio = fc.getSelectedFile();
-            FirebaseOptions options;
             try {
-                options = new FirebaseOptions.Builder()
-                        .setCredentials(GoogleCredentials.fromStream(ventana.getClass().getClassLoader()
-                                .getResourceAsStream
-                                        ("json/curriculum-a2a80-firebase-adminsdk-17wyo-de15a29f7c.json")))
-                        .setStorageBucket(Constantes.STORAGE_BUCKET)
-                        .build();
                 if (FirebaseApp.getApps().isEmpty()) {
+                    FirebaseOptions options = new FirebaseOptions.Builder()
+                            .setCredentials(GoogleCredentials.fromStream(ventana.getClass().getClassLoader()
+                                    .getResourceAsStream
+                                            ("json/curriculum-a2a80-firebase-adminsdk-17wyo-de15a29f7c.json")))
+                            .setStorageBucket(Constantes.STORAGE_BUCKET)
+                            .build();
                     FirebaseApp.initializeApp(options);
                 }
                 Bucket bucket = StorageClient.getInstance().bucket();
@@ -105,6 +105,10 @@ public class UtilidadesFirebase {
                 } else {
                     LOG.info("Error de lectura de la BBDD");
                 }
+            } catch (AccessDeniedException e) {
+                ventana.getTrayIcon().displayMessage(null, "No tiene permisos para descargar para escribir la ruta " +
+                        "indicada", TrayIcon.MessageType.ERROR);
+                descargaNuevaVersion(ventana);
             } catch (IOException e) {
                 LOG.error("Descargar nueva version", e);
             }
