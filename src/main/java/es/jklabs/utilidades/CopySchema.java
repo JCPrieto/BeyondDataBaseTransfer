@@ -73,7 +73,11 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 setProgress(count++);
                 //Subir dump
                 String src = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + esquema + ".sql";
-                ssh.newSCPFileTransfer().upload(new FileSystemFile(src), "/home/" + sDestino.getUsuario() + "/");
+                if (Objects.equals(sDestino.getUsuario(), "root")) {
+                    ssh.newSCPFileTransfer().upload(new FileSystemFile(src), sDestino.getUsuario() + "/");
+                } else {
+                    ssh.newSCPFileTransfer().upload(new FileSystemFile(src), "/home/" + sDestino.getUsuario() + "/");
+                }
                 setProgress(count++);
                 File file = new File(src);
                 file.delete();
