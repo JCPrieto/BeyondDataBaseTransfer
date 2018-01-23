@@ -13,6 +13,7 @@ import es.jklabs.utilidades.UtilidadesConfiguracion;
 import es.jklabs.utilidades.UtilidadesEncryptacion;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.PlainDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -63,6 +64,7 @@ public class ConfiguracionUI extends JDialog {
 
     private JPanel cargarPanelDerecho() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
         panel.add(cargarFormulario(), BorderLayout.CENTER);
         panel.add(cargarBotoneraFormulario(), BorderLayout.SOUTH);
         setEnableFormularioServidor(false);
@@ -263,7 +265,8 @@ public class ConfiguracionUI extends JDialog {
     }
 
     private JPanel cargarBotoneraArbol() {
-        panelBotoneraArbol = new JPanel(new GridLayout(2, 2));
+        panelBotoneraArbol = new JPanel(new GridLayout(2, 2, 10, 10));
+        panelBotoneraArbol.setBorder(new EmptyBorder(10, 10, 10, 10));
         JButton btnAddFolder = new JButton("Añadir carpeta");
         btnAddFolder.addActionListener(al -> addCarpetaToArbol());
         JButton btnAddServer = new JButton("Añadir servidor");
@@ -360,7 +363,7 @@ public class ConfiguracionUI extends JDialog {
                     (parentPath.getLastPathComponent());
             if (parentNode.getUserObject() instanceof Carpeta) {
                 Carpeta carpeta = (Carpeta) parentNode.getUserObject();
-                DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, carpeta);
+                DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, carpeta, false);
                 dialogoCarpeta.setVisible(true);
             } else if (parentNode.getUserObject() instanceof Servidor) {
                 Servidor servidor = (Servidor) parentNode.getUserObject();
@@ -379,10 +382,10 @@ public class ConfiguracionUI extends JDialog {
                 txBbddPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
                 setEnableArbol(false);
                 setEnableFormularioServidor(true);
+                UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
+                SwingUtilities.updateComponentTreeUI(arbol);
+                UtilidadesConfiguracion.guardarConfiguracion(configuracion);
             }
-            UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
-            SwingUtilities.updateComponentTreeUI(arbol);
-            UtilidadesConfiguracion.guardarConfiguracion(configuracion);
         }
     }
 
@@ -413,13 +416,8 @@ public class ConfiguracionUI extends JDialog {
         }
         if (parentNode.getUserObject() instanceof Carpeta) {
             Carpeta nuevaCarpeta = new Carpeta(UtilidadesConfiguracion.getIdCarpeta(configuracion));
-            DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, nuevaCarpeta);
+            DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, nuevaCarpeta, true);
             dialogoCarpeta.setVisible(true);
-            ((Carpeta) parentNode.getUserObject()).getCarpetas().add(nuevaCarpeta);
-            addCarpeta(parentNode, nuevaCarpeta);
-            UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
-            SwingUtilities.updateComponentTreeUI(arbol);
-            UtilidadesConfiguracion.guardarConfiguracion(configuracion);
         }
     }
 
@@ -436,18 +434,7 @@ public class ConfiguracionUI extends JDialog {
     private void cargarArbol() {
         Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
         raizArbol = new DefaultMutableTreeNode(carpetaRaiz);
-        addElementos(carpetaRaiz, raizArbol);
-    }
-
-    private void addElementos(Carpeta carpetaRaiz, DefaultMutableTreeNode padre) {
-        carpetaRaiz.getCarpetas().forEach(c -> addCarpeta(padre, c));
-        carpetaRaiz.getServidores().forEach(s -> padre.add(new DefaultMutableTreeNode(s)));
-    }
-
-    private void addCarpeta(DefaultMutableTreeNode padre, Carpeta carpeta) {
-        DefaultMutableTreeNode hijo = new DefaultMutableTreeNode(carpeta);
-        padre.add(hijo);
-        addElementos(carpeta, hijo);
+        UtilidadesJTree.addElementos(carpetaRaiz, raizArbol);
     }
 
     public Configuracion getConfiguracion() {
@@ -477,4 +464,19 @@ public class ConfiguracionUI extends JDialog {
         SwingUtilities.updateComponentTreeUI(panelFormularioServidor);
     }
 
+    public JTree getArbol() {
+        return arbol;
+    }
+
+    public void setArbol(JTree arbol) {
+        this.arbol = arbol;
+    }
+
+    public DefaultMutableTreeNode getRaizArbol() {
+        return raizArbol;
+    }
+
+    public void setRaizArbol(DefaultMutableTreeNode raizArbol) {
+        this.raizArbol = raizArbol;
+    }
 }

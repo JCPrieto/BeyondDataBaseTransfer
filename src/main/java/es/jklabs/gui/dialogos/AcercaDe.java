@@ -5,6 +5,7 @@ import es.jklabs.utilidades.Constantes;
 import es.jklabs.utilidades.Logger;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -27,6 +28,7 @@ public class AcercaDe extends JDialog {
     private void cargarPantalla() {
         final JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
         final GridBagConstraints cns = new GridBagConstraints();
         final JLabel etq1 = new JLabel(
                 "<html><h1>" + Constantes.NOMBRE_APP + " " + Constantes.VERSION + "</h1></html>", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource

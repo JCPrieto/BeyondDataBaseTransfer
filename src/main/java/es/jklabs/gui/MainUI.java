@@ -16,6 +16,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
@@ -103,6 +104,12 @@ public class MainUI extends JFrame {
     private void abrirConfiguracion() {
         ConfiguracionUI configuracionUI = new ConfiguracionUI(this, configuracion);
         configuracionUI.setVisible(true);
+        /*cargarArbolOrigen();
+        UtilidadesJTree.expandAllNodes(arbolOrigen, 0, arbolOrigen.getRowCount());
+        SwingUtilities.updateComponentTreeUI(arbolOrigen);
+        cargarArbolDestinoVacio();
+        UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
+        SwingUtilities.updateComponentTreeUI(arbolDestino);*/
     }
 
     private void cargarMenu() {
@@ -144,7 +151,8 @@ public class MainUI extends JFrame {
 
     private void cargarPantallaPrincipal() {
         super.setLayout(new BorderLayout(10, 10));
-        JPanel panelCentral = new JPanel(new GridLayout(1, 2));
+        JPanel panelCentral = new JPanel(new GridLayout(1, 2, 10, 10));
+        panelCentral.setBorder(new EmptyBorder(10, 0, 0, 0));
         panelCentral.add(cargarPanelArbolOrigen());
         panelCentral.add(cargarPanelArbolDestino());
         super.add(panelCentral, BorderLayout.CENTER);
@@ -153,6 +161,7 @@ public class MainUI extends JFrame {
 
     private JPanel cargarFormulario() {
         JPanel panelFormulario = new JPanel(new BorderLayout(10, 10));
+        panelFormulario.setBorder(new EmptyBorder(10, 10, 10, 10));
         JLabel lbEsquema = new JLabel("Esquema");
         txEsquema = new JTextField();
         txEsquema.setColumns(10);
@@ -195,16 +204,20 @@ public class MainUI extends JFrame {
     }
 
     private JScrollPane cargarPanelArbolDestino() {
-        Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
-        raizArbolDestino = new DefaultMutableTreeNode(carpetaRaiz);
+        cargarArbolDestinoVacio();
         arbolDestino = new JTree(raizArbolDestino);
         arbolDestino.setCellRenderer(new ArbolRendered());
         arbolDestino.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
         JScrollPane scroll = new JScrollPane(arbolDestino);
-        scroll.setBorder(BorderFactory.createTitledBorder("Destino"));
+        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 5, 0, 10), "Destino"));
         return scroll;
+    }
+
+    private void cargarArbolDestinoVacio() {
+        Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
+        raizArbolDestino = new DefaultMutableTreeNode(carpetaRaiz);
     }
 
     private JScrollPane cargarPanelArbolOrigen() {
@@ -216,7 +229,7 @@ public class MainUI extends JFrame {
         arbolOrigen.addTreeSelectionListener(tsl -> selecionarOrigen());
         UtilidadesJTree.expandAllNodes(arbolOrigen, 0, arbolOrigen.getRowCount());
         JScrollPane scroll = new JScrollPane(arbolOrigen);
-        scroll.setBorder(BorderFactory.createTitledBorder("Origen"));
+        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 10, 0, 5), "Origen"));
         return scroll;
     }
 
