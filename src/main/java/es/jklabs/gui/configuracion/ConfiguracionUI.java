@@ -428,7 +428,9 @@ public class ConfiguracionUI extends JDialog {
         arbol.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
-        return new JScrollPane(arbol);
+        JScrollPane jScrollPane = new JScrollPane(arbol);
+        jScrollPane.setPreferredSize(new Dimension(200, 300));
+        return jScrollPane;
     }
 
     private void cargarArbol() {
