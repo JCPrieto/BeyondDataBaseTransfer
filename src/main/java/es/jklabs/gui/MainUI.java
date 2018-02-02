@@ -85,7 +85,20 @@ public class MainUI extends JFrame {
         if (retorno == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             UtilidadesConfiguracion.loadServidores(configuracion, file);
+            recargarArboles();
         }
+    }
+
+    private void recargarArboles() {
+        Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
+        raizArbolOrigen.removeAllChildren();
+        addElementos(carpetaRaiz, raizArbolOrigen);
+        arbolOrigen.setModel(new DefaultTreeModel(raizArbolOrigen, false));
+        UtilidadesJTree.expandAllNodes(arbolOrigen, 0, arbolOrigen.getRowCount());
+        SwingUtilities.updateComponentTreeUI(arbolOrigen);
+        raizArbolDestino.removeAllChildren();
+        UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
+        SwingUtilities.updateComponentTreeUI(arbolDestino);
     }
 
     private void exportarServidores() {
@@ -105,15 +118,7 @@ public class MainUI extends JFrame {
     private void abrirConfiguracion() {
         ConfiguracionUI configuracionUI = new ConfiguracionUI(this, configuracion);
         configuracionUI.setVisible(true);
-        Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
-        raizArbolOrigen.removeAllChildren();
-        addElementos(carpetaRaiz, raizArbolOrigen);
-        arbolOrigen.setModel(new DefaultTreeModel(raizArbolOrigen, false));
-        UtilidadesJTree.expandAllNodes(arbolOrigen, 0, arbolOrigen.getRowCount());
-        SwingUtilities.updateComponentTreeUI(arbolOrigen);
-        raizArbolDestino.removeAllChildren();
-        UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
-        SwingUtilities.updateComponentTreeUI(arbolDestino);
+        recargarArboles();
     }
 
     private void cargarMenu() {
