@@ -99,7 +99,6 @@ public class CopySchema extends SwingWorker<Void, Void> {
 
     @Override
     public void done() {
-        parent.getBtnAceptar().setEnabled(true);
-        parent.setCursor(null); //turn off the wait cursor
+        parent.desbloquearPantalla();
     }
 }

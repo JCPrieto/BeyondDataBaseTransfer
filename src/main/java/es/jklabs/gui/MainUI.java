@@ -42,6 +42,8 @@ public class MainUI extends JFrame {
     private DefaultMutableTreeNode raizArbolDestino;
     private JButton btnAceptar;
     private transient TrayIcon trayIcon;
+    private JMenu jmArchivo;
+    private JMenu jmAyuda;
 
     private MainUI() {
         super("BeyondDataBaseTransfer");
@@ -123,7 +125,8 @@ public class MainUI extends JFrame {
 
     private void cargarMenu() {
         JMenuBar menu = new JMenuBar();
-        JMenu jmArchivo = new JMenu("Archivo");
+        jmArchivo = new JMenu("Archivo");
+        jmArchivo.setMargin(new Insets(5, 5, 5, 5));
         JMenuItem jmiConfiguracion = new JMenuItem("Configuración", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("img/icons/settings.png"))));
         jmiConfiguracion.addActionListener(al -> abrirConfiguracion());
@@ -136,7 +139,8 @@ public class MainUI extends JFrame {
         jmArchivo.add(jmiConfiguracion);
         jmArchivo.add(jmiExportar);
         jmArchivo.add(jmiImportar);
-        JMenu jmAyuda = new JMenu("Ayuda");
+        jmAyuda = new JMenu("Ayuda");
+        jmAyuda.setMargin(new Insets(5, 5, 5, 5));
         JMenuItem jmiAcercaDe = new JMenuItem("Acerca de...", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("img/icons/info.png"))));
         jmiAcercaDe.addActionListener(al -> mostrarAcercaDe());
@@ -194,8 +198,7 @@ public class MainUI extends JFrame {
         DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
         if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
                 () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
-            btnAceptar.setEnabled(false);
-            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            bloquearPantalla();
             CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(),
                     (Servidor) destino.getUserObject(), txEsquema.getText().trim());
             task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
@@ -204,6 +207,18 @@ public class MainUI extends JFrame {
                     (Servidor) destino.getUserObject(), txEsquema.getText().trim());
             listaEsquemas.add(txEsquema.getText().trim());
         }
+    }
+
+    private void bloquearPantalla() {
+        jmArchivo.setEnabled(false);
+        jmAyuda.setEnabled(false);
+        arbolOrigen.setEnabled(false);
+        arbolDestino.setEnabled(false);
+        txEsquema.setEnabled(false);
+        Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+        txEsquema.setCursor(waitCursor);
+        btnAceptar.setEnabled(false);
+        this.setCursor(waitCursor);
     }
 
     private void changeListener(String propertyName, Object newValue) {
@@ -307,4 +322,14 @@ public class MainUI extends JFrame {
         return trayIcon;
     }
 
+    public void desbloquearPantalla() {
+        jmArchivo.setEnabled(true);
+        jmAyuda.setEnabled(true);
+        arbolOrigen.setEnabled(true);
+        arbolDestino.setEnabled(true);
+        txEsquema.setEnabled(true);
+        txEsquema.setCursor(null);
+        getBtnAceptar().setEnabled(true);
+        setCursor(null); //turn off the wait cursor
+    }
 }
