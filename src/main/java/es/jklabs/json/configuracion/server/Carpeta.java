@@ -1,10 +1,12 @@
 package es.jklabs.json.configuracion.server;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Carpeta {
+public class Carpeta implements Serializable {
 
+    private static final long serialVersionUID = -3584563633306974634L;
     private int id;
     private String nombre;
     private boolean sistema;

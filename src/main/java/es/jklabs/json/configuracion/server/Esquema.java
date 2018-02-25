@@ -1,9 +1,11 @@
 package es.jklabs.json.configuracion.server;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Esquema {
+public class Esquema implements Serializable {
 
+    private static final long serialVersionUID = 3584818895278056255L;
     String nombre;
 
     public Esquema() {

@@ -4,9 +4,13 @@ import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class JSonFilter extends FileFilter {
+
+    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
 
     @Override
     public boolean accept(File f) {
@@ -15,6 +19,6 @@ public class JSonFilter extends FileFilter {
 
     @Override
     public String getDescription() {
-        return "Archivo JSon (*.json)";
+        return mensajes.getString("file.chooser.json");
     }
 }

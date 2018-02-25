@@ -8,10 +8,7 @@ import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
-import es.jklabs.utilidades.CopySchema;
-import es.jklabs.utilidades.Logger;
-import es.jklabs.utilidades.UtilidadesConfiguracion;
-import es.jklabs.utilidades.UtilidadesFirebase;
+import es.jklabs.utilidades.*;
 import org.apache.commons.io.FilenameUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -22,15 +19,15 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 public class MainUI extends JFrame {
 
     private static final long serialVersionUID = 4591514658240490883L;
 
     private static final Logger LOG = Logger.getLogger();
+    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
 
     private Configuracion configuracion;
     private JTree arbolOrigen;
@@ -46,7 +43,7 @@ public class MainUI extends JFrame {
     private JMenu jmAyuda;
 
     private MainUI() {
-        super("BeyondDataBaseTransfer");
+        super(Constantes.NOMBRE_APP);
         super.setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
                 ("img/icons/database.png"))).getImage());
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -59,15 +56,13 @@ public class MainUI extends JFrame {
         SystemTray tray = SystemTray.getSystemTray();
         //Alternative (if the icon is on the classpath):
         trayIcon = new TrayIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
-                ("img/icons/database.png"))).getImage(), "Tray Demo");
+                ("img/icons/database.png"))).getImage(), Constantes.NOMBRE_APP);
         //Let the system resizes the image if needed
         trayIcon.setImageAutoSize(true);
-        //Set tooltip text for the tray icon
-        trayIcon.setToolTip("BeyondDataBaseTransfer");
         try {
             tray.add(trayIcon);
         } catch (AWTException e) {
-            LOG.error("Establecer icono del systray", e);
+            LOG.error("establecer.icono.systray", e);
         }
     }
 
@@ -125,32 +120,32 @@ public class MainUI extends JFrame {
 
     private void cargarMenu() {
         JMenuBar menu = new JMenuBar();
-        jmArchivo = new JMenu("Archivo");
+        jmArchivo = new JMenu(mensajes.getString("archivo"));
         jmArchivo.setMargin(new Insets(5, 5, 5, 5));
-        JMenuItem jmiConfiguracion = new JMenuItem("Configuración", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("img/icons/settings.png"))));
+        JMenuItem jmiConfiguracion = new JMenuItem(mensajes.getString("configuracion"), new ImageIcon(Objects
+                .requireNonNull(getClass().getClassLoader().getResource("img/icons/settings.png"))));
         jmiConfiguracion.addActionListener(al -> abrirConfiguracion());
-        JMenuItem jmiExportar = new JMenuItem("Exportar Servidores", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("img/icons/download.png"))));
+        JMenuItem jmiExportar = new JMenuItem(mensajes.getString("exportar.servidores"), new ImageIcon(Objects
+                .requireNonNull(getClass().getClassLoader().getResource("img/icons/download.png"))));
         jmiExportar.addActionListener(al -> exportarServidores());
-        JMenuItem jmiImportar = new JMenuItem("Importar Servidores", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("img/icons/upload.png"))));
+        JMenuItem jmiImportar = new JMenuItem(mensajes.getString("importar.servidores"), new ImageIcon(Objects
+                .requireNonNull(getClass().getClassLoader().getResource("img/icons/upload.png"))));
         jmiImportar.addActionListener(al -> importarServidores());
         jmArchivo.add(jmiConfiguracion);
         jmArchivo.add(jmiExportar);
         jmArchivo.add(jmiImportar);
         jmAyuda = new JMenu("Ayuda");
         jmAyuda.setMargin(new Insets(5, 5, 5, 5));
-        JMenuItem jmiAcercaDe = new JMenuItem("Acerca de...", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("img/icons/info.png"))));
+        JMenuItem jmiAcercaDe = new JMenuItem(mensajes.getString("acerca.de"), new ImageIcon(Objects
+                .requireNonNull(getClass().getClassLoader().getResource("img/icons/info.png"))));
         jmiAcercaDe.addActionListener(al -> mostrarAcercaDe());
         jmAyuda.add(jmiAcercaDe);
         menu.add(jmArchivo);
         menu.add(jmAyuda);
         if (UtilidadesFirebase.existeNuevaVersion()) {
             menu.add(Box.createHorizontalGlue());
-            JMenuItem jmActualizacion = new JMenuItem("Existe una nueva versión", new ImageIcon(Objects.requireNonNull
-                    (getClass().getClassLoader().getResource("img/icons/update.png"))));
+            JMenuItem jmActualizacion = new JMenuItem(mensajes.getString("existe.nueva.version"), new ImageIcon
+                    (Objects.requireNonNull(getClass().getClassLoader().getResource("img/icons/update.png"))));
             jmActualizacion.addActionListener(al -> UtilidadesFirebase.descargaNuevaVersion(this));
             menu.add(jmActualizacion);
         }
@@ -175,13 +170,13 @@ public class MainUI extends JFrame {
     private JPanel cargarFormulario() {
         JPanel panelFormulario = new JPanel(new BorderLayout(10, 10));
         panelFormulario.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JLabel lbEsquema = new JLabel("Esquema");
+        JLabel lbEsquema = new JLabel(mensajes.getString("esquema"));
         txEsquema = new JTextField();
         txEsquema.setColumns(10);
         txEsquema.setFocusTraversalKeysEnabled(false);
         listaEsquemas = new ArrayList<>();
         AutoCompleteDecorator.decorate(txEsquema, listaEsquemas, false);
-        btnAceptar = new JButton("Copiar");
+        btnAceptar = new JButton(mensajes.getString("copiar"));
         btnAceptar.addActionListener(al -> copiarEsquema());
         progressBar = new JProgressBar(0, 9);
         progressBar.setValue(0);
@@ -236,7 +231,8 @@ public class MainUI extends JFrame {
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
         JScrollPane scroll = new JScrollPane(arbolDestino);
-        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 5, 0, 10), "Destino"));
+        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 5, 0, 10), mensajes.getString
+                ("destino")));
         scroll.setPreferredSize(new Dimension(200, 300));
         return scroll;
     }
@@ -250,7 +246,8 @@ public class MainUI extends JFrame {
         arbolOrigen.addTreeSelectionListener(tsl -> selecionarOrigen());
         UtilidadesJTree.expandAllNodes(arbolOrigen, 0, arbolOrigen.getRowCount());
         JScrollPane scroll = new JScrollPane(arbolOrigen);
-        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 10, 0, 5), "Origen"));
+        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 10, 0, 5), mensajes.getString
+                ("origen")));
         scroll.setPreferredSize(new Dimension(200, 300));
         return scroll;
     }
@@ -314,7 +311,7 @@ public class MainUI extends JFrame {
         return configuracion;
     }
 
-    public JButton getBtnAceptar() {
+    private JButton getBtnAceptar() {
         return btnAceptar;
     }
 

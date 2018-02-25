@@ -10,9 +10,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 class DialogoCarpeta extends JDialog {
 
+    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = 7372193257865030732L;
     private final Carpeta carpeta;
     private final JTree arbol;
@@ -22,7 +25,7 @@ class DialogoCarpeta extends JDialog {
     private JTextField txNombre;
 
     DialogoCarpeta(ConfiguracionUI configuracionUI, Carpeta carpeta, boolean nuevo) {
-        super(configuracionUI, "Carpeta", true);
+        super(configuracionUI, mensajes.getString("carpeta"), true);
         this.arbol = configuracionUI.getArbol();
         this.configuracion = configuracionUI.getConfiguracion();
         TreePath parentPath = arbol.getSelectionPath();
@@ -40,11 +43,11 @@ class DialogoCarpeta extends JDialog {
     private void cargarPantalla() {
         JPanel formulario = new JPanel(new BorderLayout(10, 10));
         formulario.setBorder(new EmptyBorder(10, 10, 10, 10));
-        formulario.add(new JLabel("Nombre"), BorderLayout.WEST);
+        formulario.add(new JLabel(mensajes.getString("nombre")), BorderLayout.WEST);
         txNombre = new JTextField(carpeta.getNombre());
         txNombre.setColumns(10);
         formulario.add(txNombre, BorderLayout.CENTER);
-        JButton btnAceptar = new JButton("Aceptar");
+        JButton btnAceptar = new JButton(mensajes.getString("aceptar"));
         btnAceptar.addActionListener(al -> guardarNombre());
         formulario.add(btnAceptar, BorderLayout.SOUTH);
         this.add(formulario);

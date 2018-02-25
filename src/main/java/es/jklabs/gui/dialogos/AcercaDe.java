@@ -12,16 +12,19 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class AcercaDe extends JDialog {
 
+    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = -5470046546293155454L;
     private static final Logger LOG = Logger.getLogger();
     private JLabel etq3;
 
     public AcercaDe(MainUI mainUI) {
-        super(mainUI, "Acerca de...", true);
+        super(mainUI, mensajes.getString("acerca.de"), true);
         cargarPantalla();
     }
 
@@ -39,8 +42,7 @@ public class AcercaDe extends JDialog {
         cns.gridy = 0;
         cns.gridwidth = 3;
         panel.add(etq1, cns);
-        final JLabel etq2 = new JLabel("Creado por: Juan Carlos Prieto Silos",
-                JLabel.CENTER);
+        final JLabel etq2 = new JLabel(mensajes.getString("creado.por"), JLabel.CENTER);
         cns.gridy = 1;
         panel.add(etq2, cns);
         etq3 = new JLabel("JuanC.Prieto.Silos@gmail.com", JLabel.CENTER);
@@ -55,7 +57,7 @@ public class AcercaDe extends JDialog {
                                     "mailto:JuanC.Prieto.Silos@gmail.com?subject=BeyondDataBaseTransefer"));
                     etq3.setForeground(Color.red);
                 } catch (IOException | URISyntaxException e1) {
-                    LOG.error("Lanzar ventana envio correo", e1);
+                    LOG.error("app.envio.correo", e1);
                 }
             }
 
@@ -81,7 +83,7 @@ public class AcercaDe extends JDialog {
         });
         cns.gridy = 2;
         panel.add(etq3, cns);
-        JButton botonOk = new JButton("Aceptar");
+        JButton botonOk = new JButton(mensajes.getString("aceptar"));
         botonOk.addActionListener(al -> pressAceptar());
         cns.gridx = 0;
         cns.gridy = 4;

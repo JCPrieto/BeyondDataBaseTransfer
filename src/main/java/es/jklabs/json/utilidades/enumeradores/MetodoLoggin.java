@@ -1,10 +1,14 @@
 package es.jklabs.json.utilidades.enumeradores;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public enum MetodoLoggin {
 
-    CONTRASENA("Contraseña"),
-    KEY_FILE("Archivo de clave rsa");
+    CONTRASENA("contrasena"),
+    KEY_FILE("archivo.clave.rsa");
 
+    private static ResourceBundle enumeradores = ResourceBundle.getBundle("i18n/enumeradores", Locale.getDefault());
     private final String descripcion;
 
     MetodoLoggin(String descripcion) {
@@ -13,6 +17,10 @@ public enum MetodoLoggin {
 
     @Override
     public String toString() {
-        return descripcion;
+        if (enumeradores.containsKey(descripcion)) {
+            return enumeradores.getString(descripcion);
+        } else {
+            return descripcion;
+        }
     }
 }

@@ -20,14 +20,13 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 public class ConfiguracionUI extends JDialog {
 
-    private static final String SELECCIONAR_ARCHIVO = "Seleccionar archivo...";
+    private static final String SELECCIONAR_ARCHIVO = "seleccionar.archivo";
+    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = -5947416101394804262L;
     private Configuracion configuracion;
     private JTree arbol;
@@ -50,7 +49,7 @@ public class ConfiguracionUI extends JDialog {
     private DefaultMutableTreeNode raizArbol;
 
     public ConfiguracionUI(MainUI mainUI, Configuracion configuracion) {
-        super(mainUI, "Servidores", true);
+        super(mainUI, mensajes.getString("servidores"), true);
         this.configuracion = configuracion;
         cargarPantalla();
     }
@@ -78,7 +77,7 @@ public class ConfiguracionUI extends JDialog {
 
     private JPanel cargarBotoneraFormulario() {
         JPanel panel = new JPanel();
-        btnAceptar = new JButton("Aceptar");
+        btnAceptar = new JButton(mensajes.getString("aceptar"));
         btnAceptar.addActionListener(al -> guardarServidor());
         panel.add(btnAceptar);
         return panel;
@@ -140,7 +139,7 @@ public class ConfiguracionUI extends JDialog {
     private JPanel cargarFormulario() {
         panelFormularioServidor = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        JLabel lbNombre = new JLabel("Nombre");
+        JLabel lbNombre = new JLabel(mensajes.getString("nombre"));
         c.gridx = 0;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
@@ -153,7 +152,7 @@ public class ConfiguracionUI extends JDialog {
         c.gridx = 1;
         c.gridy = 0;
         panelFormularioServidor.add(txNombre, c);
-        JLabel lbIp = new JLabel("Host");
+        JLabel lbIp = new JLabel(mensajes.getString("host"));
         c.gridx = 0;
         c.gridy = 1;
         panelFormularioServidor.add(lbIp, c);
@@ -162,7 +161,7 @@ public class ConfiguracionUI extends JDialog {
         c.gridx = 1;
         c.gridy = 1;
         panelFormularioServidor.add(txIp, c);
-        JLabel lbPuerto = new JLabel("Puerto");
+        JLabel lbPuerto = new JLabel(mensajes.getString("puerto"));
         c.gridx = 0;
         c.gridy = 2;
         panelFormularioServidor.add(lbPuerto, c);
@@ -172,7 +171,7 @@ public class ConfiguracionUI extends JDialog {
         c.gridx = 1;
         c.gridy = 2;
         panelFormularioServidor.add(txPuerto, c);
-        JLabel lbSshUser = new JLabel("Usuario SSH");
+        JLabel lbSshUser = new JLabel(mensajes.getString("usuario.ssh"));
         c.gridx = 0;
         c.gridy = 3;
         panelFormularioServidor.add(lbSshUser, c);
@@ -181,7 +180,7 @@ public class ConfiguracionUI extends JDialog {
         c.gridx = 1;
         c.gridy = 3;
         panelFormularioServidor.add(txSshUser, c);
-        JLabel lbLoginMethod = new JLabel("Metodo de autenticación");
+        JLabel lbLoginMethod = new JLabel(mensajes.getString("metodo.autenticacion"));
         c.gridx = 0;
         c.gridy = 4;
         panelFormularioServidor.add(lbLoginMethod, c);
@@ -191,7 +190,7 @@ public class ConfiguracionUI extends JDialog {
         c.gridy = 4;
         panelFormularioServidor.add(cbLoginMethod, c);
 
-        lbSshPassword = new JLabel("Contraseña SSH");
+        lbSshPassword = new JLabel(mensajes.getString("contrasena.ssh"));
         c.gridx = 0;
         c.gridy = 5;
         panelFormularioServidor.add(lbSshPassword, c);
@@ -201,26 +200,26 @@ public class ConfiguracionUI extends JDialog {
         c.gridy = 5;
         panelFormularioServidor.add(txSshPasword, c);
 
-        lbRsaFile = new JLabel("Archivo de clave RSA");
+        lbRsaFile = new JLabel(mensajes.getString("archivo.clave.rsa"));
         c.gridx = 0;
         c.gridy = 5;
         lbRsaFile.setVisible(false);
         panelFormularioServidor.add(lbRsaFile, c);
-        lbRsaUrlFile = new JLabel(SELECCIONAR_ARCHIVO);
+        lbRsaUrlFile = new JLabel(mensajes.getString(SELECCIONAR_ARCHIVO));
         lbRsaUrlFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
                 ("img/icons/key-file.png"))));
         c.gridx = 1;
         c.gridy = 5;
         lbRsaUrlFile.setVisible(false);
         panelFormularioServidor.add(lbRsaUrlFile, c);
-        btnRsaFileChooser = new JButton("Seleccionar");
+        btnRsaFileChooser = new JButton(mensajes.getString("seleccionar"));
         btnRsaFileChooser.addActionListener(ae -> seleccionarRsaKeyFile());
         c.gridx = 1;
         c.gridy = 6;
         btnRsaFileChooser.setVisible(false);
         panelFormularioServidor.add(btnRsaFileChooser, c);
 
-        JLabel lbBbddUser = new JLabel("Usuario BBDD");
+        JLabel lbBbddUser = new JLabel(mensajes.getString("usuario.bbdd"));
         c.gridx = 0;
         c.gridy = 7;
         c.anchor = GridBagConstraints.LINE_START;
@@ -230,7 +229,7 @@ public class ConfiguracionUI extends JDialog {
         c.gridx = 1;
         c.gridy = 7;
         panelFormularioServidor.add(txBbddUser, c);
-        JLabel lbBbddPassword = new JLabel("Contraseña BBDD");
+        JLabel lbBbddPassword = new JLabel(mensajes.getString("contrasena.bbdd"));
         c.gridx = 0;
         c.gridy = 8;
         panelFormularioServidor.add(lbBbddPassword, c);
@@ -252,7 +251,7 @@ public class ConfiguracionUI extends JDialog {
             rsaKeyFIle = fc.getSelectedFile();
             lbRsaUrlFile.setText(rsaKeyFIle.getName());
         } else {
-            lbRsaUrlFile.setText(SELECCIONAR_ARCHIVO);
+            lbRsaUrlFile.setText(mensajes.getString(SELECCIONAR_ARCHIVO));
         }
     }
 
@@ -267,13 +266,13 @@ public class ConfiguracionUI extends JDialog {
     private JPanel cargarBotoneraArbol() {
         panelBotoneraArbol = new JPanel(new GridLayout(2, 2, 10, 10));
         panelBotoneraArbol.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JButton btnAddFolder = new JButton("Añadir carpeta");
+        JButton btnAddFolder = new JButton(mensajes.getString("anadir.carpeta"));
         btnAddFolder.addActionListener(al -> addCarpetaToArbol());
-        JButton btnAddServer = new JButton("Añadir servidor");
+        JButton btnAddServer = new JButton(mensajes.getString("anadir.servidor"));
         btnAddServer.addActionListener(al -> addServidorToArbol());
-        JButton btnEdit = new JButton("Editar");
+        JButton btnEdit = new JButton(mensajes.getString("editar"));
         btnEdit.addActionListener(al -> editarNodoArbol());
-        JButton btnDelete = new JButton("Eliminar");
+        JButton btnDelete = new JButton(mensajes.getString("eliminar"));
         btnDelete.addActionListener(al -> eliminarNodoArbol());
         panelBotoneraArbol.add(btnAddFolder);
         panelBotoneraArbol.add(btnAddServer);
@@ -453,7 +452,7 @@ public class ConfiguracionUI extends JDialog {
             lbSshPassword.setVisible(true);
             txSshPasword.setVisible(true);
             lbRsaFile.setVisible(false);
-            lbRsaUrlFile.setText(SELECCIONAR_ARCHIVO);
+            lbRsaUrlFile.setText(mensajes.getString(SELECCIONAR_ARCHIVO));
             lbRsaUrlFile.setVisible(false);
             btnRsaFileChooser.setVisible(false);
         } else if (i == MetodoLoggin.KEY_FILE) {
@@ -470,15 +469,8 @@ public class ConfiguracionUI extends JDialog {
         return arbol;
     }
 
-    public void setArbol(JTree arbol) {
-        this.arbol = arbol;
-    }
-
     public DefaultMutableTreeNode getRaizArbol() {
         return raizArbol;
     }
 
-    public void setRaizArbol(DefaultMutableTreeNode raizArbol) {
-        this.raizArbol = raizArbol;
-    }
 }

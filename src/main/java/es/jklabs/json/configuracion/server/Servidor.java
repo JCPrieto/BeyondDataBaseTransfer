@@ -3,10 +3,12 @@ package es.jklabs.json.configuracion.server;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import es.jklabs.json.utilidades.enumeradores.MetodoLoggin;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Servidor {
+public class Servidor implements Serializable {
 
+    private static final long serialVersionUID = -6230755833251637068L;
     private int id;
     private String nombre;
     private String ip;

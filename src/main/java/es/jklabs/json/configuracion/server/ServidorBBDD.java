@@ -1,7 +1,10 @@
 package es.jklabs.json.configuracion.server;
 
-public class ServidorBBDD {
+import java.io.Serializable;
 
+public class ServidorBBDD implements Serializable {
+
+    private static final long serialVersionUID = 930490770186059126L;
     String usuario;
     String password;
 
