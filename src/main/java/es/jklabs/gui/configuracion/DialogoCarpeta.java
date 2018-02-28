@@ -1,9 +1,11 @@
 package es.jklabs.gui.configuracion;
 
+import es.jklabs.gui.utilidades.Dialogos;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
+import es.jklabs.utilidades.UtilidadesString;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -55,7 +57,7 @@ class DialogoCarpeta extends JDialog {
     }
 
     private void guardarNombre() {
-        if (!txNombre.getText().trim().isEmpty()) {
+        if (UtilidadesString.notEmpty(txNombre)) {
             carpeta.setNombre(txNombre.getText());
             if (nuevo) {
                 ((Carpeta) parentNode.getUserObject()).getCarpetas().add(carpeta);
@@ -66,7 +68,7 @@ class DialogoCarpeta extends JDialog {
             UtilidadesConfiguracion.guardarConfiguracion(configuracion);
             super.dispose();
         } else {
-            //ToDo
+            Dialogos.mostrarAviso(this, "anadir.carpeta", "nombre.carpeta.vacio");
         }
     }
 }

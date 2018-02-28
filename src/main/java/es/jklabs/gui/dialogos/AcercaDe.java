@@ -1,8 +1,8 @@
 package es.jklabs.gui.dialogos;
 
 import es.jklabs.gui.MainUI;
+import es.jklabs.gui.utilidades.Dialogos;
 import es.jklabs.utilidades.Constantes;
-import es.jklabs.utilidades.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +20,6 @@ public class AcercaDe extends JDialog {
 
     private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = -5470046546293155454L;
-    private static final Logger LOG = Logger.getLogger();
     private JLabel etq3;
 
     public AcercaDe(MainUI mainUI) {
@@ -57,7 +56,7 @@ public class AcercaDe extends JDialog {
                                     "mailto:JuanC.Prieto.Silos@gmail.com?subject=BeyondDataBaseTransefer"));
                     etq3.setForeground(Color.red);
                 } catch (IOException | URISyntaxException e1) {
-                    LOG.error("app.envio.correo", e1);
+                    Dialogos.mostrarError(AcercaDe.this, "acerca.de", "app.envio.correo", e1);
                 }
             }
 

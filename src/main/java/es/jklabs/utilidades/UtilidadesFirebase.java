@@ -25,11 +25,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class UtilidadesFirebase {
 
     private static final Logger LOG = Logger.getLogger();
+    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
+    private static ResourceBundle errores = ResourceBundle.getBundle("i18n/errores", Locale.getDefault());
 
     private UtilidadesFirebase() {
 
@@ -48,7 +52,7 @@ public class UtilidadesFirebase {
                 return diferenteVersion(aplicacion.getUltimaVersion(), Constantes.VERSION);
             }
         } catch (IOException e) {
-            LOG.error("Consultar nueva version en la aplicacion", e);
+            LOG.error("consultar.nueva.version", e);
         }
         return false;
     }
@@ -71,7 +75,7 @@ public class UtilidadesFirebase {
                 return mapper.readValue(rd, Aplicacion.class);
             }
         } catch (IOException e) {
-            LOG.error("Consultar nueva version en la aplicacion", e);
+            LOG.error("consultar.nueva.version", e);
         }
         return null;
     }
@@ -100,17 +104,17 @@ public class UtilidadesFirebase {
                             .BlobGetOption.fields(Storage.BlobField.SIZE));
                     blob.downloadTo(Paths.get(directorio.getPath() + System.getProperty("file.separator") + getNombreApp(app)));
                     actualizarNumDescargas();
-                    ventana.getTrayIcon().displayMessage(null, "Nueva version descargada completamente", TrayIcon
-                            .MessageType.INFO);
+                    ventana.getTrayIcon().displayMessage(null, mensajes.getString("nueva.version.descargada"),
+                            TrayIcon.MessageType.INFO);
                 } else {
                     LOG.info("Error de lectura de la BBDD");
                 }
             } catch (AccessDeniedException e) {
-                ventana.getTrayIcon().displayMessage(null, "No tiene permisos para descargar para escribir la ruta " +
-                        "indicada", TrayIcon.MessageType.ERROR);
+                ventana.getTrayIcon().displayMessage(null, errores.getString("path.sin.permiso.escritura"), TrayIcon
+                        .MessageType.ERROR);
                 descargaNuevaVersion(ventana);
             } catch (IOException e) {
-                LOG.error("Descargar nueva version", e);
+                LOG.error("descargar.nueva.version", e);
             }
         }
     }
@@ -130,7 +134,7 @@ public class UtilidadesFirebase {
             put.setEntity(params);
             client.execute(put);
         } else {
-            LOG.info("Error de lectura de la BBDD");
+            LOG.info("lectura.bbdd.firebase");
         }
     }
 }
