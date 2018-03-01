@@ -1,6 +1,7 @@
 package es.jklabs.utilidades;
 
 import es.jklabs.gui.MainUI;
+import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.json.utilidades.enumeradores.MetodoLoggin;
 import net.schmizz.sshj.SSHClient;
@@ -8,14 +9,12 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.xfer.FileSystemFile;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.util.Objects;
 
 public class CopySchema extends SwingWorker<Void, Void> {
 
-    private static final Logger LOG = Logger.getLogger();
-
+    public static final String COPIAR_ESQUEMA = "copiar.esquema";
     private final Servidor sOrigen;
     private final Servidor sDestino;
     private final String esquema;
@@ -57,7 +56,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             setProgress(count++);
             origenOk = true;
         } catch (Exception e) {
-            LOG.error("Copiar esquema", e);
+            Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
         }
         if (origenOk) {
             try (SSHClient ssh = new SSHClient()) {
@@ -88,10 +87,9 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 session = ssh.startSession();
                 session.exec("rm " + esquema + ".sql").join();
                 setProgress(count);
-                parent.getTrayIcon().displayMessage(esquema, "Copia realizada con éxito", TrayIcon
-                        .MessageType.INFO);
+                Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
             } catch (Exception e) {
-                LOG.error("Copiar esquema", e);
+                Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
             }
         }
         return null;

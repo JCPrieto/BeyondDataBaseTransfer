@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 import es.jklabs.gui.MainUI;
+import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.firebase.Aplicacion;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,22 +19,17 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
 public class UtilidadesFirebase {
 
     private static final Logger LOG = Logger.getLogger();
-    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
-    private static ResourceBundle errores = ResourceBundle.getBundle("i18n/errores", Locale.getDefault());
 
     private UtilidadesFirebase() {
 
@@ -104,14 +100,12 @@ public class UtilidadesFirebase {
                             .BlobGetOption.fields(Storage.BlobField.SIZE));
                     blob.downloadTo(Paths.get(directorio.getPath() + System.getProperty("file.separator") + getNombreApp(app)));
                     actualizarNumDescargas();
-                    ventana.getTrayIcon().displayMessage(null, mensajes.getString("nueva.version.descargada"),
-                            TrayIcon.MessageType.INFO);
+                    Growls.mostrarInfo(ventana, null, "nueva.version.descargada");
                 } else {
                     LOG.info("Error de lectura de la BBDD");
                 }
             } catch (AccessDeniedException e) {
-                ventana.getTrayIcon().displayMessage(null, errores.getString("path.sin.permiso.escritura"), TrayIcon
-                        .MessageType.ERROR);
+                Growls.mostrarError(ventana, null, "path.sin.permiso.escritura", e);
                 descargaNuevaVersion(ventana);
             } catch (IOException e) {
                 LOG.error("descargar.nueva.version", e);

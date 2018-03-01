@@ -2,7 +2,7 @@ package es.jklabs.gui.configuracion;
 
 import es.jklabs.gui.MainUI;
 import es.jklabs.gui.utilidades.ArbolRendered;
-import es.jklabs.gui.utilidades.Dialogos;
+import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.PuertoDocumentoFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -27,10 +27,12 @@ import java.util.List;
 
 public class ConfiguracionUI extends JDialog {
 
+    private static final String ANADIR_CARPETA = "anadir.carpeta";
     private static final String ANADIR_SERVIDOR = "anadir.servidor";
     private static final String SELECCIONAR_ARCHIVO = "seleccionar.archivo";
     private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = -5947416101394804262L;
+    private MainUI padre;
     private Configuracion configuracion;
     private JTree arbol;
     private JButton btnAceptar;
@@ -54,6 +56,7 @@ public class ConfiguracionUI extends JDialog {
 
     public ConfiguracionUI(MainUI mainUI, Configuracion configuracion) {
         super(mainUI, mensajes.getString("servidores"), true);
+        this.padre = mainUI;
         this.configuracion = configuracion;
         cargarPantalla();
     }
@@ -94,7 +97,6 @@ public class ConfiguracionUI extends JDialog {
     private void cancelarCreacionServidor() {
         setEnableArbol(true);
         setEnableFormularioServidor(false);
-        //UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
         SwingUtilities.updateComponentTreeUI(arbol);
     }
 
@@ -156,35 +158,35 @@ public class ConfiguracionUI extends JDialog {
         boolean valido = true;
         if (UtilidadesString.isEmpty(txNombre)) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "nombre.servidor.vacio");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "nombre.servidor.vacio");
         }
         if (UtilidadesString.isEmpty(txIp)) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "ip.servidor.vacio");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "ip.servidor.vacio");
         }
         if (UtilidadesString.isEmpty(txPuerto)) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "puerto.servidor.vacio");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "puerto.servidor.vacio");
         }
         if (UtilidadesString.isEmpty(txSshUser)) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "usuario.ssh.servidor.vacio");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "usuario.ssh.servidor.vacio");
         }
         if (cbLoginMethod.getSelectedItem() == MetodoLoggin.CONTRASENA && UtilidadesString.isEmpty(txSshPasword)) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "password.ssh.servidor.vacio");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "password.ssh.servidor.vacio");
         }
         if (cbLoginMethod.getSelectedItem() == MetodoLoggin.KEY_FILE && rsaKeyFile == null) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "no.rsa.key");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "no.rsa.key");
         }
         if (UtilidadesString.isEmpty(txBbddUser)) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "usuario.bbdd.servidor.vacio");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "usuario.bbdd.servidor.vacio");
         }
         if (UtilidadesString.isEmpty(txBbddPasword)) {
             valido = false;
-            Dialogos.mostrarAviso(this, ANADIR_SERVIDOR, "password.bbdd.servidor.vacio");
+            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "password.bbdd.servidor.vacio");
         }
         return valido;
     }
@@ -324,7 +326,7 @@ public class ConfiguracionUI extends JDialog {
     private JPanel cargarBotoneraArbol() {
         panelBotoneraArbol = new JPanel(new GridLayout(2, 2, 10, 10));
         panelBotoneraArbol.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JButton btnAddFolder = new JButton(mensajes.getString("anadir.carpeta"));
+        JButton btnAddFolder = new JButton(mensajes.getString(ANADIR_CARPETA));
         btnAddFolder.addActionListener(al -> addCarpetaToArbol());
         JButton btnAddServer = new JButton(mensajes.getString(ANADIR_SERVIDOR));
         btnAddServer.addActionListener(al -> addServidorToArbol());
@@ -460,7 +462,7 @@ public class ConfiguracionUI extends JDialog {
             setEnableFormularioServidor(true);
             SwingUtilities.updateComponentTreeUI(arbol);
         } else {
-            Dialogos.mostrarAviso(this, "anadir.carpeta", "anadir.servidor.en.servidor");
+            Growls.mostrarAviso(padre, ANADIR_CARPETA, "anadir.servidor.en.servidor");
         }
     }
 
@@ -478,7 +480,7 @@ public class ConfiguracionUI extends JDialog {
             DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, nuevaCarpeta, true);
             dialogoCarpeta.setVisible(true);
         } else {
-            Dialogos.mostrarAviso(this, "anadir.carpeta", "anadir.carpeta.en.servidor");
+            Growls.mostrarAviso(padre, ANADIR_CARPETA, "anadir.carpeta.en.servidor");
         }
     }
 
@@ -535,4 +537,11 @@ public class ConfiguracionUI extends JDialog {
         return raizArbol;
     }
 
+    public MainUI getPadre() {
+        return padre;
+    }
+
+    public void setPadre(MainUI padre) {
+        this.padre = padre;
+    }
 }

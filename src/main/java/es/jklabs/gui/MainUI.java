@@ -3,6 +3,7 @@ package es.jklabs.gui;
 import es.jklabs.gui.configuracion.ConfiguracionUI;
 import es.jklabs.gui.dialogos.AcercaDe;
 import es.jklabs.gui.utilidades.ArbolRendered;
+import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -27,6 +28,7 @@ public class MainUI extends JFrame {
     private static final long serialVersionUID = 4591514658240490883L;
 
     private static final Logger LOG = Logger.getLogger();
+    private static final String COPIAR_ESQUEMA = "copiar.esquema";
     private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
 
     private Configuracion configuracion;
@@ -189,19 +191,40 @@ public class MainUI extends JFrame {
     }
 
     private void copiarEsquema() {
-        DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
-        DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
-        if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
-                () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
-            bloquearPantalla();
-            CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(),
-                    (Servidor) destino.getUserObject(), txEsquema.getText().trim());
-            task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
-            task.execute();
-            UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(),
-                    (Servidor) destino.getUserObject(), txEsquema.getText().trim());
-            listaEsquemas.add(txEsquema.getText().trim());
+        if (validaCopiado()) {
+            DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
+            DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
+            if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
+                    () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
+                bloquearPantalla();
+                CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(),
+                        (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+                task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
+                task.execute();
+                UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(),
+                        (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+                listaEsquemas.add(txEsquema.getText().trim());
+            }
         }
+    }
+
+    private boolean validaCopiado() {
+        boolean valido = true;
+        DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
+        if (origen == null || !(origen.getUserObject() instanceof Servidor)) {
+            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "bbdd.origen.vacio");
+            valido = false;
+        }
+        DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
+        if (destino == null || !(destino.getUserObject() instanceof Servidor)) {
+            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "bbdd.destino.vacio");
+            valido = false;
+        }
+        if (UtilidadesString.isEmpty(txEsquema)) {
+            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "nombre.esquema.vacio");
+            valido = false;
+        }
+        return valido;
     }
 
     private void bloquearPantalla() {
