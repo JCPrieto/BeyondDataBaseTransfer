@@ -20,6 +20,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -144,14 +145,27 @@ public class MainUI extends JFrame {
         jmAyuda.add(jmiAcercaDe);
         menu.add(jmArchivo);
         menu.add(jmAyuda);
-        if (UtilidadesFirebase.existeNuevaVersion()) {
-            menu.add(Box.createHorizontalGlue());
-            JMenuItem jmActualizacion = new JMenuItem(mensajes.getString("existe.nueva.version"), new ImageIcon
-                    (Objects.requireNonNull(getClass().getClassLoader().getResource("img/icons/update.png"))));
-            jmActualizacion.addActionListener(al -> UtilidadesFirebase.descargaNuevaVersion(this));
-            menu.add(jmActualizacion);
+        try {
+            if (UtilidadesFirebase.existeNuevaVersion()) {
+                menu.add(Box.createHorizontalGlue());
+                JMenuItem jmActualizacion = new JMenuItem(mensajes.getString("existe.nueva.version"), new ImageIcon
+                        (Objects.requireNonNull(getClass().getClassLoader().getResource("img/icons/update.png"))));
+                jmActualizacion.addActionListener(al -> descargarNuevaVersion());
+                menu.add(jmActualizacion);
+            }
+        } catch (IOException | InterruptedException e) {
+            LOG.error("consultar.nueva.version", e);
         }
         super.setJMenuBar(menu);
+    }
+
+    private void descargarNuevaVersion() {
+        try {
+            UtilidadesFirebase.descargaNuevaVersion(this);
+        } catch (InterruptedException e) {
+            Growls.mostrarError(this, "descargar.nueva.version", e);
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void mostrarAcercaDe() {

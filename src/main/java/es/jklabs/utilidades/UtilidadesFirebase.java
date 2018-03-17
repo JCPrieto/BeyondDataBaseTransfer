@@ -1,6 +1,5 @@
 package es.jklabs.utilidades;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
@@ -8,49 +7,46 @@ import com.google.cloud.storage.Storage;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
+import com.google.firebase.database.*;
 import es.jklabs.gui.MainUI;
 import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.firebase.Aplicacion;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import javax.swing.*;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Paths;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public class UtilidadesFirebase {
 
     private static final Logger LOG = Logger.getLogger();
+    private static final String REFERENCE = "aplicaciones/BeyondDataBaseTransfer";
 
     private UtilidadesFirebase() {
 
     }
 
-    public static boolean existeNuevaVersion() {
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet("https://curriculum-a2a80.firebaseio.com/aplicaciones/BeyondDataBaseTransfer.json");
-        try {
-            HttpResponse response = client.execute(request);
-            if (Objects.equals(response.getStatusLine().getStatusCode(), HttpResponseCode.OK)) {
-                BufferedReader rd = new BufferedReader(
-                        new InputStreamReader(response.getEntity().getContent()));
-                ObjectMapper mapper = new ObjectMapper();
-                Aplicacion aplicacion = mapper.readValue(rd, Aplicacion.class);
-                return diferenteVersion(aplicacion.getUltimaVersion(), Constantes.VERSION);
-            }
-        } catch (IOException e) {
-            LOG.error("consultar.nueva.version", e);
+    public static boolean existeNuevaVersion() throws IOException, InterruptedException {
+        instanciarFirebase();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(REFERENCE);
+        Aplicacion app = getAplicacion(ref);
+        return diferenteVersion(app.getUltimaVersion(), Constantes.VERSION);
+    }
+
+    private static void instanciarFirebase() throws IOException {
+        if (FirebaseApp.getApps().isEmpty()) {
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(UtilidadesFirebase.class.getClassLoader()
+                            .getResourceAsStream
+                                    ("json/curriculum-a2a80-firebase-adminsdk-17wyo-de15a29f7c.json")))
+                    .setStorageBucket(Constantes.STORAGE_BUCKET).setDatabaseUrl
+                            ("https://curriculum-a2a80.firebaseio.com").build();
+            FirebaseApp.initializeApp(options);
         }
-        return false;
     }
 
     private static boolean diferenteVersion(String serverVersion, String appVersion) {
@@ -59,43 +55,40 @@ public class UtilidadesFirebase {
         return Integer.parseInt(sv[0]) > Integer.parseInt(av[0]) || Integer.parseInt(sv[0]) == Integer.parseInt(av[0]) && (Integer.parseInt(sv[1]) > Integer.parseInt(av[1]) || Integer.parseInt(sv[1]) == Integer.parseInt(av[1]) && Integer.parseInt(sv[2]) > Integer.parseInt(av[2]));
     }
 
-    private static Aplicacion getAplicacion() {
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet("https://curriculum-a2a80.firebaseio.com/aplicaciones/BeyondDataBaseTransfer.json");
-        try {
-            HttpResponse response = client.execute(request);
-            if (Objects.equals(response.getStatusLine().getStatusCode(), HttpResponseCode.OK)) {
-                BufferedReader rd = new BufferedReader(
-                        new InputStreamReader(response.getEntity().getContent()));
-                ObjectMapper mapper = new ObjectMapper();
-                return mapper.readValue(rd, Aplicacion.class);
+    private static Aplicacion getAplicacion(DatabaseReference ref) throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        Aplicacion app = new Aplicacion();
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Aplicacion snap = snapshot.getValue(Aplicacion.class);
+                app.setNumDescargas(snap.getNumDescargas());
+                app.setUltimaVersion(snap.getUltimaVersion());
+                latch.countDown();
             }
-        } catch (IOException e) {
-            LOG.error("consultar.nueva.version", e);
-        }
-        return null;
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                LOG.info(error.getMessage());
+                latch.countDown();
+            }
+        });
+        latch.await();
+        return app;
     }
 
-    public static void descargaNuevaVersion(MainUI ventana) {
+    public static void descargaNuevaVersion(MainUI ventana) throws InterruptedException {
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int retorno = fc.showSaveDialog(ventana);
         if (retorno == JFileChooser.APPROVE_OPTION) {
             File directorio = fc.getSelectedFile();
             try {
-                if (FirebaseApp.getApps().isEmpty()) {
-                    FirebaseOptions options = new FirebaseOptions.Builder()
-                            .setCredentials(GoogleCredentials.fromStream(ventana.getClass().getClassLoader()
-                                    .getResourceAsStream
-                                            ("json/curriculum-a2a80-firebase-adminsdk-17wyo-de15a29f7c.json")))
-                            .setStorageBucket(Constantes.STORAGE_BUCKET)
-                            .build();
-                    FirebaseApp.initializeApp(options);
-                }
+                instanciarFirebase();
                 Bucket bucket = StorageClient.getInstance().bucket();
                 Storage storage = bucket.getStorage();
-                Aplicacion app = getAplicacion();
-                if (app != null) {
+                Aplicacion app = getAplicacion(FirebaseDatabase.getInstance().getReference(REFERENCE));
+                if (app.getUltimaVersion() != null) {
                     Blob blob = storage.get(Constantes.STORAGE_BUCKET, getNombreApp(app), Storage
                             .BlobGetOption.fields(Storage.BlobField.SIZE));
                     blob.downloadTo(Paths.get(directorio.getPath() + System.getProperty("file.separator") + getNombreApp(app)));
@@ -117,18 +110,12 @@ public class UtilidadesFirebase {
         return Constantes.NOMBRE_APP + "-" + app.getUltimaVersion() + ".zip";
     }
 
-    private static void actualizarNumDescargas() throws IOException {
-        Aplicacion app = getAplicacion();
-        if (app != null) {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpPut put = new HttpPut("https://curriculum-a2a80.firebaseio.com/aplicaciones/BeyondDataBaseTransfer/numDescargas.json");
-            StringEntity params = new StringEntity(Integer.toString(app.getNumDescargas() + 1), "UTF-8");
-            params.setContentType("application/json");
-            put.addHeader("content-type", "application/json");
-            put.setEntity(params);
-            client.execute(put);
-        } else {
-            LOG.info("lectura.bbdd.firebase");
-        }
+    private static void actualizarNumDescargas() throws IOException, InterruptedException {
+        instanciarFirebase();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(REFERENCE);
+        Aplicacion app = getAplicacion(ref);
+        Map<String, Object> map = new HashMap<>();
+        map.put("numDescargas", (app.getNumDescargas() + 1));
+        ref.updateChildrenAsync(map);
     }
 }
