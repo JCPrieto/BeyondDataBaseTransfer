@@ -8,6 +8,10 @@ sourceCompatibility = 1.8
 
 mainClassName = "es.jklabs.Inicio"
 
+applicationDistribution.from("README.md") {
+    into ""
+}
+
 repositories {
     mavenCentral()
 }
