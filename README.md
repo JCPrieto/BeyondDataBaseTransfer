@@ -1,35 +1,45 @@
 # README #
 
-Aplicacion de uso interno de la empresa BeBeyond para realizar transferencias de esquemas de base de datos entre las distintas maquinas de produccion, preproduccion y desarrollo.
-La aplicacion está basada en la librería SSHJ (https://github.com/hierynomus/sshj).
-En una primera aproximacion se hará en linea de comandos.
-En una segunda aproximacion se hará una interfaz grafica usando Swing.
-Por último me gustaría pasarlo a JavaFx y trastear un poco esa tecnología.
+Aplicación de uso interno de la empresa BeBeyond para realizar transferencias de esquemas de base de datos entre las 
+distintas máquinas de producción, preproducción y desarrollo.
 
-La opción de hacer una aplicacion web tambien la contemplo.
+El funcionamiento es el siguiente:
+* Se realiza una conexión por ssh a la máquina con el servidor MySql de orígen.
+* Un dump del esquema indicado es generado y descargado al equipo.
+* Por SCP el dump a la máquina de destino
+* Y por último se realiza la restauración del dump.
 
-### What is this repository for? ###
+### Tecnologías utilizadas ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* Iconos: Papirus https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
+* Librerias:
+    * Sshj https://github.com/hierynomus/sshj
+    * Jackson https://github.com/FasterXML/jackson-core/wiki
+    * Apache Commons https://commons.apache.org
+    * SwingX 
+    * Firebase https://firebase.google.com
+    
+### ToDo ###
 
-### How do I get set up? ###
+* Limpiar el esquema en la máquina de destino antes de restaurar.
+* Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
+* Buscar los esquemas disponibles en el propio servidor de orígen.
+* Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
+* Eliminar logs vacios
+* Crear los esquemas si no existen en la máquina de destino
+* Mostras un texto descriptivo en la barra de progreso
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Licencia ### 
 
-### Contribution guidelines ###
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-* Writing tests
-* Code review
-* Other guidelines
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
