@@ -1,4 +1,4 @@
-# README #
+# BeyondDataBaseTransfer #
 
 Aplicación de uso interno de la empresa BeBeyond para realizar transferencias de esquemas de base de datos entre las 
 distintas máquinas de producción, preproducción y desarrollo.
@@ -21,12 +21,14 @@ El funcionamiento es el siguiente:
     
 ### ToDo ###
 
+* En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
+* Crear los esquemas si no existen en la máquina de destino
 * Limpiar el esquema en la máquina de destino antes de restaurar.
 * Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
 * Buscar los esquemas disponibles en el propio servidor de orígen.
 * Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
 * Eliminar logs vacios
-* Crear los esquemas si no existen en la máquina de destino
+* Clonar esquemas en una misma máquina
 * Mostras un texto descriptivo en la barra de progreso
 
 ### Licencia ### 
