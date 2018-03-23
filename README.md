@@ -21,7 +21,6 @@ El funcionamiento es el siguiente:
     
 ### ToDo ###
 
-* En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
 * Crear los esquemas si no existen en la máquina de destino
 * Limpiar el esquema en la máquina de destino antes de restaurar.
 * Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
@@ -30,6 +29,11 @@ El funcionamiento es el siguiente:
 * Eliminar logs vacios
 * Clonar esquemas en una misma máquina
 * Mostras un texto descriptivo en la barra de progreso
+
+### Changelog ###
+
+0.2.8: 
+* En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
 
 ### Licencia ### 
 
