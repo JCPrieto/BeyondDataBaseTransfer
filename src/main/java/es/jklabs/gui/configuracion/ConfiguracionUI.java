@@ -425,20 +425,7 @@ public class ConfiguracionUI extends JDialog {
                 DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, carpeta, false);
                 dialogoCarpeta.setVisible(true);
             } else if (parentNode.getUserObject() instanceof Servidor) {
-                Servidor servidor = (Servidor) parentNode.getUserObject();
-                txNombre.setText(servidor.getNombre());
-                txIp.setText(servidor.getIp());
-                txPuerto.setText(String.valueOf(servidor.getPuerto()));
-                txSshUser.setText(servidor.getUsuario());
-                cbLoginMethod.setSelectedItem(servidor.getMetodoLoggin());
-                if (servidor.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
-                    txSshPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getPassword()));
-                } else if (servidor.getMetodoLoggin() == MetodoLoggin.KEY_FILE) {
-                    lbRsaUrlFile.setText(servidor.getKeyUrl());
-                    rsaKeyFile = new File(servidor.getKeyUrl());
-                }
-                txBbddUser.setText(servidor.getServidorBBDD().getUsuario());
-                txBbddPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
+                cargarDatosFormularioServidor(parentNode);
                 setEnableArbol(false);
                 setEnableFormularioServidor(true);
                 UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
@@ -446,6 +433,23 @@ public class ConfiguracionUI extends JDialog {
                 UtilidadesConfiguracion.guardarConfiguracion(configuracion);
             }
         }
+    }
+
+    private void cargarDatosFormularioServidor(DefaultMutableTreeNode parentNode) {
+        Servidor servidor = (Servidor) parentNode.getUserObject();
+        txNombre.setText(servidor.getNombre());
+        txIp.setText(servidor.getIp());
+        txPuerto.setText(String.valueOf(servidor.getPuerto()));
+        txSshUser.setText(servidor.getUsuario());
+        cbLoginMethod.setSelectedItem(servidor.getMetodoLoggin());
+        if (servidor.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
+            txSshPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getPassword()));
+        } else if (servidor.getMetodoLoggin() == MetodoLoggin.KEY_FILE) {
+            lbRsaUrlFile.setText(servidor.getKeyUrl());
+            rsaKeyFile = new File(servidor.getKeyUrl());
+        }
+        txBbddUser.setText(servidor.getServidorBBDD().getUsuario());
+        txBbddPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
     }
 
     private void addServidorToArbol() {
@@ -490,10 +494,32 @@ public class ConfiguracionUI extends JDialog {
         arbol.setCellRenderer(new ArbolRendered());
         arbol.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
+        arbol.addTreeSelectionListener(tsl -> seleccionarNodo());
         UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
         JScrollPane jScrollPane = new JScrollPane(arbol);
         jScrollPane.setPreferredSize(new Dimension(200, 300));
         return jScrollPane;
+    }
+
+    private void seleccionarNodo() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) arbol.getLastSelectedPathComponent();
+        if (node != null && node.getUserObject() instanceof Servidor) {
+            cargarDatosFormularioServidor(node);
+        } else {
+            limpiarFormularioServidor();
+        }
+    }
+
+    private void limpiarFormularioServidor() {
+        txNombre.setText(null);
+        txIp.setText(null);
+        txPuerto.setText(null);
+        txSshUser.setText(null);
+        cbLoginMethod.setSelectedItem(MetodoLoggin.CONTRASENA);
+        txSshPasword.setText(null);
+        rsaKeyFile = null;
+        txBbddUser.setText(null);
+        txBbddPasword.setText(null);
     }
 
     private void cargarArbol() {

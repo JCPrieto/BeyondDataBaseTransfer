@@ -26,13 +26,17 @@ public class PuertoDocumentoFilter extends DocumentFilter {
 
     @Override
     public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-        Document doc = fb.getDocument();
-        StringBuilder sb = new StringBuilder();
-        sb.append(doc.getText(0, doc.getLength()));
-        sb.replace(offset, offset + length, text);
+        if (text != null) {
+            Document doc = fb.getDocument();
+            StringBuilder sb = new StringBuilder();
+            sb.append(doc.getText(0, doc.getLength()));
+            sb.replace(offset, offset + length, text);
 
-        if (regexCheck.matcher(sb).matches()) {
-            fb.replace(offset, length, text, attrs);
+            if (regexCheck.matcher(sb).matches()) {
+                fb.replace(offset, length, text, attrs);
+            }
+        } else {
+            fb.replace(offset, length, "", attrs);
         }
     }
 
