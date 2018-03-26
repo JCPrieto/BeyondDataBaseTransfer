@@ -4,6 +4,7 @@ Aplicación de uso interno de la empresa BeBeyond para realizar transferencias d
 distintas máquinas de producción, preproducción y desarrollo.
 
 El funcionamiento es el siguiente:
+
 * Se realiza una conexión por ssh a la máquina con el servidor MySql de orígen.
 * Un dump del esquema indicado es generado y descargado al equipo.
 * Por SCP el dump a la máquina de destino
@@ -33,6 +34,7 @@ El funcionamiento es el siguiente:
 ### Changelog ###
 
 0.2.8: 
+
 * En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
 
 ### Licencia ### 
