@@ -8,7 +8,7 @@ import es.jklabs.utilidades.UtilidadesConfiguracion;
 
 import javax.swing.*;
 
-public class Inicio {
+public class BeyondDataBaseTransfer {
 
     private static final Logger LOG = Logger.getLogger();
 
