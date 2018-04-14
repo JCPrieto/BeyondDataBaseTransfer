@@ -150,6 +150,8 @@ public class MainUI extends JFrame {
                 menu.add(Box.createHorizontalGlue());
                 JMenuItem jmActualizacion = new JMenuItem(mensajes.getString("existe.nueva.version"), new ImageIcon
                         (Objects.requireNonNull(getClass().getClassLoader().getResource("img/icons/update.png"))));
+                jmActualizacion.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                jmActualizacion.setHorizontalTextPosition(SwingConstants.RIGHT);
                 jmActualizacion.addActionListener(al -> descargarNuevaVersion());
                 menu.add(jmActualizacion);
             }

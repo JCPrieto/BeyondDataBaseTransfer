@@ -33,6 +33,10 @@ El funcionamiento es el siguiente:
 
 ### Changelog ###
 
+0.2.9:
+
+* Alineacion correcta del botón de descarga de la nueva versión a la derecha del todo de la ventana.
+
 0.2.8: 
 
 * En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
