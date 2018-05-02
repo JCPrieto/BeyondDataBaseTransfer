@@ -42,13 +42,12 @@ public class PuertoDocumentoFilter extends DocumentFilter {
 
     @Override
     public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-
         Document doc = fb.getDocument();
         StringBuilder sb = new StringBuilder();
         sb.append(doc.getText(0, doc.getLength()));
         sb.delete(offset, offset + length);
 
-        if (regexCheck.matcher(sb).matches()) {
+        if (sb.length() == 0 || regexCheck.matcher(sb).matches()) {
             super.remove(fb, offset, length);
         }
     }

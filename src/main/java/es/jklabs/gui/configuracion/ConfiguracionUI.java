@@ -21,6 +21,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.*;
 import java.util.List;
@@ -48,7 +50,6 @@ public class ConfiguracionUI extends JDialog {
     private JLabel lbSshPassword;
     private JLabel lbRsaFile;
     private JPanel panelFormularioServidor;
-    private JButton btnRsaFileChooser;
     private File rsaKeyFile;
     private JPanel panelBotoneraArbol;
     private DefaultMutableTreeNode raizArbol;
@@ -268,35 +269,61 @@ public class ConfiguracionUI extends JDialog {
         lbRsaUrlFile = new JLabel(mensajes.getString(SELECCIONAR_ARCHIVO));
         lbRsaUrlFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
                 ("img/icons/key-file.png"))));
+        lbRsaUrlFile.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (cbLoginMethod.isEnabled()) {
+                    seleccionarRsaKeyFile();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (cbLoginMethod.isEnabled()) {
+                    lbRsaUrlFile.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (cbLoginMethod.isEnabled()) {
+                    lbRsaUrlFile.setCursor(null);
+                }
+            }
+        });
         c.gridx = 1;
         c.gridy = 5;
         lbRsaUrlFile.setVisible(false);
         panelFormularioServidor.add(lbRsaUrlFile, c);
-        btnRsaFileChooser = new JButton(mensajes.getString("seleccionar"));
-        btnRsaFileChooser.addActionListener(ae -> seleccionarRsaKeyFile());
-        c.gridx = 1;
-        c.gridy = 6;
-        btnRsaFileChooser.setVisible(false);
-        panelFormularioServidor.add(btnRsaFileChooser, c);
 
         JLabel lbBbddUser = new JLabel(mensajes.getString("usuario.bbdd"));
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 6;
         c.anchor = GridBagConstraints.LINE_START;
         panelFormularioServidor.add(lbBbddUser, c);
         txBbddUser = new JTextField();
         txBbddUser.setColumns(10);
         c.gridx = 1;
-        c.gridy = 7;
+        c.gridy = 6;
         panelFormularioServidor.add(txBbddUser, c);
         JLabel lbBbddPassword = new JLabel(mensajes.getString("contrasena.bbdd"));
         c.gridx = 0;
-        c.gridy = 8;
+        c.gridy = 7;
         panelFormularioServidor.add(lbBbddPassword, c);
         txBbddPasword = new JPasswordField();
         txBbddPasword.setColumns(10);
         c.gridx = 1;
-        c.gridy = 8;
+        c.gridy = 7;
         panelFormularioServidor.add(txBbddPasword, c);
         return panelFormularioServidor;
     }
@@ -313,6 +340,7 @@ public class ConfiguracionUI extends JDialog {
         } else {
             lbRsaUrlFile.setText(mensajes.getString(SELECCIONAR_ARCHIVO));
         }
+        pack();
     }
 
     private JPanel cargarPanelCentral() {
@@ -450,6 +478,7 @@ public class ConfiguracionUI extends JDialog {
         }
         txBbddUser.setText(servidor.getServidorBBDD().getUsuario());
         txBbddPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
+        pack();
     }
 
     private void addServidorToArbol() {
@@ -544,15 +573,12 @@ public class ConfiguracionUI extends JDialog {
             lbRsaFile.setVisible(false);
             lbRsaUrlFile.setText(mensajes.getString(SELECCIONAR_ARCHIVO));
             lbRsaUrlFile.setVisible(false);
-            btnRsaFileChooser.setVisible(false);
         } else if (i == MetodoLoggin.KEY_FILE) {
             lbSshPassword.setVisible(false);
             txSshPasword.setVisible(false);
             lbRsaFile.setVisible(true);
             lbRsaUrlFile.setVisible(true);
-            btnRsaFileChooser.setVisible(true);
         }
-        SwingUtilities.updateComponentTreeUI(panelFormularioServidor);
     }
 
     public JTree getArbol() {

@@ -3,8 +3,8 @@ package es.jklabs.utilidades;
 public class Constantes {
 
     public static final String NOMBRE_APP = "BeyondDataBaseTransfer";
-    public static final String VERSION = "0.2.9";
-    public static final String STORAGE_BUCKET = "curriculum-a2a80.appspot.com";
+    public static final String VERSION = "0.3.0";
+    static final String STORAGE_BUCKET = "curriculum-a2a80.appspot.com";
 
     private Constantes() {
 

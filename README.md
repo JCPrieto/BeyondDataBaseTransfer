@@ -10,6 +10,18 @@ El funcionamiento es el siguiente:
 * Por SCP el dump a la máquina de destino
 * Y por último se realiza la restauración del dump.
 
+### Requisitos ###
+
+* Java 1.8
+
+### Ejecución ###
+
+* Windows:
+    * Ejecutar BeyondDataBaseTransfer.bat dentro del directorio bin
+
+* Linux:
+    * Ejecutar BeyondDataBaseTransfer.sh dentro del directorio bin
+
 ### Tecnologías utilizadas ###
 
 * Iconos: Papirus https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
@@ -32,6 +44,12 @@ El funcionamiento es el siguiente:
 * Mostras un texto descriptivo en la barra de progreso
 
 ### Changelog ###
+
+0.3.0:
+
+* Optimización a la hora de realizar los backup
+* Corrección en el campo del puerto en el formulario de configuración del servidor.
+* Corrección en el formulario de configuración del servidor a la hora de refrescar los elementos.
 
 0.2.9:
 
