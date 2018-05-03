@@ -45,8 +45,8 @@ public class CopySchema extends SwingWorker<Void, Void> {
             setProgress(count++);
             //Crear dump
             session.exec("mysqldump -u " + sOrigen.getServidorBBDD().getUsuario() + " -p"
-                    + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword()) + "  --quick " +
-                    "--single-transactions --triggers --routines " + esquema + " > " + esquema + ".sql").join();
+                    + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword()) + " --quick " +
+                    "--single-transaction --events --routines --triggers " + esquema + " > " + esquema + ".sql").join();
             setProgress(count++);
             //Descargar dump
             ssh.newSCPFileTransfer().download(esquema + ".sql", System.getProperty("java.io.tmpdir"));
