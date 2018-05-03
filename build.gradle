@@ -6,7 +6,7 @@ apply plugin: 'application'
 
 sourceCompatibility = 1.8
 
-mainClassName = "es.jklabs.Inicio"
+mainClassName = "es.jklabs.BeyondDataBaseTransfer"
 
 applicationDistribution.from("README.md") {
     into ""
