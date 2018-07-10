@@ -5,14 +5,13 @@ distintas máquinas de producción, preproducción y desarrollo.
 
 El funcionamiento es el siguiente:
 
-* Se realiza una conexión por ssh a la máquina con el servidor MySql de orígen.
-* Un dump del esquema indicado es generado y descargado al equipo.
-* Por SCP el dump a la máquina de destino
-* Y por último se realiza la restauración del dump.
+* Se genera un dump del esquema indicado utilizando el comando mysqldump del cliente Mysql instalado en el equipo.
+* Se restaura el dump en la maquina remota mediante el comando mysql.
 
 ### Requisitos ###
 
 * Java 1.8
+* Cliente Mysql
 
 ### Ejecución ###
 
@@ -26,7 +25,6 @@ El funcionamiento es el siguiente:
 
 * Iconos: Papirus https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
 * Librerias:
-    * Sshj https://github.com/hierynomus/sshj
     * Jackson https://github.com/FasterXML/jackson-core/wiki
     * Apache Commons https://commons.apache.org
     * SwingX 
@@ -44,6 +42,9 @@ El funcionamiento es el siguiente:
 * Mostras un texto descriptivo en la barra de progreso
 
 ### Changelog ###
+
+1.0.0:
+* El copiado de esquemas a partir de ahora se realiza utilizando un cliente de Mysql ejecutandose en el equipo local.
 
 0.3.0:
 

@@ -9,7 +9,6 @@ import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.json.configuracion.server.ServidorBBDD;
-import es.jklabs.json.utilidades.enumeradores.MetodoLoggin;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 import es.jklabs.utilidades.UtilidadesEncryptacion;
 import es.jklabs.utilidades.UtilidadesString;
@@ -21,9 +20,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -31,7 +27,6 @@ public class ConfiguracionUI extends JDialog {
 
     private static final String ANADIR_CARPETA = "anadir.carpeta";
     private static final String ANADIR_SERVIDOR = "anadir.servidor";
-    private static final String SELECCIONAR_ARCHIVO = "seleccionar.archivo";
     private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = -5947416101394804262L;
     private MainUI padre;
@@ -41,16 +36,10 @@ public class ConfiguracionUI extends JDialog {
     private JTextField txNombre;
     private JTextField txIp;
     private JTextField txPuerto;
-    private JComboBox<MetodoLoggin> cbLoginMethod;
-    private JTextField txSshUser;
     private JTextField txBbddUser;
     private JPasswordField txBbddPasword;
     private JPasswordField txSshPasword;
-    private JLabel lbRsaUrlFile;
-    private JLabel lbSshPassword;
-    private JLabel lbRsaFile;
     private JPanel panelFormularioServidor;
-    private File rsaKeyFile;
     private JPanel panelBotoneraArbol;
     private DefaultMutableTreeNode raizArbol;
     private JButton btnCancelar;
@@ -128,16 +117,6 @@ public class ConfiguracionUI extends JDialog {
             servidor.setNombre(txNombre.getText());
             servidor.setIp(txIp.getText());
             servidor.setPuerto(Integer.valueOf(txPuerto.getText()));
-            servidor.setUsuario(txSshUser.getText());
-            MetodoLoggin metodo = (MetodoLoggin) cbLoginMethod.getSelectedItem();
-            servidor.setMetodoLoggin(metodo);
-            if (metodo == MetodoLoggin.CONTRASENA) {
-                servidor.setPassword(UtilidadesEncryptacion.encrypt(String.valueOf(txSshPasword.getPassword())));
-                servidor.setKeyUrl(null);
-            } else if (metodo == MetodoLoggin.KEY_FILE) {
-                servidor.setKeyUrl(rsaKeyFile.getAbsolutePath());
-                servidor.setPassword(null);
-            }
             ServidorBBDD servidorBBDD;
             if (servidor.getServidorBBDD() != null) {
                 servidorBBDD = servidor.getServidorBBDD();
@@ -168,18 +147,6 @@ public class ConfiguracionUI extends JDialog {
         if (UtilidadesString.isEmpty(txPuerto)) {
             valido = false;
             Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "puerto.servidor.vacio");
-        }
-        if (UtilidadesString.isEmpty(txSshUser)) {
-            valido = false;
-            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "usuario.ssh.servidor.vacio");
-        }
-        if (cbLoginMethod.getSelectedItem() == MetodoLoggin.CONTRASENA && UtilidadesString.isEmpty(txSshPasword)) {
-            valido = false;
-            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "password.ssh.servidor.vacio");
-        }
-        if (cbLoginMethod.getSelectedItem() == MetodoLoggin.KEY_FILE && rsaKeyFile == null) {
-            valido = false;
-            Growls.mostrarAviso(padre, ANADIR_SERVIDOR, "no.rsa.key");
         }
         if (UtilidadesString.isEmpty(txBbddUser)) {
             valido = false;
@@ -236,76 +203,15 @@ public class ConfiguracionUI extends JDialog {
         c.gridx = 0;
         c.gridy = 3;
         panelFormularioServidor.add(lbSshUser, c);
-        txSshUser = new JTextField();
-        txSshUser.setColumns(10);
-        c.gridx = 1;
-        c.gridy = 3;
-        panelFormularioServidor.add(txSshUser, c);
         JLabel lbLoginMethod = new JLabel(mensajes.getString("metodo.autenticacion"));
         c.gridx = 0;
         c.gridy = 4;
         panelFormularioServidor.add(lbLoginMethod, c);
-        cbLoginMethod = new JComboBox<>(MetodoLoggin.values());
-        cbLoginMethod.addActionListener(ae -> seleccionarMetodoAutenticacion());
-        c.gridx = 1;
-        c.gridy = 4;
-        panelFormularioServidor.add(cbLoginMethod, c);
-
-        lbSshPassword = new JLabel(mensajes.getString("contrasena.ssh"));
-        c.gridx = 0;
-        c.gridy = 5;
-        panelFormularioServidor.add(lbSshPassword, c);
         txSshPasword = new JPasswordField();
         txSshPasword.setColumns(10);
         c.gridx = 1;
         c.gridy = 5;
         panelFormularioServidor.add(txSshPasword, c);
-
-        lbRsaFile = new JLabel(mensajes.getString("archivo.clave.rsa"));
-        c.gridx = 0;
-        c.gridy = 5;
-        lbRsaFile.setVisible(false);
-        panelFormularioServidor.add(lbRsaFile, c);
-        lbRsaUrlFile = new JLabel(mensajes.getString(SELECCIONAR_ARCHIVO));
-        lbRsaUrlFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
-                ("img/icons/key-file.png"))));
-        lbRsaUrlFile.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (cbLoginMethod.isEnabled()) {
-                    seleccionarRsaKeyFile();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                if (cbLoginMethod.isEnabled()) {
-                    lbRsaUrlFile.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                }
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                if (cbLoginMethod.isEnabled()) {
-                    lbRsaUrlFile.setCursor(null);
-                }
-            }
-        });
-        c.gridx = 1;
-        c.gridy = 5;
-        lbRsaUrlFile.setVisible(false);
-        panelFormularioServidor.add(lbRsaUrlFile, c);
-
         JLabel lbBbddUser = new JLabel(mensajes.getString("usuario.bbdd"));
         c.gridx = 0;
         c.gridy = 6;
@@ -326,21 +232,6 @@ public class ConfiguracionUI extends JDialog {
         c.gridy = 7;
         panelFormularioServidor.add(txBbddPasword, c);
         return panelFormularioServidor;
-    }
-
-    private void seleccionarRsaKeyFile() {
-        JFileChooser fc = new JFileChooser();
-        fc.setFileHidingEnabled(false);
-        fc.setAcceptAllFileFilterUsed(false);
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        int retorno = fc.showOpenDialog(this);
-        if (Objects.equals(retorno, JFileChooser.APPROVE_OPTION)) {
-            rsaKeyFile = fc.getSelectedFile();
-            lbRsaUrlFile.setText(rsaKeyFile.getName());
-        } else {
-            lbRsaUrlFile.setText(mensajes.getString(SELECCIONAR_ARCHIVO));
-        }
-        pack();
     }
 
     private JPanel cargarPanelCentral() {
@@ -468,14 +359,6 @@ public class ConfiguracionUI extends JDialog {
         txNombre.setText(servidor.getNombre());
         txIp.setText(servidor.getIp());
         txPuerto.setText(String.valueOf(servidor.getPuerto()));
-        txSshUser.setText(servidor.getUsuario());
-        cbLoginMethod.setSelectedItem(servidor.getMetodoLoggin());
-        if (servidor.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
-            txSshPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getPassword()));
-        } else if (servidor.getMetodoLoggin() == MetodoLoggin.KEY_FILE) {
-            lbRsaUrlFile.setText(servidor.getKeyUrl());
-            rsaKeyFile = new File(servidor.getKeyUrl());
-        }
         txBbddUser.setText(servidor.getServidorBBDD().getUsuario());
         txBbddPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
         pack();
@@ -543,10 +426,7 @@ public class ConfiguracionUI extends JDialog {
         txNombre.setText(null);
         txIp.setText(null);
         txPuerto.setText(null);
-        txSshUser.setText(null);
-        cbLoginMethod.setSelectedItem(MetodoLoggin.CONTRASENA);
         txSshPasword.setText(null);
-        rsaKeyFile = null;
         txBbddUser.setText(null);
         txBbddPasword.setText(null);
     }
@@ -565,35 +445,16 @@ public class ConfiguracionUI extends JDialog {
         this.configuracion = configuracion;
     }
 
-    private void seleccionarMetodoAutenticacion() {
-        MetodoLoggin i = (MetodoLoggin) cbLoginMethod.getSelectedItem();
-        if (i == MetodoLoggin.CONTRASENA) {
-            lbSshPassword.setVisible(true);
-            txSshPasword.setVisible(true);
-            lbRsaFile.setVisible(false);
-            lbRsaUrlFile.setText(mensajes.getString(SELECCIONAR_ARCHIVO));
-            lbRsaUrlFile.setVisible(false);
-        } else if (i == MetodoLoggin.KEY_FILE) {
-            lbSshPassword.setVisible(false);
-            txSshPasword.setVisible(false);
-            lbRsaFile.setVisible(true);
-            lbRsaUrlFile.setVisible(true);
-        }
-    }
-
-    public JTree getArbol() {
+    JTree getArbol() {
         return arbol;
     }
 
-    public DefaultMutableTreeNode getRaizArbol() {
+    DefaultMutableTreeNode getRaizArbol() {
         return raizArbol;
     }
 
-    public MainUI getPadre() {
+    MainUI getPadre() {
         return padre;
     }
 
-    public void setPadre(MainUI padre) {
-        this.padre = padre;
-    }
 }

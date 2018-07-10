@@ -1,8 +1,5 @@
 package es.jklabs.json.configuracion.server;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import es.jklabs.json.utilidades.enumeradores.MetodoLoggin;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -13,14 +10,6 @@ public class Servidor implements Serializable {
     private String nombre;
     private String ip;
     private Integer puerto;
-    private MetodoLoggin metodoLoggin;
-    private String usuario;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private
-    String password;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private
-    String keyUrl;
     private ServidorBBDD servidorBBDD;
     private List<Esquema> esquemas;
 
@@ -37,14 +26,6 @@ public class Servidor implements Serializable {
         this.nombre = s.getNombre();
         this.ip = s.getIp();
         this.puerto = s.getPuerto();
-        this.metodoLoggin = s.getMetodoLoggin();
-        if (metodoLoggin == MetodoLoggin.CONTRASENA) {
-            this.password = s.getPassword();
-
-        } else if (metodoLoggin == MetodoLoggin.KEY_FILE) {
-            this.keyUrl = s.getKeyUrl();
-
-        }
         this.servidorBBDD = s.getServidorBBDD();
     }
 
@@ -78,38 +59,6 @@ public class Servidor implements Serializable {
 
     public void setPuerto(Integer puerto) {
         this.puerto = puerto;
-    }
-
-    public MetodoLoggin getMetodoLoggin() {
-        return metodoLoggin;
-    }
-
-    public void setMetodoLoggin(MetodoLoggin metodoLoggin) {
-        this.metodoLoggin = metodoLoggin;
-    }
-
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getKeyUrl() {
-        return keyUrl;
-    }
-
-    public void setKeyUrl(String keyUrl) {
-        this.keyUrl = keyUrl;
     }
 
     public ServidorBBDD getServidorBBDD() {

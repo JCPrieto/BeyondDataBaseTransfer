@@ -3,14 +3,9 @@ package es.jklabs.utilidades;
 import es.jklabs.gui.MainUI;
 import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.server.Servidor;
-import es.jklabs.json.utilidades.enumeradores.MetodoLoggin;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.xfer.FileSystemFile;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.Objects;
 
 public class CopySchema extends SwingWorker<Void, Void> {
 
@@ -32,64 +27,32 @@ public class CopySchema extends SwingWorker<Void, Void> {
         setProgress(0);
         int count = 1;
         boolean origenOk = false;
-        try (SSHClient ssh = new SSHClient()) {
+        try {
             //Conexion
-            ssh.addHostKeyVerifier((hostname, port, key) -> true);
-            ssh.connect(sOrigen.getIp(), sOrigen.getPuerto());
-            if (sOrigen.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
-                ssh.authPassword(sOrigen.getUsuario(), Objects.requireNonNull(UtilidadesEncryptacion.decrypt(sOrigen.getPassword())));
-            } else if (sOrigen.getMetodoLoggin() == es.jklabs.json.utilidades.enumeradores.MetodoLoggin.KEY_FILE) {
-                ssh.authPublickey(sOrigen.getUsuario(), sOrigen.getKeyUrl());
-            }
-            Session session = ssh.startSession();
             setProgress(count++);
             //Crear dump
-            session.exec("mysqldump -u " + sOrigen.getServidorBBDD().getUsuario() + " -p"
+            Runtime.getRuntime().exec("mysqldump -u " + sOrigen.getServidorBBDD().getUsuario() + " -p"
                     + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword()) + " --quick " +
-                    "--single-transaction --events --routines --triggers " + esquema + " > " + esquema + ".sql").join();
-            setProgress(count++);
-            //Descargar dump
-            ssh.newSCPFileTransfer().download(esquema + ".sql", System.getProperty("java.io.tmpdir"));
-            setProgress(count++);
-            session = ssh.startSession();
-            session.exec("rm " + esquema + ".sql").join();
-            setProgress(count++);
+                    "--single-transaction --events --routines --triggers " + esquema + " > " + System.getProperty
+                    ("java.io.tmpdir") + UtilidadesFichero.SEPARADOR + esquema + ".sql");
             origenOk = true;
         } catch (Exception e) {
             Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
         }
         if (origenOk) {
-            try (SSHClient ssh = new SSHClient()) {
-                //Conectar con el destino
-                ssh.addHostKeyVerifier((hostname, port, key) -> true);
-                ssh.connect(sDestino.getIp(), sDestino.getPuerto());
-                if (sDestino.getMetodoLoggin() == MetodoLoggin.CONTRASENA) {
-                    ssh.authPassword(sDestino.getUsuario(), Objects.requireNonNull(UtilidadesEncryptacion.decrypt(sDestino.getPassword())));
-                } else if (sDestino.getMetodoLoggin() == MetodoLoggin.KEY_FILE) {
-                    ssh.authPublickey(sDestino.getUsuario(), sDestino.getKeyUrl());
-                }
-                Session session = ssh.startSession();
+            String src = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + esquema + ".sql";
+            try {
                 setProgress(count++);
-                //Subir dump
-                String src = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + esquema + ".sql";
-                if (Objects.equals(sDestino.getUsuario(), "root")) {
-                    ssh.newSCPFileTransfer().upload(new FileSystemFile(src), "/" + sDestino.getUsuario() + "/");
-                } else {
-                    ssh.newSCPFileTransfer().upload(new FileSystemFile(src), "/home/" + sDestino.getUsuario() + "/");
-                }
-                setProgress(count++);
-                File file = new File(src);
-                file.delete();
-                setProgress(count++);
-                session.exec("mysql -u " + sDestino.getServidorBBDD().getUsuario() + " -p"
-                        + UtilidadesEncryptacion.decrypt(sDestino.getServidorBBDD().getPassword()) + " " + esquema + " < " + esquema + ".sql").join();
-                setProgress(count++);
-                session = ssh.startSession();
-                session.exec("rm " + esquema + ".sql").join();
+                Runtime.getRuntime().exec("mysql -u " + sDestino.getServidorBBDD().getUsuario() + " -p"
+                        + UtilidadesEncryptacion.decrypt(sDestino.getServidorBBDD().getPassword()) + " " + esquema +
+                        " < " + src);
                 setProgress(count);
                 Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
             } catch (Exception e) {
                 Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+            } finally {
+                File file = new File(src);
+                file.delete();
             }
         }
         return null;
