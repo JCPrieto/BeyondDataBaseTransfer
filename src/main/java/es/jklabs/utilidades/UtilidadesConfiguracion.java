@@ -1,5 +1,6 @@
 package es.jklabs.utilidades;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import es.jklabs.json.configuracion.Configuracion;
@@ -37,6 +38,7 @@ public class UtilidadesConfiguracion {
             }
         }
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         Configuracion configuracion = null;
         try {
             configuracion = mapper.readValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +

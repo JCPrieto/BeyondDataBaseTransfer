@@ -38,7 +38,6 @@ public class ConfiguracionUI extends JDialog {
     private JTextField txPuerto;
     private JTextField txBbddUser;
     private JPasswordField txBbddPasword;
-    private JPasswordField txSshPasword;
     private JPanel panelFormularioServidor;
     private JPanel panelBotoneraArbol;
     private DefaultMutableTreeNode raizArbol;
@@ -199,19 +198,6 @@ public class ConfiguracionUI extends JDialog {
         c.gridx = 1;
         c.gridy = 2;
         panelFormularioServidor.add(txPuerto, c);
-        JLabel lbSshUser = new JLabel(mensajes.getString("usuario.ssh"));
-        c.gridx = 0;
-        c.gridy = 3;
-        panelFormularioServidor.add(lbSshUser, c);
-        JLabel lbLoginMethod = new JLabel(mensajes.getString("metodo.autenticacion"));
-        c.gridx = 0;
-        c.gridy = 4;
-        panelFormularioServidor.add(lbLoginMethod, c);
-        txSshPasword = new JPasswordField();
-        txSshPasword.setColumns(10);
-        c.gridx = 1;
-        c.gridy = 5;
-        panelFormularioServidor.add(txSshPasword, c);
         JLabel lbBbddUser = new JLabel(mensajes.getString("usuario.bbdd"));
         c.gridx = 0;
         c.gridy = 6;
@@ -426,7 +412,6 @@ public class ConfiguracionUI extends JDialog {
         txNombre.setText(null);
         txIp.setText(null);
         txPuerto.setText(null);
-        txSshPasword.setText(null);
         txBbddUser.setText(null);
         txBbddPasword.setText(null);
     }
