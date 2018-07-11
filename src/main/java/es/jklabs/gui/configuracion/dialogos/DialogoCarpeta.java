@@ -1,6 +1,7 @@
-package es.jklabs.gui.configuracion;
+package es.jklabs.gui.configuracion.dialogos;
 
 import es.jklabs.gui.MainUI;
+import es.jklabs.gui.configuracion.panel.ServersConfigPanel;
 import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.json.configuracion.Configuracion;
@@ -16,7 +17,7 @@ import java.awt.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-class DialogoCarpeta extends JDialog {
+public class DialogoCarpeta extends JDialog {
 
     private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = 7372193257865030732L;
@@ -28,17 +29,17 @@ class DialogoCarpeta extends JDialog {
     private final MainUI padre;
     private JTextField txNombre;
 
-    DialogoCarpeta(ConfiguracionUI configuracionUI, Carpeta carpeta, boolean nuevo) {
-        super(configuracionUI, mensajes.getString("carpeta"), true);
-        this.padre = configuracionUI.getPadre();
-        this.arbol = configuracionUI.getArbol();
-        this.configuracion = configuracionUI.getConfiguracion();
+    public DialogoCarpeta(ServersConfigPanel panel, Carpeta carpeta, boolean nuevo) {
+        super(panel.getDialogo(), mensajes.getString("carpeta"), true);
+        this.padre = panel.getDialogo().getVentanaPrincipal();
+        this.arbol = panel.getArbol();
+        this.configuracion = panel.getConfiguracion();
         TreePath parentPath = arbol.getSelectionPath();
         if (parentPath != null) {
             parentNode = (DefaultMutableTreeNode)
                     (parentPath.getLastPathComponent());
         } else {
-            parentNode = configuracionUI.getRaizArbol();
+            parentNode = panel.getRaizArbol();
         }
         this.carpeta = carpeta;
         this.nuevo = nuevo;
