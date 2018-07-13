@@ -28,7 +28,7 @@ public class ConfiguracionUI extends JDialog {
     private void cargarPantalla() {
         this.setLayout(new BorderLayout());
         JTabbedPane jTabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-        jTabbedPane.add(mensajes.getString("mysql"), new MysqlConfigPanel(configuracion));
+        jTabbedPane.add(mensajes.getString("mysql"), new MysqlConfigPanel(this, configuracion));
         jTabbedPane.add(mensajes.getString("servidores"), new ServersConfigPanel(padre, this, configuracion));
         this.add(jTabbedPane, BorderLayout.CENTER);
         this.pack();
