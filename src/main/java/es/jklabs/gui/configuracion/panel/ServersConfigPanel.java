@@ -157,11 +157,11 @@ public class ServersConfigPanel extends JPanel {
         }
         if (UtilidadesString.isEmpty(txBbddUser)) {
             valido = false;
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "usuario.bbdd.servidor.vacio");
+            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "usuario.vacio");
         }
         if (UtilidadesString.isEmpty(txBbddPasword)) {
             valido = false;
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "password.bbdd.servidor.vacio");
+            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "password.vacio");
         }
         return valido;
     }
@@ -201,7 +201,7 @@ public class ServersConfigPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 2;
         panelFormularioServidor.add(txPuerto, c);
-        JLabel lbBbddUser = new JLabel(mensajes.getString("usuario.bbdd"));
+        JLabel lbBbddUser = new JLabel(mensajes.getString("usuario"));
         c.gridx = 0;
         c.gridy = 6;
         c.anchor = GridBagConstraints.LINE_START;
@@ -211,7 +211,7 @@ public class ServersConfigPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 6;
         panelFormularioServidor.add(txBbddUser, c);
-        JLabel lbBbddPassword = new JLabel(mensajes.getString("contrasena.bbdd"));
+        JLabel lbBbddPassword = new JLabel(mensajes.getString("contrasena"));
         c.gridx = 0;
         c.gridy = 7;
         panelFormularioServidor.add(lbBbddPassword, c);
@@ -428,16 +428,8 @@ public class ServersConfigPanel extends JPanel {
         return dialogo;
     }
 
-    public void setDialogo(ConfiguracionUI dialogo) {
-        this.dialogo = dialogo;
-    }
-
     public JTree getArbol() {
         return arbol;
-    }
-
-    public void setArbol(JTree arbol) {
-        this.arbol = arbol;
     }
 
     public Configuracion getConfiguracion() {
@@ -452,7 +444,4 @@ public class ServersConfigPanel extends JPanel {
         return raizArbol;
     }
 
-    public void setRaizArbol(DefaultMutableTreeNode raizArbol) {
-        this.raizArbol = raizArbol;
-    }
 }

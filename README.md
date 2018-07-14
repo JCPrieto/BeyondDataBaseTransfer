@@ -6,7 +6,8 @@ distintas máquinas de producción, preproducción y desarrollo.
 El funcionamiento es el siguiente:
 
 * Se genera un dump del esquema indicado utilizando el comando mysqldump del cliente Mysql instalado en el equipo.
-* Se restaura el dump en la maquina remota mediante el comando mysql.
+Para el dump se utilizan los parametros: '--quick --single-transaction --events --routines --triggers'
+* Se restaura el dump en la maquina remota mediante el comando mysql del cliente Mysql instalado en el equipo.
 
 ### Requisitos ###
 

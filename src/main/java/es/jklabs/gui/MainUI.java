@@ -196,7 +196,7 @@ public class MainUI extends JFrame {
         AutoCompleteDecorator.decorate(txEsquema, listaEsquemas, false);
         btnAceptar = new JButton(mensajes.getString("copiar"));
         btnAceptar.addActionListener(al -> copiarEsquema());
-        progressBar = new JProgressBar(0, 9);
+        progressBar = new JProgressBar(0, 3);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
         panelFormulario.add(lbEsquema, BorderLayout.WEST);
@@ -213,8 +213,8 @@ public class MainUI extends JFrame {
             if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
                     () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
                 bloquearPantalla();
-                CopySchema task = new CopySchema(this, (Servidor) origen.getUserObject(),
-                        (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+                CopySchema task = new CopySchema(this, configuracion.getMysqlCliente(), (Servidor) origen
+                        .getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim());
                 task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
                 task.execute();
                 UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(),
@@ -239,6 +239,24 @@ public class MainUI extends JFrame {
         if (UtilidadesString.isEmpty(txEsquema)) {
             Growls.mostrarAviso(this, COPIAR_ESQUEMA, "nombre.esquema.vacio");
             valido = false;
+        }
+        if (configuracion.getMysqlCliente() == null ||
+                UtilidadesString.isEmpty(configuracion.getMysqlCliente().getPath())) {
+            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "ruta.instalacion.mysql.no.configurada");
+            valido = false;
+        } else {
+            File mysql = new File(configuracion.getMysqlCliente().getPath() + UtilidadesFichero.SEPARADOR +
+                    Constantes.MYSQL);
+            File mysqlDump = new File(configuracion.getMysqlCliente().getPath() + UtilidadesFichero.SEPARADOR +
+                    Constantes.MYSQLDUMP);
+            if (!mysql.exists()) {
+                Growls.mostrarAviso(this, COPIAR_ESQUEMA, "orden.mysql.no.encontrado");
+                valido = false;
+            }
+            if (!mysqlDump.exists()) {
+                Growls.mostrarAviso(this, COPIAR_ESQUEMA, "orden.mysqldump.no.encontrado");
+                valido = false;
+            }
         }
         return valido;
     }

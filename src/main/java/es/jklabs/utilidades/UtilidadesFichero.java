@@ -9,14 +9,14 @@ public class UtilidadesFichero {
 
     static final String HOME = System.getProperty("user.home");
     static final String BEYOND_DATA_BASE_TRANSFER_FOLDER = ".BeyondDataBaseTransfer";
-    static final String SEPARADOR = System.getProperty("file.separator");
+    public static final String SEPARADOR = System.getProperty("file.separator");
     private static final Logger LOG = Logger.getLogger();
 
     private UtilidadesFichero() {
 
     }
 
-    public static void createBaseFolder() {
+    static void createBaseFolder() {
         File base = new File(HOME + SEPARADOR + BEYOND_DATA_BASE_TRANSFER_FOLDER);
         if (!base.exists()) {
             try {
