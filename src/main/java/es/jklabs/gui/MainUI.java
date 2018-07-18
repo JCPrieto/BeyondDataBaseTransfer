@@ -245,10 +245,20 @@ public class MainUI extends JFrame {
             Growls.mostrarAviso(this, COPIAR_ESQUEMA, "ruta.instalacion.mysql.no.configurada");
             valido = false;
         } else {
+            String sistemaOperativo = System.getProperty("os.name", "generic").toLowerCase();
+            String comandoMysql;
+            String comandoMysqlDump;
+            if (sistemaOperativo.contains("win")) {
+                comandoMysql = Constantes.MYSQL_EXE;
+                comandoMysqlDump = Constantes.MYSQLDUMP_EXE;
+            } else {
+                comandoMysql = Constantes.MYSQL;
+                comandoMysqlDump = Constantes.MYSQLDUMP;
+            }
             File mysql = new File(configuracion.getMysqlCliente().getPath() + UtilidadesFichero.SEPARADOR +
-                    Constantes.MYSQL);
+                    comandoMysql);
             File mysqlDump = new File(configuracion.getMysqlCliente().getPath() + UtilidadesFichero.SEPARADOR +
-                    Constantes.MYSQLDUMP);
+                    comandoMysqlDump);
             if (!mysql.exists()) {
                 Growls.mostrarAviso(this, COPIAR_ESQUEMA, "orden.mysql.no.encontrado");
                 valido = false;

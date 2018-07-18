@@ -27,6 +27,16 @@ public class CopySchema extends SwingWorker<Void, Void> {
 
     @Override
     protected Void doInBackground() {
+        String sistemaOperativo = System.getProperty("os.name", "generic").toLowerCase();
+        String comandoMysql;
+        String comandoMysqlDump;
+        if (sistemaOperativo.contains("win")) {
+            comandoMysql = Constantes.MYSQL_EXE;
+            comandoMysqlDump = Constantes.MYSQLDUMP_EXE;
+        } else {
+            comandoMysql = Constantes.MYSQL;
+            comandoMysqlDump = Constantes.MYSQLDUMP;
+        }
         setProgress(0);
         int count = 1;
         boolean origenOk = false;
@@ -38,7 +48,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             String port = "-P " + sOrigen.getPuerto();
             String usuario = "-u" + sOrigen.getServidorBBDD().getUsuario();
             String pass = "-p" + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword());
-            Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes.MYSQLDUMP +
+            Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + comandoMysqlDump +
                     " " + server + " " + port + " " + usuario + " " + pass + " --quick --single-transaction --events " +
                     "--routines --triggers " + esquema + " > " + System.getProperty("java.io.tmpdir") +
                     UtilidadesFichero.SEPARADOR + esquema + ".sql");
@@ -54,7 +64,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 String usuario = "-u" + sDestino.getServidorBBDD().getUsuario();
                 String pass = "-p" + UtilidadesEncryptacion.decrypt(sDestino.getServidorBBDD().getPassword());
                 setProgress(count++);
-                Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes.MYSQL +
+                Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + comandoMysql +
                         " " + server + " " + port + " " + usuario + " " + pass + " " + esquema + " < " + src);
                 setProgress(count);
                 Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
