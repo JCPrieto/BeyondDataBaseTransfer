@@ -53,7 +53,7 @@ public class AcercaDe extends JDialog {
         cns.gridy = 2;
         panel.add(jLabelMyName, cns);
         final JLabel jLabelMyWeb = new JLabel("JCPrieto.tk", JLabel.LEFT);
-        jLabelMyWeb.addMouseListener(new UrlMouseListener(padre, jLabelMyWeb, "https://jcprieto.tk"));
+        jLabelMyWeb.addMouseListener(new UrlMouseListener(padre, jLabelMyWeb, "http://jcprieto.tk"));
         cns.gridx = 1;
         panel.add(jLabelMyWeb, cns);
         JLabel jLabelMyMail = new JLabel("JuanC.Prieto.Silos@gmail.com", JLabel.LEFT);
