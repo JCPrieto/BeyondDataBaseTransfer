@@ -6,7 +6,10 @@ import es.jklabs.json.configuracion.mysql.MysqlCliente;
 import es.jklabs.json.configuracion.server.Servidor;
 
 import javax.swing.*;
-import java.io.File;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class CopySchema extends SwingWorker<Void, Void> {
 
@@ -30,7 +33,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
         setProgress(0);
         int count = 1;
         boolean origenOk = false;
-        try {
+        try (FileOutputStream fos = new FileOutputStream(System.getProperty("java.io.tmpdir") + esquema + ".sql")) {
             //Conexion
             setProgress(count++);
             //Crear dump
@@ -38,34 +41,68 @@ public class CopySchema extends SwingWorker<Void, Void> {
             String port = "-P " + sOrigen.getPuerto();
             String usuario = "-u" + sOrigen.getServidorBBDD().getUsuario();
             String pass = "-p" + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword());
-            Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes.MYSQLDUMP +
-                    " " + server + " " + port + " " + usuario + " " + pass + " --quick --single-transaction --events " +
-                    "--routines --triggers " + esquema + " > " + System.getProperty("java.io.tmpdir") +
-                    UtilidadesFichero.SEPARADOR + esquema + ".sql");
+            Process p = Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes
+                    .MYSQLDUMP + " " + server + " " + port + " " + usuario + " " + pass + " --quick " +
+                    "--single-transaction --events --routines --triggers --databases " + esquema);
+            InputStream is = p.getInputStream();
+            byte[] buffer = new byte[1000];
+            int leido = is.read(buffer);
+            while (leido > 0) {
+                fos.write(buffer, 0, leido);
+                leido = is.read(buffer);
+            }
+            mostrarErrores(p);
             origenOk = true;
         } catch (Exception e) {
             Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
         }
         if (origenOk) {
-            String src = System.getProperty("java.io.tmpdir") + UtilidadesFichero.SEPARADOR + esquema + ".sql";
-            try {
+            String src = System.getProperty("java.io.tmpdir") + esquema + ".sql";
+            try (FileInputStream fis = new FileInputStream(src)) {
                 String server = "-h " + sDestino.getIp();
                 String port = "-P " + sDestino.getPuerto();
                 String usuario = "-u" + sDestino.getServidorBBDD().getUsuario();
                 String pass = "-p" + UtilidadesEncryptacion.decrypt(sDestino.getServidorBBDD().getPassword());
                 setProgress(count++);
-                Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes.MYSQL +
-                        " " + server + " " + port + " " + usuario + " " + pass + " " + esquema + " < " + src);
+                Process p = Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR +
+                        Constantes.MYSQL + " " + server + " " + port + " " + usuario + " " + pass + " " + esquema);
+                OutputStream os = p.getOutputStream();
+                byte[] buffer = new byte[1000];
+                int leido = fis.read(buffer);
+                while (leido > 0) {
+                    os.write(buffer, 0, leido);
+                    leido = fis.read(buffer);
+                }
+                os.flush();
+                os.close();
+                mostrarErrores(p);
                 setProgress(count);
                 Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
             } catch (Exception e) {
                 Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
             } finally {
-                File file = new File(src);
-                file.delete();
+                Path paths = Paths.get(src);
+                try {
+                    Files.delete(paths);
+                } catch (IOException e) {
+                    Growls.mostrarError(parent, COPIAR_ESQUEMA, "eliminar.archivo.temporal");
+                }
             }
         }
         return null;
+    }
+
+    private void mostrarErrores(Process p) throws IOException {
+        BufferedReader stdError = new BufferedReader(new
+                InputStreamReader(p.getErrorStream()));
+        String s;
+        while ((s = stdError.readLine()) != null) {
+            if (s.contains("[Warning]")) {
+                Logger.aviso(s);
+            } else {
+                Logger.error(s);
+            }
+        }
     }
 
     @Override

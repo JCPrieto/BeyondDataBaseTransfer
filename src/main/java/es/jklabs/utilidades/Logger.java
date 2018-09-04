@@ -39,7 +39,15 @@ public class Logger {
         return logger;
     }
 
-    public void info(String mensaje, Throwable e) {
+    public static void error(String mensaje) {
+        LOG.log(Level.SEVERE, mensaje);
+    }
+
+    static void aviso(String mensaje) {
+        LOG.log(Level.WARNING, mensaje);
+    }
+
+    void info(String mensaje, Throwable e) {
         LOG.log(Level.INFO, mensaje, e);
     }
 
@@ -51,11 +59,7 @@ public class Logger {
         }
     }
 
-    public void aviso(String mensaje, Throwable e) {
-        LOG.log(Level.WARNING, mensaje, e);
-    }
-
-    public void info(String mensaje) {
+    void info(String mensaje) {
         LOG.log(Level.INFO, mensaje);
     }
 }

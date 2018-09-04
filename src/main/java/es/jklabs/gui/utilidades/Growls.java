@@ -27,6 +27,11 @@ public class Growls {
         LOG.error(cuerpo, e);
     }
 
+    public static void mostrarError(MainUI parent, String titulo, String cuerpo) {
+        parent.getTrayIcon().displayMessage(titulo != null ? mensajes.getString(titulo) : null, errores.getString
+                (cuerpo), TrayIcon.MessageType.ERROR);
+    }
+
     public static void mostrarInfo(MainUI parent, String titulo, String cuerpo) {
         parent.getTrayIcon().displayMessage(titulo != null ? mensajes.getString(titulo) : null, mensajes.getString
                 (cuerpo), TrayIcon.MessageType.INFO);
