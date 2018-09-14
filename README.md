@@ -44,7 +44,12 @@ Para el dump se utilizan los parametros: '--quick --single-transaction --events 
 
 ### Changelog ###
 
+1.0.1:
+
+* Controlar y mostrar mensaje con los errores de los comandos mysqldump y mysql.
+
 1.0.0:
+
 * El copiado de esquemas a partir de ahora se realiza utilizando un cliente de Mysql ejecutandose en el equipo local.
 
 0.3.0:

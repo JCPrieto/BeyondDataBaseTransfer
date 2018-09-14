@@ -43,7 +43,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             String pass = "-p" + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword());
             Process p = Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes
                     .MYSQLDUMP + " " + server + " " + port + " " + usuario + " " + pass + " --quick " +
-                    "--single-transaction --events --routines --triggers --databases " + esquema);
+                    "--max_allowed_packet=2048M --single-transaction --events --routines --triggers --databases " + esquema);
             InputStream is = p.getInputStream();
             byte[] buffer = new byte[1000];
             int leido = is.read(buffer);
@@ -51,13 +51,13 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 fos.write(buffer, 0, leido);
                 leido = is.read(buffer);
             }
-            mostrarErrores(p);
-            origenOk = true;
+            origenOk = sinErrores(p);
         } catch (Exception e) {
             Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
         }
         if (origenOk) {
             String src = System.getProperty("java.io.tmpdir") + esquema + ".sql";
+            boolean destinoOk = false;
             try (FileInputStream fis = new FileInputStream(src)) {
                 String server = "-h " + sDestino.getIp();
                 String port = "-P " + sDestino.getPuerto();
@@ -75,15 +75,19 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 }
                 os.flush();
                 os.close();
-                mostrarErrores(p);
-                setProgress(count);
-                Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
+                destinoOk = sinErrores(p);
+                if (destinoOk) {
+                    setProgress(count);
+                    Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
+                }
             } catch (Exception e) {
                 Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
             } finally {
                 Path paths = Paths.get(src);
                 try {
-                    Files.delete(paths);
+                    if (destinoOk) {
+                        Files.delete(paths);
+                    }
                 } catch (IOException e) {
                     Growls.mostrarError(parent, COPIAR_ESQUEMA, "eliminar.archivo.temporal");
                 }
@@ -92,17 +96,20 @@ public class CopySchema extends SwingWorker<Void, Void> {
         return null;
     }
 
-    private void mostrarErrores(Process p) throws IOException {
+    private boolean sinErrores(Process p) throws IOException {
         BufferedReader stdError = new BufferedReader(new
                 InputStreamReader(p.getErrorStream()));
         String s;
+        boolean correcto = true;
         while ((s = stdError.readLine()) != null) {
             if (s.contains("[Warning]")) {
                 Logger.aviso(s);
             } else {
-                Logger.error(s);
+                Growls.mostrarError(parent, COPIAR_ESQUEMA, s, true);
+                correcto = false;
             }
         }
+        return correcto;
     }
 
     @Override

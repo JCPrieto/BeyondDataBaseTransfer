@@ -51,7 +51,7 @@ public class Logger {
         LOG.log(Level.INFO, mensaje, e);
     }
 
-    public void error(String mensaje, Throwable e) {
+    public static void error(String mensaje, Throwable e) {
         if (errores.containsKey(mensaje)) {
             LOG.log(Level.SEVERE, errores.getString(mensaje), e);
         } else {
