@@ -6,7 +6,8 @@ distintas máquinas de producción, preproducción y desarrollo.
 El funcionamiento es el siguiente:
 
 * Se genera un dump del esquema indicado utilizando el comando mysqldump del cliente Mysql instalado en el equipo.
-Para el dump se utilizan los parametros: '--quick --single-transaction --events --routines --triggers'
+Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --single-transaction --events --routines
+ --triggers'
 * Se restaura el dump en la maquina remota mediante el comando mysql del cliente Mysql instalado en el equipo.
 
 ### Requisitos ###
@@ -47,6 +48,8 @@ Para el dump se utilizan los parametros: '--quick --single-transaction --events 
 1.0.1:
 
 * Controlar y mostrar mensaje con los errores de los comandos mysqldump y mysql.
+* Se añade el parametro "--max_allowed_packet=2048M" para evitar que se corte la conexion con la BBDD a la hora de 
+realizar el dump.
 
 1.0.0:
 
