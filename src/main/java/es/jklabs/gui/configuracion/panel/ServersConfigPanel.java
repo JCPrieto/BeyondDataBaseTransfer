@@ -11,6 +11,7 @@ import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.json.configuracion.server.ServidorBBDD;
+import es.jklabs.utilidades.Mensajes;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 import es.jklabs.utilidades.UtilidadesEncryptacion;
 import es.jklabs.utilidades.UtilidadesString;
@@ -22,15 +23,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class ServersConfigPanel extends JPanel {
 
     private static final long serialVersionUID = -8382765162561596108L;
     private static final String ANADIR_SERVIDOR = "anadir.servidor";
     private static final String ANADIR_CARPETA = "anadir.carpeta";
-    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private final MainUI ventanaPrincipal;
     private Configuracion configuracion;
     private ConfiguracionUI dialogo;
@@ -77,9 +79,9 @@ public class ServersConfigPanel extends JPanel {
 
     private JPanel cargarBotoneraFormulario() {
         JPanel panel = new JPanel();
-        btnAceptar = new JButton(mensajes.getString("aceptar"));
+        btnAceptar = new JButton(Mensajes.getMensaje("aceptar"));
         btnAceptar.addActionListener(al -> guardarServidor());
-        btnCancelar = new JButton(mensajes.getString("cancelar"));
+        btnCancelar = new JButton(Mensajes.getMensaje("cancelar"));
         btnCancelar.addActionListener(al -> cancelarCreacionServidor());
         panel.add(btnAceptar);
         panel.add(btnCancelar);
@@ -169,7 +171,7 @@ public class ServersConfigPanel extends JPanel {
     private JPanel cargarFormulario() {
         panelFormularioServidor = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        JLabel lbNombre = new JLabel(mensajes.getString("nombre"));
+        JLabel lbNombre = new JLabel(Mensajes.getMensaje("nombre"));
         c.gridx = 0;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
@@ -182,7 +184,7 @@ public class ServersConfigPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 0;
         panelFormularioServidor.add(txNombre, c);
-        JLabel lbIp = new JLabel(mensajes.getString("host"));
+        JLabel lbIp = new JLabel(Mensajes.getMensaje("host"));
         c.gridx = 0;
         c.gridy = 1;
         panelFormularioServidor.add(lbIp, c);
@@ -191,7 +193,7 @@ public class ServersConfigPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 1;
         panelFormularioServidor.add(txIp, c);
-        JLabel lbPuerto = new JLabel(mensajes.getString("puerto"));
+        JLabel lbPuerto = new JLabel(Mensajes.getMensaje("puerto"));
         c.gridx = 0;
         c.gridy = 2;
         panelFormularioServidor.add(lbPuerto, c);
@@ -201,7 +203,7 @@ public class ServersConfigPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 2;
         panelFormularioServidor.add(txPuerto, c);
-        JLabel lbBbddUser = new JLabel(mensajes.getString("usuario"));
+        JLabel lbBbddUser = new JLabel(Mensajes.getMensaje("usuario"));
         c.gridx = 0;
         c.gridy = 6;
         c.anchor = GridBagConstraints.LINE_START;
@@ -211,7 +213,7 @@ public class ServersConfigPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 6;
         panelFormularioServidor.add(txBbddUser, c);
-        JLabel lbBbddPassword = new JLabel(mensajes.getString("contrasena"));
+        JLabel lbBbddPassword = new JLabel(Mensajes.getMensaje("contrasena"));
         c.gridx = 0;
         c.gridy = 7;
         panelFormularioServidor.add(lbBbddPassword, c);
@@ -234,13 +236,13 @@ public class ServersConfigPanel extends JPanel {
     private JPanel cargarBotoneraArbol() {
         panelBotoneraArbol = new JPanel(new GridLayout(2, 2, 10, 10));
         panelBotoneraArbol.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JButton btnAddFolder = new JButton(mensajes.getString(ANADIR_CARPETA));
+        JButton btnAddFolder = new JButton(Mensajes.getMensaje(ANADIR_CARPETA));
         btnAddFolder.addActionListener(al -> addCarpetaToArbol());
-        JButton btnAddServer = new JButton(mensajes.getString(ANADIR_SERVIDOR));
+        JButton btnAddServer = new JButton(Mensajes.getMensaje(ANADIR_SERVIDOR));
         btnAddServer.addActionListener(al -> addServidorToArbol());
-        JButton btnEdit = new JButton(mensajes.getString("editar"));
+        JButton btnEdit = new JButton(Mensajes.getMensaje("editar"));
         btnEdit.addActionListener(al -> editarNodoArbol());
-        JButton btnDelete = new JButton(mensajes.getString("eliminar"));
+        JButton btnDelete = new JButton(Mensajes.getMensaje("eliminar"));
         btnDelete.addActionListener(al -> eliminarNodoArbol());
         panelBotoneraArbol.add(btnAddFolder);
         panelBotoneraArbol.add(btnAddServer);

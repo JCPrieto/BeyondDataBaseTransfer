@@ -21,16 +21,15 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainUI extends JFrame {
 
     private static final long serialVersionUID = 4591514658240490883L;
 
-    private static final Logger LOG = Logger.getLogger();
     private static final String COPIAR_ESQUEMA = "copiar.esquema";
-    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
 
     private Configuracion configuracion;
     private JTree arbolOrigen;
@@ -44,6 +43,7 @@ public class MainUI extends JFrame {
     private transient TrayIcon trayIcon;
     private JMenu jmArchivo;
     private JMenu jmAyuda;
+    private JCheckBox cbLimpiar;
 
     private MainUI() {
         super(Constantes.NOMBRE_APP);
@@ -65,7 +65,7 @@ public class MainUI extends JFrame {
         try {
             tray.add(trayIcon);
         } catch (AWTException e) {
-            LOG.error("establecer.icono.systray", e);
+            Logger.error("establecer.icono.systray", e);
         }
     }
 
@@ -123,15 +123,15 @@ public class MainUI extends JFrame {
 
     private void cargarMenu() {
         JMenuBar menu = new JMenuBar();
-        jmArchivo = new JMenu(mensajes.getString("archivo"));
+        jmArchivo = new JMenu(Mensajes.getMensaje("archivo"));
         jmArchivo.setMargin(new Insets(5, 5, 5, 5));
-        JMenuItem jmiConfiguracion = new JMenuItem(mensajes.getString("configuracion"), new ImageIcon(Objects
+        JMenuItem jmiConfiguracion = new JMenuItem(Mensajes.getMensaje("configuracion"), new ImageIcon(Objects
                 .requireNonNull(getClass().getClassLoader().getResource("img/icons/settings.png"))));
         jmiConfiguracion.addActionListener(al -> abrirConfiguracion());
-        JMenuItem jmiExportar = new JMenuItem(mensajes.getString("exportar.servidores"), new ImageIcon(Objects
+        JMenuItem jmiExportar = new JMenuItem(Mensajes.getMensaje("exportar.servidores"), new ImageIcon(Objects
                 .requireNonNull(getClass().getClassLoader().getResource("img/icons/download.png"))));
         jmiExportar.addActionListener(al -> exportarServidores());
-        JMenuItem jmiImportar = new JMenuItem(mensajes.getString("importar.servidores"), new ImageIcon(Objects
+        JMenuItem jmiImportar = new JMenuItem(Mensajes.getMensaje("importar.servidores"), new ImageIcon(Objects
                 .requireNonNull(getClass().getClassLoader().getResource("img/icons/upload.png"))));
         jmiImportar.addActionListener(al -> importarServidores());
         jmArchivo.add(jmiConfiguracion);
@@ -139,7 +139,7 @@ public class MainUI extends JFrame {
         jmArchivo.add(jmiImportar);
         jmAyuda = new JMenu("Ayuda");
         jmAyuda.setMargin(new Insets(5, 5, 5, 5));
-        JMenuItem jmiAcercaDe = new JMenuItem(mensajes.getString("acerca.de"), new ImageIcon(Objects
+        JMenuItem jmiAcercaDe = new JMenuItem(Mensajes.getMensaje("acerca.de"), new ImageIcon(Objects
                 .requireNonNull(getClass().getClassLoader().getResource("img/icons/info.png"))));
         jmiAcercaDe.addActionListener(al -> mostrarAcercaDe());
         jmAyuda.add(jmiAcercaDe);
@@ -148,7 +148,7 @@ public class MainUI extends JFrame {
         try {
             if (UtilidadesFirebase.existeNuevaVersion()) {
                 menu.add(Box.createHorizontalGlue());
-                JMenuItem jmActualizacion = new JMenuItem(mensajes.getString("existe.nueva.version"), new ImageIcon
+                JMenuItem jmActualizacion = new JMenuItem(Mensajes.getMensaje("existe.nueva.version"), new ImageIcon
                         (Objects.requireNonNull(getClass().getClassLoader().getResource("img/icons/update.png"))));
                 jmActualizacion.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
                 jmActualizacion.setHorizontalTextPosition(SwingConstants.RIGHT);
@@ -156,7 +156,8 @@ public class MainUI extends JFrame {
                 menu.add(jmActualizacion);
             }
         } catch (IOException | InterruptedException e) {
-            LOG.error("consultar.nueva.version", e);
+            Logger.error("consultar.nueva.version", e);
+            Thread.currentThread().interrupt();
         }
         super.setJMenuBar(menu);
     }
@@ -186,23 +187,31 @@ public class MainUI extends JFrame {
     }
 
     private JPanel cargarFormulario() {
-        JPanel panelFormulario = new JPanel(new BorderLayout(10, 10));
+        JPanel panelFormulario = new JPanel(new BorderLayout(0, 5));
         panelFormulario.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JLabel lbEsquema = new JLabel(mensajes.getString("esquema"));
+        cbLimpiar = new JCheckBox(Mensajes.getMensaje("limpiar.esquema"));
+        progressBar = new JProgressBar(0, 3);
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
+        panelFormulario.add(getFormularioEsquema(), BorderLayout.NORTH);
+        panelFormulario.add(cbLimpiar, BorderLayout.CENTER);
+        panelFormulario.add(progressBar, BorderLayout.SOUTH);
+        return panelFormulario;
+    }
+
+    private JPanel getFormularioEsquema() {
+        JPanel panelFormulario = new JPanel(new BorderLayout(10, 10));
+        JLabel lbEsquema = new JLabel(Mensajes.getMensaje("esquema"));
         txEsquema = new JTextField();
         txEsquema.setColumns(10);
         txEsquema.setFocusTraversalKeysEnabled(false);
         listaEsquemas = new ArrayList<>();
         AutoCompleteDecorator.decorate(txEsquema, listaEsquemas, false);
-        btnAceptar = new JButton(mensajes.getString("copiar"));
+        btnAceptar = new JButton(Mensajes.getMensaje("copiar"));
         btnAceptar.addActionListener(al -> copiarEsquema());
-        progressBar = new JProgressBar(0, 3);
-        progressBar.setValue(0);
-        progressBar.setStringPainted(true);
         panelFormulario.add(lbEsquema, BorderLayout.WEST);
         panelFormulario.add(txEsquema, BorderLayout.CENTER);
         panelFormulario.add(btnAceptar, BorderLayout.EAST);
-        panelFormulario.add(progressBar, BorderLayout.SOUTH);
         return panelFormulario;
     }
 
@@ -214,7 +223,8 @@ public class MainUI extends JFrame {
                     () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
                 bloquearPantalla();
                 CopySchema task = new CopySchema(this, configuracion.getMysqlCliente(), (Servidor) origen
-                        .getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim());
+                        .getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim(),
+                        cbLimpiar.isSelected());
                 task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
                 task.execute();
                 UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(),
@@ -245,10 +255,9 @@ public class MainUI extends JFrame {
             Growls.mostrarAviso(this, COPIAR_ESQUEMA, "ruta.instalacion.mysql.no.configurada");
             valido = false;
         } else {
-            String sistemaOperativo = System.getProperty("os.name", "generic").toLowerCase();
             String comandoMysql;
             String comandoMysqlDump;
-            if (sistemaOperativo.contains("win")) {
+            if (UtilidadesSistema.isWindows()) {
                 comandoMysql = Constantes.MYSQL_EXE;
                 comandoMysqlDump = Constantes.MYSQLDUMP_EXE;
             } else {
@@ -298,7 +307,7 @@ public class MainUI extends JFrame {
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
         JScrollPane scroll = new JScrollPane(arbolDestino);
-        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 5, 0, 10), mensajes.getString
+        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 5, 0, 10), Mensajes.getMensaje
                 ("destino")));
         scroll.setPreferredSize(new Dimension(200, 300));
         return scroll;
@@ -313,7 +322,7 @@ public class MainUI extends JFrame {
         arbolOrigen.addTreeSelectionListener(tsl -> selecionarOrigen());
         UtilidadesJTree.expandAllNodes(arbolOrigen, 0, arbolOrigen.getRowCount());
         JScrollPane scroll = new JScrollPane(arbolOrigen);
-        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 10, 0, 5), mensajes.getString
+        scroll.setBorder(BorderFactory.createTitledBorder(new EmptyBorder(10, 10, 0, 5), Mensajes.getMensaje
                 ("origen")));
         scroll.setPreferredSize(new Dimension(200, 300));
         return scroll;

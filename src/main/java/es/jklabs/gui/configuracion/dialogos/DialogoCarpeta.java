@@ -6,6 +6,7 @@ import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
+import es.jklabs.utilidades.Mensajes;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 import es.jklabs.utilidades.UtilidadesString;
 
@@ -14,12 +15,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class DialogoCarpeta extends JDialog {
 
-    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = 7372193257865030732L;
     private final Carpeta carpeta;
     private final JTree arbol;
@@ -30,7 +28,7 @@ public class DialogoCarpeta extends JDialog {
     private JTextField txNombre;
 
     public DialogoCarpeta(ServersConfigPanel panel, Carpeta carpeta, boolean nuevo) {
-        super(panel.getDialogo(), mensajes.getString("carpeta"), true);
+        super(panel.getDialogo(), Mensajes.getMensaje("carpeta"), true);
         this.padre = panel.getDialogo().getVentanaPrincipal();
         this.arbol = panel.getArbol();
         this.configuracion = panel.getConfiguracion();
@@ -49,11 +47,11 @@ public class DialogoCarpeta extends JDialog {
     private void cargarPantalla() {
         JPanel formulario = new JPanel(new BorderLayout(10, 10));
         formulario.setBorder(new EmptyBorder(10, 10, 10, 10));
-        formulario.add(new JLabel(mensajes.getString("nombre")), BorderLayout.WEST);
+        formulario.add(new JLabel(Mensajes.getMensaje("nombre")), BorderLayout.WEST);
         txNombre = new JTextField(carpeta.getNombre());
         txNombre.setColumns(10);
         formulario.add(txNombre, BorderLayout.CENTER);
-        JButton btnAceptar = new JButton(mensajes.getString("aceptar"));
+        JButton btnAceptar = new JButton(Mensajes.getMensaje("aceptar"));
         btnAceptar.addActionListener(al -> guardarNombre());
         formulario.add(btnAceptar, BorderLayout.SOUTH);
         this.add(formulario);

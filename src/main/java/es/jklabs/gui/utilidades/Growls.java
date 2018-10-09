@@ -2,15 +2,11 @@ package es.jklabs.gui.utilidades;
 
 import es.jklabs.gui.MainUI;
 import es.jklabs.utilidades.Logger;
+import es.jklabs.utilidades.Mensajes;
 
 import java.awt.*;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class Growls {
-
-    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
-    private static ResourceBundle errores = ResourceBundle.getBundle("i18n/errores", Locale.getDefault());
 
     private Growls() {
 
@@ -21,7 +17,7 @@ public class Growls {
     }
 
     public static void mostrarError(MainUI parent, String titulo, String cuerpo, Exception e) {
-        parent.getTrayIcon().displayMessage(titulo != null ? mensajes.getString(titulo) : null, errores.getString
+        parent.getTrayIcon().displayMessage(titulo != null ? Mensajes.getMensaje(titulo) : null, Mensajes.getError
                 (cuerpo), TrayIcon.MessageType.ERROR);
         Logger.error(cuerpo, e);
     }
@@ -31,7 +27,7 @@ public class Growls {
     }
 
     public static void mostrarError(MainUI parent, String titulo, String cuerpo, boolean log) {
-        parent.getTrayIcon().displayMessage(titulo != null ? mensajes.getString(titulo) : null, errores.getString
+        parent.getTrayIcon().displayMessage(titulo != null ? Mensajes.getMensaje(titulo) : null, Mensajes.getError
                 (cuerpo), TrayIcon.MessageType.ERROR);
         if (log) {
             Logger.error(cuerpo);
@@ -39,12 +35,12 @@ public class Growls {
     }
 
     public static void mostrarInfo(MainUI parent, String titulo, String cuerpo) {
-        parent.getTrayIcon().displayMessage(titulo != null ? mensajes.getString(titulo) : null, mensajes.getString
+        parent.getTrayIcon().displayMessage(titulo != null ? Mensajes.getMensaje(titulo) : null, Mensajes.getMensaje
                 (cuerpo), TrayIcon.MessageType.INFO);
     }
 
     public static void mostrarAviso(MainUI parent, String titulo, String cuerpo) {
-        parent.getTrayIcon().displayMessage(titulo != null ? mensajes.getString(titulo) : null, errores.getString
+        parent.getTrayIcon().displayMessage(titulo != null ? Mensajes.getMensaje(titulo) : null, Mensajes.getError
                 (cuerpo), TrayIcon.MessageType.WARNING);
     }
 

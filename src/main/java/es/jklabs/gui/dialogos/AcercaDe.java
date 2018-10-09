@@ -4,6 +4,7 @@ import es.jklabs.gui.MainUI;
 import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.listener.UrlMouseListener;
 import es.jklabs.utilidades.Constantes;
+import es.jklabs.utilidades.Mensajes;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,18 +14,15 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
 public class AcercaDe extends JDialog {
 
-    private static ResourceBundle mensajes = ResourceBundle.getBundle("i18n/mensajes", Locale.getDefault());
     private static final long serialVersionUID = -5470046546293155454L;
     private final MainUI padre;
 
     public AcercaDe(MainUI mainUI) {
-        super(mainUI, mensajes.getString("acerca.de"), true);
+        super(mainUI, Mensajes.getMensaje("acerca.de"), true);
         this.padre = mainUI;
         cargarPantalla();
     }
@@ -43,7 +41,7 @@ public class AcercaDe extends JDialog {
         cns.gridy = 0;
         cns.gridwidth = 3;
         panel.add(jLabelTitle, cns);
-        final JLabel jLabelCreadoPor = new JLabel(mensajes.getString("creado.por"), JLabel.LEFT);
+        final JLabel jLabelCreadoPor = new JLabel(Mensajes.getMensaje("creado.por"), JLabel.LEFT);
         cns.insets = new Insets(10, 10, 3, 10);
         cns.gridy = 1;
         cns.gridwidth = 1;
@@ -91,7 +89,7 @@ public class AcercaDe extends JDialog {
         });
         cns.gridx = 2;
         panel.add(jLabelMyMail, cns);
-        final JLabel jLabelPoweredBy = new JLabel(mensajes.getString("powered.by"), JLabel.LEFT);
+        final JLabel jLabelPoweredBy = new JLabel(Mensajes.getMensaje("powered.by"), JLabel.LEFT);
         cns.insets = new Insets(10, 10, 3, 10);
         cns.gridx = 0;
         cns.gridy = 4;
@@ -113,7 +111,7 @@ public class AcercaDe extends JDialog {
         cns.gridy = 11;
         cns.gridwidth = 3;
         panel.add(jLabelLicense, cns);
-        JButton botonOk = new JButton(mensajes.getString("aceptar"));
+        JButton botonOk = new JButton(Mensajes.getMensaje("aceptar"));
         botonOk.addActionListener(al -> pressAceptar());
         cns.gridy = 12;
         panel.add(botonOk, cns);

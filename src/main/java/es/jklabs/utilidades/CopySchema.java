@@ -19,13 +19,16 @@ public class CopySchema extends SwingWorker<Void, Void> {
     private final String esquema;
     private final MainUI parent;
     private final MysqlCliente mysqlCliente;
+    private final boolean limparEsquema;
 
-    public CopySchema(MainUI parent, MysqlCliente mysqlCliente, Servidor sOrigen, Servidor sDestino, String esquema) {
+    public CopySchema(MainUI parent, MysqlCliente mysqlCliente, Servidor sOrigen, Servidor sDestino, String esquema,
+                      boolean limparEsquema) {
         this.parent = parent;
         this.mysqlCliente = mysqlCliente;
         this.sOrigen = sOrigen;
         this.sDestino = sDestino;
         this.esquema = esquema;
+        this.limparEsquema = limparEsquema;
     }
 
     @Override
@@ -33,7 +36,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
         setProgress(0);
         int count = 1;
         boolean origenOk = false;
-        try (FileOutputStream fos = new FileOutputStream(System.getProperty("java.io.tmpdir") + esquema + ".sql")) {
+        try (FileOutputStream fos = new FileOutputStream(UtilidadesSistema.getTmpDir() + esquema + ".sql")) {
             //Conexion
             setProgress(count++);
             //Crear dump
@@ -41,9 +44,13 @@ public class CopySchema extends SwingWorker<Void, Void> {
             String port = "-P " + sOrigen.getPuerto();
             String usuario = "-u" + sOrigen.getServidorBBDD().getUsuario();
             String pass = "-p" + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword());
-            Process p = Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes
-                    .MYSQLDUMP + " " + server + " " + port + " " + usuario + " " + pass + " --quick " +
-                    "--max_allowed_packet=2048M --single-transaction --events --routines --triggers --databases " + esquema);
+            String comando =
+                    mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes.MYSQLDUMP + " " + server + " " + port + " " + usuario + " " + pass + " --quick " +
+                            "--max_allowed_packet=2048M --single-transaction --events --routines --triggers --databases " + esquema;
+            if (limparEsquema) {
+                comando = comando + " --add-drop-database";
+            }
+            Process p = Runtime.getRuntime().exec(comando);
             InputStream is = p.getInputStream();
             byte[] buffer = new byte[1000];
             int leido = is.read(buffer);
@@ -56,7 +63,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
         }
         if (origenOk) {
-            String src = System.getProperty("java.io.tmpdir") + esquema + ".sql";
+            String src = UtilidadesSistema.getTmpDir() + esquema + ".sql";
             boolean destinoOk = false;
             try (FileInputStream fis = new FileInputStream(src)) {
                 String server = "-h " + sDestino.getIp();

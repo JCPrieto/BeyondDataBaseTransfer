@@ -3,8 +3,6 @@ package es.jklabs.utilidades;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
@@ -13,7 +11,6 @@ public class Logger {
 
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(Logger.class.getName());
     private static Logger logger;
-    private static ResourceBundle errores = ResourceBundle.getBundle("i18n/errores", Locale.getDefault());
 
     private Logger() {
         LocalDate hoy = LocalDate.now();
@@ -52,11 +49,7 @@ public class Logger {
     }
 
     public static void error(String mensaje, Throwable e) {
-        if (errores.containsKey(mensaje)) {
-            LOG.log(Level.SEVERE, errores.getString(mensaje), e);
-        } else {
-            LOG.log(Level.SEVERE, mensaje, e);
-        }
+        LOG.log(Level.SEVERE, Mensajes.getError(mensaje), e);
     }
 
     void info(String mensaje) {
