@@ -51,14 +51,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 comando = comando + " --add-drop-database";
             }
             Process p = Runtime.getRuntime().exec(comando);
-            InputStream is = p.getInputStream();
-            byte[] buffer = new byte[1000];
-            int leido = is.read(buffer);
-            while (leido > 0) {
-                fos.write(buffer, 0, leido);
-                leido = is.read(buffer);
-            }
-            origenOk = sinErrores(p);
+            origenOk = crearBackUp(fos, p);
         } catch (Exception e) {
             Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
         }
@@ -73,20 +66,8 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 setProgress(count++);
                 Process p = Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR +
                         Constantes.MYSQL + " " + server + " " + port + " " + usuario + " " + pass + " " + esquema);
-                OutputStream os = p.getOutputStream();
-                byte[] buffer = new byte[1000];
-                int leido = fis.read(buffer);
-                while (leido > 0) {
-                    os.write(buffer, 0, leido);
-                    leido = fis.read(buffer);
-                }
-                os.flush();
-                os.close();
-                destinoOk = sinErrores(p);
-                if (destinoOk) {
-                    setProgress(count);
-                    Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
-                }
+                destinoOk = restautarBackUp(fis, p);
+                setProgress(count);
             } catch (Exception e) {
                 Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
             } finally {
@@ -101,6 +82,52 @@ public class CopySchema extends SwingWorker<Void, Void> {
             }
         }
         return null;
+    }
+
+    private boolean restautarBackUp(FileInputStream fis, Process p) throws IOException {
+        boolean error = false;
+        boolean correcto = true;
+        try {
+            OutputStream os = p.getOutputStream();
+            byte[] buffer = new byte[1000];
+            int leido = fis.read(buffer);
+            while (leido > 0) {
+                os.write(buffer, 0, leido);
+                leido = fis.read(buffer);
+            }
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+            error = true;
+        } finally {
+            if (sinErrores(p) && !error) {
+                Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
+            } else {
+                correcto = false;
+            }
+        }
+        return correcto;
+    }
+
+    private boolean crearBackUp(FileOutputStream fos, Process p) throws IOException {
+        boolean error = false;
+        boolean correcto;
+        try {
+            InputStream is = p.getInputStream();
+            byte[] buffer = new byte[1000];
+            int leido = is.read(buffer);
+            while (leido > 0) {
+                fos.write(buffer, 0, leido);
+                leido = is.read(buffer);
+            }
+        } catch (Exception e) {
+            Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
+            error = true;
+        } finally {
+            correcto = sinErrores(p) && !error;
+        }
+        return correcto;
     }
 
     private boolean sinErrores(Process p) throws IOException {
