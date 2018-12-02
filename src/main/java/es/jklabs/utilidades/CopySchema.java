@@ -53,7 +53,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             Process p = Runtime.getRuntime().exec(comando);
             origenOk = crearBackUp(fos, p);
         } catch (Exception e) {
-            Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.realizar.backup", e);
         }
         if (origenOk) {
             String src = UtilidadesSistema.getTmpDir() + esquema + ".sql";
@@ -69,7 +69,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 destinoOk = restautarBackUp(fis, p);
                 setProgress(count);
             } catch (Exception e) {
-                Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+                Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
             } finally {
                 Path paths = Paths.get(src);
                 try {
@@ -77,7 +77,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
                         Files.delete(paths);
                     }
                 } catch (IOException e) {
-                    Growls.mostrarError(parent, COPIAR_ESQUEMA, "eliminar.archivo.temporal");
+                    Growls.mostrarError(COPIAR_ESQUEMA, "eliminar.archivo.temporal");
                 }
             }
         }
@@ -98,11 +98,11 @@ public class CopySchema extends SwingWorker<Void, Void> {
             os.flush();
             os.close();
         } catch (Exception e) {
-            Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
             error = true;
         } finally {
             if (sinErrores(p) && !error) {
-                Growls.mostrarInfo(parent, COPIAR_ESQUEMA, "copia.realizada.exito");
+                Growls.mostrarInfo(COPIAR_ESQUEMA, "copia.realizada.exito");
             } else {
                 correcto = false;
             }
@@ -122,7 +122,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 leido = is.read(buffer);
             }
         } catch (Exception e) {
-            Growls.mostrarError(parent, COPIAR_ESQUEMA, "fallo.realizar.backup", e);
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.realizar.backup", e);
             error = true;
         } finally {
             correcto = sinErrores(p) && !error;
@@ -139,7 +139,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             if (s.contains("[Warning]")) {
                 Logger.aviso(s);
             } else {
-                Growls.mostrarError(parent, COPIAR_ESQUEMA, s, true);
+                Growls.mostrarError(COPIAR_ESQUEMA, s, true);
                 correcto = false;
             }
         }

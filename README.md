@@ -31,6 +31,7 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
     * Apache Commons https://commons.apache.org
     * SwingX 
     * Firebase https://firebase.google.com
+    * ControlsFX http://fxexperience.com/controlsfx
     
 ### ToDo ###
 
@@ -43,6 +44,11 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 * Mostras un texto descriptivo en la barra de progreso
 
 ### Changelog ###
+
+1.2.0:
+
+* Se elimina el icono de Systray, por la incompatibilidad con Gnome3 y utilizamos ControlsFX para monstrar las 
+notificaciones.
 
 1.1.0:
 

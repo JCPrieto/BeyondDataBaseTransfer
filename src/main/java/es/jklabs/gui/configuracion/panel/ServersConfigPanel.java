@@ -1,6 +1,5 @@
 package es.jklabs.gui.configuracion.panel;
 
-import es.jklabs.gui.MainUI;
 import es.jklabs.gui.configuracion.ConfiguracionUI;
 import es.jklabs.gui.configuracion.dialogos.DialogoCarpeta;
 import es.jklabs.gui.utilidades.ArbolRendered;
@@ -33,7 +32,6 @@ public class ServersConfigPanel extends JPanel {
     private static final long serialVersionUID = -8382765162561596108L;
     private static final String ANADIR_SERVIDOR = "anadir.servidor";
     private static final String ANADIR_CARPETA = "anadir.carpeta";
-    private final MainUI ventanaPrincipal;
     private Configuracion configuracion;
     private ConfiguracionUI dialogo;
     private JButton btnAceptar;
@@ -48,9 +46,8 @@ public class ServersConfigPanel extends JPanel {
     private JTextField txBbddUser;
     private JPasswordField txBbddPasword;
 
-    public ServersConfigPanel(MainUI ventanaPrincipal, ConfiguracionUI dialogo, Configuracion configuracion) {
+    public ServersConfigPanel(ConfiguracionUI dialogo, Configuracion configuracion) {
         super();
-        this.ventanaPrincipal = ventanaPrincipal;
         this.dialogo = dialogo;
         this.configuracion = configuracion;
         cargarPantalla();
@@ -147,23 +144,23 @@ public class ServersConfigPanel extends JPanel {
         boolean valido = true;
         if (UtilidadesString.isEmpty(txNombre)) {
             valido = false;
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "nombre.servidor.vacio");
+            Growls.mostrarAviso(ANADIR_SERVIDOR, "nombre.servidor.vacio");
         }
         if (UtilidadesString.isEmpty(txIp)) {
             valido = false;
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "ip.servidor.vacio");
+            Growls.mostrarAviso(ANADIR_SERVIDOR, "ip.servidor.vacio");
         }
         if (UtilidadesString.isEmpty(txPuerto)) {
             valido = false;
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "puerto.servidor.vacio");
+            Growls.mostrarAviso(ANADIR_SERVIDOR, "puerto.servidor.vacio");
         }
         if (UtilidadesString.isEmpty(txBbddUser)) {
             valido = false;
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "usuario.vacio");
+            Growls.mostrarAviso(ANADIR_SERVIDOR, "usuario.vacio");
         }
         if (UtilidadesString.isEmpty(txBbddPasword)) {
             valido = false;
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_SERVIDOR, "password.vacio");
+            Growls.mostrarAviso(ANADIR_SERVIDOR, "password.vacio");
         }
         return valido;
     }
@@ -368,7 +365,7 @@ public class ServersConfigPanel extends JPanel {
             setEnableFormularioServidor(true);
             SwingUtilities.updateComponentTreeUI(arbol);
         } else {
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_CARPETA, "anadir.servidor.en.servidor");
+            Growls.mostrarAviso(ANADIR_CARPETA, "anadir.servidor.en.servidor");
         }
     }
 
@@ -386,7 +383,7 @@ public class ServersConfigPanel extends JPanel {
             DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, nuevaCarpeta, true);
             dialogoCarpeta.setVisible(true);
         } else {
-            Growls.mostrarAviso(ventanaPrincipal, ANADIR_CARPETA, "anadir.carpeta.en.servidor");
+            Growls.mostrarAviso(ANADIR_CARPETA, "anadir.carpeta.en.servidor");
         }
     }
 

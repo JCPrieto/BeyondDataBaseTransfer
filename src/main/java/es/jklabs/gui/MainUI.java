@@ -10,6 +10,7 @@ import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.utilidades.*;
+import javafx.embed.swing.JFXPanel;
 import org.apache.commons.io.FilenameUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -40,7 +41,6 @@ public class MainUI extends JFrame {
     private List<String> listaEsquemas;
     private DefaultMutableTreeNode raizArbolDestino;
     private JButton btnAceptar;
-    private transient TrayIcon trayIcon;
     private JMenu jmArchivo;
     private JMenu jmAyuda;
     private JCheckBox cbLimpiar;
@@ -51,26 +51,12 @@ public class MainUI extends JFrame {
                 ("img/icons/database.png"))).getImage());
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         cargarMenu();
-        cargarNotificaciones();
         super.pack();
     }
 
-    private void cargarNotificaciones() {
-        SystemTray tray = SystemTray.getSystemTray();
-        //Alternative (if the icon is on the classpath):
-        trayIcon = new TrayIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
-                ("img/icons/database.png"))).getImage(), Constantes.NOMBRE_APP);
-        //Let the system resizes the image if needed
-        trayIcon.setImageAutoSize(true);
-        try {
-            tray.add(trayIcon);
-        } catch (AWTException e) {
-            Logger.error("establecer.icono.systray", e);
-        }
-    }
-
-    public MainUI(Configuracion configuracion) {
+    public MainUI(JFXPanel fxPanel, Configuracion configuracion) {
         this();
+        add(fxPanel);
         this.configuracion = configuracion;
         cargarPantallaPrincipal();
         super.pack();
@@ -166,7 +152,7 @@ public class MainUI extends JFrame {
         try {
             UtilidadesFirebase.descargaNuevaVersion(this);
         } catch (InterruptedException e) {
-            Growls.mostrarError(this, "descargar.nueva.version", e);
+            Growls.mostrarError("descargar.nueva.version", e);
             Thread.currentThread().interrupt();
         }
     }
@@ -238,21 +224,21 @@ public class MainUI extends JFrame {
         boolean valido = true;
         DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
         if (origen == null || !(origen.getUserObject() instanceof Servidor)) {
-            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "bbdd.origen.vacio");
+            Growls.mostrarAviso(COPIAR_ESQUEMA, "bbdd.origen.vacio");
             valido = false;
         }
         DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
         if (destino == null || !(destino.getUserObject() instanceof Servidor)) {
-            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "bbdd.destino.vacio");
+            Growls.mostrarAviso(COPIAR_ESQUEMA, "bbdd.destino.vacio");
             valido = false;
         }
         if (UtilidadesString.isEmpty(txEsquema)) {
-            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "nombre.esquema.vacio");
+            Growls.mostrarAviso(COPIAR_ESQUEMA, "nombre.esquema.vacio");
             valido = false;
         }
         if (configuracion.getMysqlCliente() == null ||
                 UtilidadesString.isEmpty(configuracion.getMysqlCliente().getPath())) {
-            Growls.mostrarAviso(this, COPIAR_ESQUEMA, "ruta.instalacion.mysql.no.configurada");
+            Growls.mostrarAviso(COPIAR_ESQUEMA, "ruta.instalacion.mysql.no.configurada");
             valido = false;
         } else {
             String comandoMysql;
@@ -269,11 +255,11 @@ public class MainUI extends JFrame {
             File mysqlDump = new File(configuracion.getMysqlCliente().getPath() + UtilidadesFichero.SEPARADOR +
                     comandoMysqlDump);
             if (!mysql.exists()) {
-                Growls.mostrarAviso(this, COPIAR_ESQUEMA, "orden.mysql.no.encontrado");
+                Growls.mostrarAviso(COPIAR_ESQUEMA, "orden.mysql.no.encontrado");
                 valido = false;
             }
             if (!mysqlDump.exists()) {
-                Growls.mostrarAviso(this, COPIAR_ESQUEMA, "orden.mysqldump.no.encontrado");
+                Growls.mostrarAviso(COPIAR_ESQUEMA, "orden.mysqldump.no.encontrado");
                 valido = false;
             }
         }
@@ -389,10 +375,6 @@ public class MainUI extends JFrame {
 
     private JButton getBtnAceptar() {
         return btnAceptar;
-    }
-
-    public TrayIcon getTrayIcon() {
-        return trayIcon;
     }
 
     public void desbloquearPantalla() {

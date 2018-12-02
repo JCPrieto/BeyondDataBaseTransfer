@@ -1,6 +1,5 @@
 package es.jklabs.gui.configuracion.dialogos;
 
-import es.jklabs.gui.MainUI;
 import es.jklabs.gui.configuracion.panel.ServersConfigPanel;
 import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
@@ -24,12 +23,10 @@ public class DialogoCarpeta extends JDialog {
     private final Configuracion configuracion;
     private final DefaultMutableTreeNode parentNode;
     private final boolean nuevo;
-    private final MainUI padre;
     private JTextField txNombre;
 
     public DialogoCarpeta(ServersConfigPanel panel, Carpeta carpeta, boolean nuevo) {
         super(panel.getDialogo(), Mensajes.getMensaje("carpeta"), true);
-        this.padre = panel.getDialogo().getVentanaPrincipal();
         this.arbol = panel.getArbol();
         this.configuracion = panel.getConfiguracion();
         TreePath parentPath = arbol.getSelectionPath();
@@ -70,7 +67,7 @@ public class DialogoCarpeta extends JDialog {
             UtilidadesConfiguracion.guardarConfiguracion(configuracion);
             super.dispose();
         } else {
-            Growls.mostrarAviso(padre, "anadir.carpeta", "nombre.carpeta.vacio");
+            Growls.mostrarAviso("anadir.carpeta", "nombre.carpeta.vacio");
         }
     }
 }
