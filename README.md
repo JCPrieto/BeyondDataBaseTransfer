@@ -45,6 +45,10 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 ### Changelog ###
 
+1.2.1:
+
+* Correción a la hora de importar un archivo de configuracion de servidores anterior a la version 1.0.0.
+
 1.2.0:
 
 * Se elimina el icono de Systray, por la incompatibilidad con Gnome3 y utilizamos ControlsFX para monstrar las 

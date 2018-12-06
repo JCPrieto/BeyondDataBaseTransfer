@@ -34,11 +34,10 @@ public class UtilidadesConfiguracion {
                 Files.move(file.toPath(), FileSystems.getDefault().getPath(UtilidadesFichero.HOME +
                         UtilidadesFichero.SEPARADOR + UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON));
             } catch (IOException e) {
-                LOG.error("Mover archivo de configuracion", e);
+                Logger.error("Mover archivo de configuracion", e);
             }
         }
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper mapper = getObjectMapper();
         Configuracion configuracion = null;
         try {
             configuracion = mapper.readValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
@@ -46,20 +45,19 @@ public class UtilidadesConfiguracion {
         } catch (FileNotFoundException e) {
             LOG.info("Fichero de configuracion no encontrado", e);
         } catch (IOException e) {
-            LOG.error("Error de lectura del fichero de configuracion", e);
+            Logger.error("Error de lectura del fichero de configuracion", e);
         }
         return configuracion;
     }
 
     public static void guardarConfiguracion(Configuracion configuracion) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectMapper mapper = getObjectMapper();
         try {
             UtilidadesFichero.createBaseFolder();
             mapper.writeValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
                     UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON), configuracion);
         } catch (IOException e) {
-            LOG.error("Guardar configuracion", e);
+            Logger.error("Guardar configuracion", e);
         }
     }
 
@@ -78,24 +76,30 @@ public class UtilidadesConfiguracion {
     }
 
     public static void guardarServidores(ServerConfig serverConfig, File file) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectMapper mapper = getObjectMapper();
         try {
             mapper.writeValue(file, serverConfig);
         } catch (IOException e) {
-            LOG.error("Guardar servidores", e);
+            Logger.error("Guardar servidores", e);
         }
     }
 
     public static void loadServidores(Configuracion configuracion, File file) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = getObjectMapper();
         try {
             ServerConfig nuevosServidores = mapper.readValue(file, ServerConfig.class);
             addServidores(configuracion, configuracion.getServerConfig().getRaiz(), nuevosServidores.getRaiz());
             guardarConfiguracion(configuracion);
         } catch (IOException e) {
-            LOG.error("Cargar servidores", e);
+            Logger.error("Cargar servidores", e);
         }
+    }
+
+    private static ObjectMapper getObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
     }
 
     private static void addServidores(Configuracion configuracion, Carpeta destino, Carpeta origen) {
