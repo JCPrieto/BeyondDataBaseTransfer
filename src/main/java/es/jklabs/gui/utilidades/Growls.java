@@ -66,7 +66,7 @@ public class Growls {
         if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
             SystemTray tray = SystemTray.getSystemTray();
             trayIcon = new TrayIcon(new ImageIcon(Objects.requireNonNull(Growls.class.getClassLoader().getResource
-                    ("img/icons/newpct.png"))).getImage(), Constantes.NOMBRE_APP);
+                    ("img/icons/database.png"))).getImage(), Constantes.NOMBRE_APP);
             trayIcon.setImageAutoSize(true);
             try {
                 tray.add(trayIcon);
