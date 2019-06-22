@@ -2,49 +2,35 @@ package es.jklabs;
 
 import es.jklabs.gui.MainUI;
 import es.jklabs.gui.configuracion.ConfiguracionUI;
+import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 
 import javax.swing.*;
 
 public class BeyondDataBaseTransfer {
 
-    private static final Logger LOG = Logger.getLogger();
-
     public static void main(String[] args) {
+        Logger.init();
         try {
+            Growls.init();
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            final JFXPanel fxPanel = new JFXPanel();
             Configuracion configuracion = UtilidadesConfiguracion.loadConfig();
             if (configuracion == null) {
                 configuracion = new Configuracion();
-                MainUI mainUI = new MainUI(fxPanel, configuracion);
+                MainUI mainUI = new MainUI(configuracion);
                 ConfiguracionUI configuracionUI = new ConfiguracionUI(mainUI, configuracion);
                 configuracionUI.setVisible(true);
                 mainUI.setVisible(true);
             } else {
-                MainUI mainUI = new MainUI(fxPanel, configuracion);
+                MainUI mainUI = new MainUI(configuracion);
                 mainUI.setVisible(true);
             }
-            Platform.runLater(() -> initFX(fxPanel));
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                 UnsupportedLookAndFeelException e) {
-            LOG.error("Cargar el LookAndFeel del S.O", e);
+            Logger.error("Cargar el LookAndFeel del S.O", e);
         }
     }
 
-    private static void initFX(JFXPanel fxPanel) {
-        Scene scene = createScene();
-        fxPanel.setScene(scene);
-    }
-
-    private static Scene createScene() {
-        Group root = new Group();
-        return (new Scene(root));
-    }
 }

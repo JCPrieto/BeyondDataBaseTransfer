@@ -4,14 +4,12 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
 
 public class UtilidadesEncryptacion {
 
-    private static final Logger LOG = Logger.getLogger();
-
     private static final String INIT_VECTOR = "5AAA6aC_funj3E#S";
     private static final String KEY = "UqebTGVj&f%8%SUR";
-    private static final String UTF_8 = "UTF-8";
 
     private UtilidadesEncryptacion() {
 
@@ -19,8 +17,8 @@ public class UtilidadesEncryptacion {
 
     public static String encrypt(String value) {
         try {
-            IvParameterSpec iv = new IvParameterSpec(INIT_VECTOR.getBytes(UTF_8));
-            SecretKeySpec skeySpec = new SecretKeySpec(KEY.getBytes(UTF_8), "AES");
+            IvParameterSpec iv = new IvParameterSpec(INIT_VECTOR.getBytes(StandardCharsets.UTF_8));
+            SecretKeySpec skeySpec = new SecretKeySpec(KEY.getBytes(StandardCharsets.UTF_8), "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
@@ -29,7 +27,7 @@ public class UtilidadesEncryptacion {
 
             return DatatypeConverter.printBase64Binary(encrypted);
         } catch (Exception ex) {
-            LOG.error("Encriptar dato", ex);
+            Logger.error("Encriptar dato", ex);
         }
 
         return null;
@@ -37,8 +35,8 @@ public class UtilidadesEncryptacion {
 
     public static String decrypt(String encrypted) {
         try {
-            IvParameterSpec iv = new IvParameterSpec(INIT_VECTOR.getBytes(UTF_8));
-            SecretKeySpec skeySpec = new SecretKeySpec(KEY.getBytes(UTF_8), "AES");
+            IvParameterSpec iv = new IvParameterSpec(INIT_VECTOR.getBytes(StandardCharsets.UTF_8));
+            SecretKeySpec skeySpec = new SecretKeySpec(KEY.getBytes(StandardCharsets.UTF_8), "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
@@ -46,7 +44,7 @@ public class UtilidadesEncryptacion {
 
             return new String(original);
         } catch (Exception ex) {
-            LOG.error("Desencriptar dato", ex);
+            Logger.error("Desencriptar dato", ex);
         }
 
         return null;

@@ -29,13 +29,6 @@ public class Logger {
         }
     }
 
-    public static Logger getLogger() {
-        if (logger == null) {
-            logger = new Logger();
-        }
-        return logger;
-    }
-
     public static void error(String mensaje) {
         LOG.log(Level.SEVERE, mensaje);
     }
@@ -44,7 +37,17 @@ public class Logger {
         LOG.log(Level.WARNING, mensaje);
     }
 
-    void info(String mensaje, Throwable e) {
+    public static void init() {
+        if (logger == null) {
+            logger = new Logger();
+        }
+    }
+
+    public static void error(Exception e) {
+        LOG.log(Level.SEVERE, null, e);
+    }
+
+    static void info(String mensaje, Throwable e) {
         LOG.log(Level.INFO, mensaje, e);
     }
 
@@ -52,7 +55,7 @@ public class Logger {
         LOG.log(Level.SEVERE, Mensajes.getError(mensaje), e);
     }
 
-    void info(String mensaje) {
+    static void info(String mensaje) {
         LOG.log(Level.INFO, mensaje);
     }
 }

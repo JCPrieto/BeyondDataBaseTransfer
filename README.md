@@ -12,8 +12,9 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 ### Requisitos ###
 
-* Java 1.8
+* Java 11
 * Cliente Mysql
+* LibNotify (Para las notificaciones en Linux)
 
 ### Ejecución ###
 
@@ -31,7 +32,6 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
     * Apache Commons https://commons.apache.org
     * SwingX 
     * Firebase https://firebase.google.com
-    * ControlsFX http://fxexperience.com/controlsfx
     
 ### ToDo ###
 
@@ -45,42 +45,48 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 ### Changelog ###
 
-1.2.1:
+* 1.3.0
 
-* Correción a la hora de importar un archivo de configuracion de servidores anterior a la version 1.0.0.
+    * Migracion a Java 11.
+    * Eliminamos ControlFX por problemas de compatibilidad con OpenJDK 11 y en su lugar utilizamos Systray en S.O Windows
+    y LibNotofy en S.O Linux. 
 
-1.2.0:
+* 1.2.1:
 
-* Se elimina el icono de Systray, por la incompatibilidad con Gnome3 y utilizamos ControlsFX para monstrar las 
-notificaciones.
+    * Correción a la hora de importar un archivo de configuracion de servidores anterior a la version 1.0.0.
 
-1.1.0:
+* 1.2.0:
 
-* Se añade la opción de limpiar el esquema en la máquina de destino antes de restaurar.
+    * Se elimina el icono de Systray, por la incompatibilidad con Gnome3 y utilizamos ControlsFX para monstrar las 
+    notificaciones.
 
-1.0.1:
+* 1.1.0:
 
-* Controlar y mostrar mensaje con los errores de los comandos mysqldump y mysql.
-* Se añade el parametro "--max_allowed_packet=2048M" para evitar que se corte la conexion con la BBDD a la hora de 
-realizar el dump.
+    * Se añade la opción de limpiar el esquema en la máquina de destino antes de restaurar.
 
-1.0.0:
+* 1.0.1:
 
-* El copiado de esquemas a partir de ahora se realiza utilizando un cliente de Mysql ejecutandose en el equipo local.
+    * Controlar y mostrar mensaje con los errores de los comandos mysqldump y mysql.
+    * Se añade el parametro "--max_allowed_packet=2048M" para evitar que se corte la conexion con la BBDD a la hora de 
+    realizar el dump.
 
-0.3.0:
+* 1.0.0:
 
-* Optimización a la hora de realizar los backup
-* Corrección en el campo del puerto en el formulario de configuración del servidor.
-* Corrección en el formulario de configuración del servidor a la hora de refrescar los elementos.
+    * El copiado de esquemas a partir de ahora se realiza utilizando un cliente de Mysql ejecutandose en el equipo local.
 
-0.2.9:
+* 0.3.0:
 
-* Alineacion correcta del botón de descarga de la nueva versión a la derecha del todo de la ventana.
+    * Optimización a la hora de realizar los backup
+    * Corrección en el campo del puerto en el formulario de configuración del servidor.
+    * Corrección en el formulario de configuración del servidor a la hora de refrescar los elementos.
 
-0.2.8: 
+* 0.2.9:
 
-* En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
+    * Alineacion correcta del botón de descarga de la nueva versión a la derecha del todo de la ventana.
+
+* 0.2.8: 
+
+    * En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
 
 ### Licencia ### 
 

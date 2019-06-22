@@ -20,7 +20,6 @@ import java.util.Objects;
 public class UtilidadesConfiguracion {
 
     private static final String CONFIG_JSON = "config.json";
-    private static final Logger LOG = Logger.getLogger();
 
     private UtilidadesConfiguracion() {
 
@@ -43,7 +42,7 @@ public class UtilidadesConfiguracion {
             configuracion = mapper.readValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
                     UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON), Configuracion.class);
         } catch (FileNotFoundException e) {
-            LOG.info("Fichero de configuracion no encontrado", e);
+            Logger.info("Fichero de configuracion no encontrado", e);
         } catch (IOException e) {
             Logger.error("Error de lectura del fichero de configuracion", e);
         }

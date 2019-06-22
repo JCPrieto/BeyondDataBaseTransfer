@@ -10,7 +10,6 @@ import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.utilidades.*;
-import javafx.embed.swing.JFXPanel;
 import org.apache.commons.io.FilenameUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -54,9 +53,8 @@ public class MainUI extends JFrame {
         super.pack();
     }
 
-    public MainUI(JFXPanel fxPanel, Configuracion configuracion) {
+    public MainUI(Configuracion configuracion) {
         this();
-        add(fxPanel);
         this.configuracion = configuracion;
         cargarPantallaPrincipal();
         super.pack();
