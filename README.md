@@ -45,6 +45,9 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 ### Changelog ###
 
+* 1.3.1
+    * Actualización de seguridad de la librería de Jackson
+
 * 1.3.0
 
     * Migracion a Java 11.
