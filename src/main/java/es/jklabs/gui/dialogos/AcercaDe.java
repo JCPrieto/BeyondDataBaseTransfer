@@ -33,27 +33,27 @@ public class AcercaDe extends JDialog {
         final GridBagConstraints cns = new GridBagConstraints();
         final JLabel jLabelTitle = new JLabel(
                 "<html><h1>" + Constantes.NOMBRE_APP + " " + Constantes.VERSION + "</h1></html>", new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
-                ("img/icons/database.png"))), JLabel.CENTER);
+                ("img/icons/database.png"))), SwingConstants.CENTER);
         cns.fill = GridBagConstraints.HORIZONTAL;
         cns.insets = new Insets(10, 10, 10, 10);
         cns.gridx = 0;
         cns.gridy = yPosition++;
         cns.gridwidth = 3;
         panel.add(jLabelTitle, cns);
-        final JLabel jLabelCreadoPor = new JLabel(Mensajes.getMensaje("creado.por"), JLabel.LEFT);
+        final JLabel jLabelCreadoPor = new JLabel(Mensajes.getMensaje("creado.por"), SwingConstants.LEFT);
         cns.insets = new Insets(10, 10, 3, 10);
         cns.gridy = yPosition++;
         cns.gridwidth = 1;
         panel.add(jLabelCreadoPor, cns);
-        final JLabel jLabelMyName = new JLabel("<html><b>Juan Carlos Prieto Silos</b></html>", JLabel.LEFT);
+        final JLabel jLabelMyName = new JLabel("<html><b>Juan Carlos Prieto Silos</b></html>", SwingConstants.LEFT);
         cns.insets = new Insets(3, 10, 3, 10);
         cns.gridy = yPosition++;
         panel.add(jLabelMyName, cns);
-        final JLabel jLabelMyWeb = new JLabel("JCPrieto.tk", JLabel.LEFT);
+        final JLabel jLabelMyWeb = new JLabel("JCPrieto.tk", SwingConstants.LEFT);
         jLabelMyWeb.addMouseListener(new UrlMouseListener(jLabelMyWeb, "http://jcprieto.tk"));
         cns.gridx = 1;
         panel.add(jLabelMyWeb, cns);
-        JLabel jLabelMyMail = new JLabel("JuanC.Prieto.Silos@gmail.com", JLabel.LEFT);
+        JLabel jLabelMyMail = new JLabel("JuanC.Prieto.Silos@gmail.com", SwingConstants.LEFT);
         jLabelMyMail.setAlignmentX(CENTER_ALIGNMENT);
         jLabelMyMail.addMouseListener(new MouseListener() {
             @Override
@@ -68,12 +68,12 @@ public class AcercaDe extends JDialog {
 
             @Override
             public void mousePressed(MouseEvent e) {
-
+                //
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
+                //
             }
 
             @Override
@@ -88,7 +88,7 @@ public class AcercaDe extends JDialog {
         });
         cns.gridx = 2;
         panel.add(jLabelMyMail, cns);
-        final JLabel jLabelPoweredBy = new JLabel(Mensajes.getMensaje("powered.by"), JLabel.LEFT);
+        final JLabel jLabelPoweredBy = new JLabel(Mensajes.getMensaje("powered.by"), SwingConstants.LEFT);
         cns.insets = new Insets(10, 10, 3, 10);
         cns.gridx = 0;
         yPosition++;
@@ -103,7 +103,7 @@ public class AcercaDe extends JDialog {
                 ("<html><i>Esta obra está bajo una licencia de Creative Commons " +
                         "Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional</i><html>", new ImageIcon(Objects
                         .requireNonNull(getClass().getClassLoader().getResource
-                                ("img/icons/creative_commons.png"))), JLabel.TRAILING);
+                                ("img/icons/creative_commons.png"))), SwingConstants.TRAILING);
         jLabelLicense.addMouseListener(new UrlMouseListener(jLabelLicense, "http://creativecommons.org/licenses/by-nc-sa/4.0/"));
         cns.insets = new Insets(10, 10, 10, 10);
         cns.gridx = 0;
@@ -119,7 +119,7 @@ public class AcercaDe extends JDialog {
     }
 
     private void addPowered(JPanel panel, GridBagConstraints cns, int y, String titulo, String url) {
-        JLabel jLabelTitulo = new JLabel("<html><b>" + titulo + "</b></html>", JLabel.LEFT);
+        JLabel jLabelTitulo = new JLabel("<html><b>" + titulo + "</b></html>", SwingConstants.LEFT);
         if (url != null) {
             jLabelTitulo.addMouseListener(new UrlMouseListener(jLabelTitulo, url));
         }
@@ -129,7 +129,7 @@ public class AcercaDe extends JDialog {
         cns.gridwidth = 1;
         panel.add(jLabelTitulo, cns);
         if (url != null) {
-            JLabel jLabelUrl = new JLabel(url, JLabel.LEFT);
+            JLabel jLabelUrl = new JLabel(url, SwingConstants.LEFT);
             jLabelUrl.addMouseListener(new UrlMouseListener(jLabelUrl, url));
             cns.gridx = 1;
             cns.gridy = y;
