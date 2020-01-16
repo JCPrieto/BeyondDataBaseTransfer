@@ -11,6 +11,7 @@ import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.utilidades.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import javax.swing.*;
@@ -235,7 +236,7 @@ public class MainUI extends JFrame {
             valido = false;
         }
         if (configuracion.getMysqlCliente() == null ||
-                UtilidadesString.isEmpty(configuracion.getMysqlCliente().getPath())) {
+                StringUtils.isEmpty(configuracion.getMysqlCliente().getPath())) {
             Growls.mostrarAviso(COPIAR_ESQUEMA, "ruta.instalacion.mysql.no.configurada");
             valido = false;
         } else {
