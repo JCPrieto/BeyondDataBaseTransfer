@@ -19,18 +19,18 @@ public class ArbolRendered implements TreeCellRenderer {
                 label = new JLabel(
                         node.getUserObject().toString(), new ImageIcon(Objects.requireNonNull(getClass()
                         .getClassLoader().getResource
-                                ("img/icons/folder-blue-open.png"))), JLabel.CENTER);
+                                ("img/icons/folder-blue-open.png"))), SwingConstants.CENTER);
             } else {
                 label = new JLabel(
                         node.getUserObject().toString(), new ImageIcon(Objects.requireNonNull(getClass()
                         .getClassLoader().getResource
-                                ("img/icons/folder-blue.png"))), JLabel.CENTER);
+                                ("img/icons/folder-blue.png"))), SwingConstants.CENTER);
             }
         } else if (node.getUserObject() instanceof Servidor) {
-            label =  new JLabel(
+            label = new JLabel(
                     node.getUserObject().toString(), new ImageIcon(Objects.requireNonNull(getClass()
                     .getClassLoader().getResource
-                            ("img/icons/application-x-sqlite2.png"))), JLabel.CENTER);
+                            ("img/icons/application-x-sqlite2.png"))), SwingConstants.CENTER);
         }
         if (selected) {
             assert label != null;
