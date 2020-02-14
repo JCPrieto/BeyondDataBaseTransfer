@@ -48,6 +48,7 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 * 1.3.4
 
     * Correciones de seguridad y estabilidad
+    * Nueva URL de la web
 
 * 1.3.3
 
