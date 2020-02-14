@@ -49,8 +49,8 @@ public class AcercaDe extends JDialog {
         cns.insets = new Insets(3, 10, 3, 10);
         cns.gridy = yPosition++;
         panel.add(jLabelMyName, cns);
-        final JLabel jLabelMyWeb = new JLabel("JCPrieto.tk", SwingConstants.LEFT);
-        jLabelMyWeb.addMouseListener(new UrlMouseListener(jLabelMyWeb, "http://jcprieto.tk"));
+        final JLabel jLabelMyWeb = new JLabel("JCPrieto.cf", SwingConstants.LEFT);
+        jLabelMyWeb.addMouseListener(new UrlMouseListener(jLabelMyWeb, "http://jcprieto.cf"));
         cns.gridx = 1;
         panel.add(jLabelMyWeb, cns);
         JLabel jLabelMyMail = new JLabel("JuanC.Prieto.Silos@gmail.com", SwingConstants.LEFT);
@@ -60,7 +60,7 @@ public class AcercaDe extends JDialog {
             public void mouseClicked(MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(new URI(
-                                    "mailto:JuanC.Prieto.Silos@gmail.com?subject=BeyondDataBaseTransefer"));
+                            "mailto:JuanC.Prieto.Silos@gmail.com?subject=BeyondDataBaseTransefer"));
                 } catch (IOException | URISyntaxException e1) {
                     Growls.mostrarError("acerca.de", "app.envio.correo", e1);
                 }
