@@ -12,7 +12,7 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 ### Requisitos ###
 
-* Java 11
+* Java 21
 * Cliente Mysql
 * LibNotify (Para las notificaciones en Linux)
 
@@ -39,11 +39,17 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 * Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
 * Buscar los esquemas disponibles en el propio servidor de orígen.
 * Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
-* Eliminar logs vacios
+* Eliminar logs vacíos
 * Clonar esquemas en una misma máquina
-* Mostras un texto descriptivo en la barra de progreso
+* Mostrar un texto descriptivo en la barra de progreso
 
 ### Changelog ###
+
+* 1.3.5
+
+  * Actualizacion de la configuracion de Gradle para versiones modernas.
+  * Actualizacion del dialogo "Acerca de" con URL y licencia actualizadas.
+  * Compilación de la aplicación con Java 21
 
 * 1.3.4
 
