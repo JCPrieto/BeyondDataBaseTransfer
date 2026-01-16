@@ -22,6 +22,7 @@ hs_err_pid*
 ### Gradle template
 .gradle
 /build/
+src/main/resources/json/curriculum-a2a80-firebase-adminsdk-17wyo-de15a29f7c.json
 
 # Ignore Gradle GUI config
 gradle-app.setting
