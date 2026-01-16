@@ -5,7 +5,6 @@ import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.listener.UrlMouseListener;
 import es.jklabs.utilidades.Constantes;
 import es.jklabs.utilidades.Mensajes;
-import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -28,7 +27,6 @@ public class AcercaDe extends JDialog {
         cargarPantalla();
     }
 
-    @NonNullDecl
     private static JLabel getJLabelMyMail() {
         JLabel jLabelMyMail = new JLabel("JuanC.Prieto.Silos@gmail.com", SwingConstants.LEFT);
         jLabelMyMail.setAlignmentX(CENTER_ALIGNMENT);
@@ -107,7 +105,7 @@ public class AcercaDe extends JDialog {
         addPowered(panel, cns, yPosition++, "Jackson", "https://github.com/FasterXML/jackson-core/wiki");
         addPowered(panel, cns, yPosition++, "Apache Commons", "https://commons.apache.org");
         addPowered(panel, cns, yPosition++, "SwingX", null);
-        addPowered(panel, cns, yPosition++, "Firebase", "https://firebase.google.com");
+        addPowered(panel, cns, yPosition++, "GitHub", "https://github.com");
         JLabel jLabelLicense = new JLabel
                 ("<html><i>Esta obra está bajo una licencia de Creative Commons " +
                         "Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional</i><html>", new ImageIcon(Objects

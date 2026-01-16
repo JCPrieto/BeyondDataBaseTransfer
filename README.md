@@ -31,7 +31,7 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
     * Jackson https://github.com/FasterXML/jackson-core/wiki
     * Apache Commons https://commons.apache.org
     * SwingX 
-    * Firebase https://firebase.google.com
+  * GitHub Releases API https://docs.github.com/en/rest/releases/releases
     
 ### ToDo ###
 
@@ -50,6 +50,7 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
   * Actualizacion de la configuracion de Gradle para versiones modernas.
   * Actualizacion del dialogo "Acerca de" con URL y licencia actualizadas.
   * Compilación de la aplicación con Java 21
+  * API de Github Releases para la detección y descarga de nuevas versiones.
 
 * 1.3.4
 

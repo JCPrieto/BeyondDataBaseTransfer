@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-test-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Build distribution
+        run: ./gradlew distZip
+
+      - name: Resolve version
+        id: version
+        run: |
+          VERSION=$(sed -n 's/.*public static final String VERSION = "\([^"]*\)".*/\1/p' src/main/java/es/jklabs/utilidades/Constantes.java)
+          if [ -z "$VERSION" ]; then
+            echo "No se pudo leer VERSION desde Constantes.java" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: BeyondDataBaseTransfer ${{ steps.version.outputs.version }}
+          files: build/distributions/BeyondDataBaseTransfer-${{ steps.version.outputs.version }}.zip
+          generate_release_notes: true

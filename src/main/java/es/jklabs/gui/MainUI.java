@@ -22,12 +22,14 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class MainUI extends JFrame {
 
+    @Serial
     private static final long serialVersionUID = 4591514658240490883L;
 
     private static final String COPIAR_ESQUEMA = "copiar.esquema";
@@ -94,7 +96,7 @@ public class MainUI extends JFrame {
         if (retorno == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             if (!Objects.equals(FilenameUtils.getExtension(file.getName()), "json")) {
-                file = new File(file.toString() + ".json");
+                file = new File(file + ".json");
             }
             UtilidadesConfiguracion.guardarServidores(configuracion.getServerConfig(), file);
         }
@@ -131,7 +133,7 @@ public class MainUI extends JFrame {
         menu.add(jmArchivo);
         menu.add(jmAyuda);
         try {
-            if (UtilidadesFirebase.existeNuevaVersion()) {
+            if (UtilidadesGithubReleases.existeNuevaVersion()) {
                 menu.add(Box.createHorizontalGlue());
                 JMenuItem jmActualizacion = new JMenuItem(Mensajes.getMensaje("existe.nueva.version"), new ImageIcon
                         (Objects.requireNonNull(getClass().getClassLoader().getResource("img/icons/update.png"))));
@@ -149,7 +151,7 @@ public class MainUI extends JFrame {
 
     private void descargarNuevaVersion() {
         try {
-            UtilidadesFirebase.descargaNuevaVersion(this);
+            UtilidadesGithubReleases.descargaNuevaVersion(this);
         } catch (InterruptedException e) {
             Growls.mostrarError("descargar.nueva.version", e);
             Thread.currentThread().interrupt();
@@ -316,8 +318,7 @@ public class MainUI extends JFrame {
     private void selecionarOrigen() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
         raizArbolDestino.removeAllChildren();
-        if (node != null && node.getUserObject() instanceof Servidor) {
-            Servidor servidor = (Servidor) node.getUserObject();
+        if (node != null && node.getUserObject() instanceof Servidor servidor) {
             cargarArbolDestino(servidor);
             cargarEsquemas(servidor);
         }
