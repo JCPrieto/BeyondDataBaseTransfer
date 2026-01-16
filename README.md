@@ -1,0 +1,127 @@
+# BeyondDataBaseTransfer #
+
+Aplicación de uso interno de la empresa BeBeyond para realizar transferencias de esquemas de base de datos entre las 
+distintas máquinas de producción, preproducción y desarrollo.
+
+El funcionamiento es el siguiente:
+
+* Se genera un dump del esquema indicado utilizando el comando mysqldump del cliente Mysql instalado en el equipo.
+Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --single-transaction --events --routines
+ --triggers'
+* Se restaura el dump en la maquina remota mediante el comando mysql del cliente Mysql instalado en el equipo.
+
+### Requisitos ###
+
+* Java 21
+* Cliente Mysql
+* LibNotify (Para las notificaciones en Linux)
+
+### Ejecución ###
+
+* Windows:
+    * Ejecutar BeyondDataBaseTransfer.bat dentro del directorio bin
+
+* Linux:
+    * Ejecutar BeyondDataBaseTransfer.sh dentro del directorio bin
+
+### Tecnologías utilizadas ###
+
+* Iconos: Papirus https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
+* Librerias:
+    * Jackson https://github.com/FasterXML/jackson-core/wiki
+    * Apache Commons https://commons.apache.org
+    * SwingX 
+    * Firebase https://firebase.google.com
+    
+### ToDo ###
+
+* Crear los esquemas si no existen en la máquina de destino
+* Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
+* Buscar los esquemas disponibles en el propio servidor de orígen.
+* Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
+* Eliminar logs vacíos
+* Clonar esquemas en una misma máquina
+* Mostrar un texto descriptivo en la barra de progreso
+
+### Changelog ###
+
+* 1.3.5
+
+  * Actualizacion de la configuracion de Gradle para versiones modernas.
+  * Actualizacion del dialogo "Acerca de" con URL y licencia actualizadas.
+  * Compilación de la aplicación con Java 21
+
+* 1.3.4
+
+    * Correciones de seguridad y estabilidad
+    * Nueva URL de la web
+
+* 1.3.3
+
+    * Correciones de seguridad y estabilidad
+
+* 1.3.2
+
+    * Actualización de seguridad de despendencias.
+
+* 1.3.1
+
+    * Actualización de seguridad de la librería de Jackson
+
+* 1.3.0
+
+    * Migracion a Java 11.
+    * Eliminamos ControlFX por problemas de compatibilidad con OpenJDK 11 y en su lugar utilizamos Systray en S.O Windows
+    y LibNotofy en S.O Linux. 
+
+* 1.2.1:
+
+    * Correción a la hora de importar un archivo de configuracion de servidores anterior a la version 1.0.0.
+
+* 1.2.0:
+
+    * Se elimina el icono de Systray, por la incompatibilidad con Gnome3 y utilizamos ControlsFX para monstrar las 
+    notificaciones.
+
+* 1.1.0:
+
+    * Se añade la opción de limpiar el esquema en la máquina de destino antes de restaurar.
+
+* 1.0.1:
+
+    * Controlar y mostrar mensaje con los errores de los comandos mysqldump y mysql.
+    * Se añade el parametro "--max_allowed_packet=2048M" para evitar que se corte la conexion con la BBDD a la hora de 
+    realizar el dump.
+
+* 1.0.0:
+
+    * El copiado de esquemas a partir de ahora se realiza utilizando un cliente de Mysql ejecutandose en el equipo local.
+
+* 0.3.0:
+
+    * Optimización a la hora de realizar los backup
+    * Corrección en el campo del puerto en el formulario de configuración del servidor.
+    * Corrección en el formulario de configuración del servidor a la hora de refrescar los elementos.
+
+* 0.2.9:
+
+    * Alineacion correcta del botón de descarga de la nueva versión a la derecha del todo de la ventana.
+
+* 0.2.8: 
+
+    * En el menú de configuracion: Al seleccionar un servidor, mostrar su configuración.
+
+### Licencia ### 
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
