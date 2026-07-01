@@ -1,5 +1,7 @@
 # BeyondDataBaseTransfer #
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=JCPrieto_BeyondDataBaseTransfer&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=JCPrieto_BeyondDataBaseTransfer)
+
 Aplicación de uso interno de la empresa BeBeyond para realizar transferencias de esquemas de base de datos entre las 
 distintas máquinas de producción, preproducción y desarrollo.
 
