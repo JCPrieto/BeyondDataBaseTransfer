@@ -1,7 +1,14 @@
 plugins {
     id "java"
     id "application"
-    id "org.sonarqube" version "2.7"
+    id "org.sonarqube" version "7.3.1.8318"
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "JCPrieto_BeyondDataBaseTransfer"
+        property "sonar.organization", "jcprieto"
+    }
 }
 
 group 'es.jklabs.desktop'

@@ -82,3 +82,5 @@ fabric.properties
 .idea/
 config.json
 src/main/main.iml
+
+.codex/*
