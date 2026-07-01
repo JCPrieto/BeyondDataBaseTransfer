@@ -29,8 +29,8 @@ public class UtilidadesGithubReleasesTest {
 
     @Test
     public void comparaVersiones() {
-        assertTrue(UtilidadesGithubReleases.diferenteVersion("1.3.6"));
-        assertFalse(UtilidadesGithubReleases.diferenteVersion("1.3.5"));
+        assertTrue(UtilidadesGithubReleases.diferenteVersion("1.3.7"));
+        assertFalse(UtilidadesGithubReleases.diferenteVersion("1.3.6"));
         assertFalse(UtilidadesGithubReleases.diferenteVersion("1.2.9"));
     }
 

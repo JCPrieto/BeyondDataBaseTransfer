@@ -1,0 +1,55 @@
+package es.jklabs.utilidades;
+
+import es.jklabs.json.configuracion.Configuracion;
+import es.jklabs.json.configuracion.server.Carpeta;
+import es.jklabs.json.configuracion.server.Servidor;
+import org.junit.Test;
+
+import java.lang.reflect.Method;
+
+import static org.junit.Assert.*;
+
+public class UtilidadesConfiguracionTest {
+
+    @Test
+    public void importaServidoresCreandoCopiasConIdsNuevosYManteniendoEstructura() throws Exception {
+        Configuracion configuracion = new Configuracion();
+        Carpeta destino = configuracion.getServerConfig().getRaiz();
+        Carpeta origen = new Carpeta("Raiz importada", true, 1);
+        Carpeta carpetaImportada = new Carpeta("Carpeta importada", false, 50);
+        Carpeta subcarpetaImportada = new Carpeta("Subcarpeta importada", false, 51);
+        Servidor servidorRaiz = new Servidor(90);
+        Servidor servidorSubcarpeta = new Servidor(91);
+
+        servidorRaiz.setNombre("Servidor raiz");
+        servidorSubcarpeta.setNombre("Servidor subcarpeta");
+        origen.getServidores().add(servidorRaiz);
+        subcarpetaImportada.getServidores().add(servidorSubcarpeta);
+        carpetaImportada.getCarpetas().add(subcarpetaImportada);
+        origen.getCarpetas().add(carpetaImportada);
+
+        Method addServidores = UtilidadesConfiguracion.class.getDeclaredMethod(
+                "addServidores", Configuracion.class, Carpeta.class, Carpeta.class);
+        addServidores.setAccessible(true);
+        addServidores.invoke(null, configuracion, destino, origen);
+
+        assertEquals(1, destino.getServidores().size());
+        assertEquals("Servidor raiz", destino.getServidores().get(0).getNombre());
+        assertNotEquals(90, destino.getServidores().get(0).getId());
+        assertEquals(1, destino.getCarpetas().size());
+
+        Carpeta carpetaCopiada = destino.getCarpetas().get(0);
+        assertNotSame(carpetaImportada, carpetaCopiada);
+        assertEquals("Carpeta importada", carpetaCopiada.getNombre());
+        assertNotEquals(carpetaImportada.getId(), carpetaCopiada.getId());
+        assertEquals(1, carpetaCopiada.getCarpetas().size());
+
+        Carpeta subcarpetaCopiada = carpetaCopiada.getCarpetas().get(0);
+        assertNotSame(subcarpetaImportada, subcarpetaCopiada);
+        assertEquals("Subcarpeta importada", subcarpetaCopiada.getNombre());
+        assertNotEquals(subcarpetaImportada.getId(), subcarpetaCopiada.getId());
+        assertEquals(1, subcarpetaCopiada.getServidores().size());
+        assertEquals("Servidor subcarpeta", subcarpetaCopiada.getServidores().get(0).getNombre());
+        assertNotEquals(servidorSubcarpeta.getId(), subcarpetaCopiada.getServidores().get(0).getId());
+    }
+}

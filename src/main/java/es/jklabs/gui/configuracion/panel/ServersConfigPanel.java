@@ -22,6 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -29,11 +30,12 @@ import java.util.Objects;
 
 public class ServersConfigPanel extends JPanel {
 
+    @Serial
     private static final long serialVersionUID = -8382765162561596108L;
     private static final String ANADIR_SERVIDOR = "anadir.servidor";
     private static final String ANADIR_CARPETA = "anadir.carpeta";
     private Configuracion configuracion;
-    private ConfiguracionUI dialogo;
+    private final ConfiguracionUI dialogo;
     private JButton btnAceptar;
     private JButton btnCancelar;
     private JPanel panelFormularioServidor;
@@ -251,41 +253,44 @@ public class ServersConfigPanel extends JPanel {
     private void eliminarNodoArbol() {
         TreePath parentPath = arbol.getSelectionPath();
         DefaultMutableTreeNode parentNode;
+        boolean eliminado = false;
         if (parentPath != null) {
             parentNode = (DefaultMutableTreeNode)
                     (parentPath.getLastPathComponent());
-            if (parentNode.getUserObject() instanceof Carpeta) {
-                Carpeta carpeta = (Carpeta) parentNode.getUserObject();
-                eliminarCarpeta(carpeta);
-            } else if (parentNode.getUserObject() instanceof Servidor) {
-                Servidor servidor = (Servidor) parentNode.getUserObject();
-                eliminarServidor(servidor);
+            if (parentNode.getUserObject() instanceof Carpeta carpeta) {
+                eliminado = eliminarCarpeta(carpeta);
+            } else if (parentNode.getUserObject() instanceof Servidor servidor) {
+                eliminado = eliminarServidor(servidor);
             }
-            parentNode.removeFromParent();
+            if (eliminado) {
+                parentNode.removeFromParent();
+            }
         }
-        UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
-        SwingUtilities.updateComponentTreeUI(arbol);
-        UtilidadesConfiguracion.guardarConfiguracion(configuracion);
+        if (eliminado) {
+            UtilidadesJTree.expandAllNodes(arbol, 0, arbol.getRowCount());
+            SwingUtilities.updateComponentTreeUI(arbol);
+            UtilidadesConfiguracion.guardarConfiguracion(configuracion);
+        }
     }
 
-    private void eliminarServidor(Servidor servidor) {
+    private boolean eliminarServidor(Servidor servidor) {
         Iterator<Servidor> it = configuracion.getServerConfig().getRaiz().getServidores().iterator();
         if (eliminarServidor(servidor, it)) {
-            eliminarServidor(configuracion.getServerConfig().getRaiz().getCarpetas(), servidor);
+            return true;
         }
+        return eliminarServidor(configuracion.getServerConfig().getRaiz().getCarpetas(), servidor);
     }
 
     private boolean eliminarServidor(List<Carpeta> carpetas, Servidor servidor) {
-        boolean enc = false;
         for (Carpeta c : carpetas) {
             if (eliminarServidor(servidor, c.getServidores().iterator())) {
-                enc = eliminarServidor(c.getCarpetas(), servidor);
+                return true;
             }
-            if (enc) {
-                break;
+            if (eliminarServidor(c.getCarpetas(), servidor)) {
+                return true;
             }
         }
-        return enc;
+        return false;
     }
 
     private boolean eliminarServidor(Servidor servidor, Iterator<Servidor> it) {
@@ -297,14 +302,15 @@ public class ServersConfigPanel extends JPanel {
                 enc = true;
             }
         }
-        return !enc;
+        return enc;
     }
 
-    private void eliminarCarpeta(Carpeta carpeta) {
-        if (!carpeta.isSistema()) {
-            Iterator<Carpeta> it = configuracion.getServerConfig().getRaiz().getCarpetas().iterator();
-            eliminarCarpeta(it, carpeta);
+    private boolean eliminarCarpeta(Carpeta carpeta) {
+        if (carpeta.isSistema()) {
+            return false;
         }
+        Iterator<Carpeta> it = configuracion.getServerConfig().getRaiz().getCarpetas().iterator();
+        return eliminarCarpeta(it, carpeta);
     }
 
     private boolean eliminarCarpeta(Iterator<Carpeta> it, Carpeta carpeta) {
@@ -327,8 +333,7 @@ public class ServersConfigPanel extends JPanel {
         if (parentPath != null) {
             parentNode = (DefaultMutableTreeNode)
                     (parentPath.getLastPathComponent());
-            if (parentNode.getUserObject() instanceof Carpeta) {
-                Carpeta carpeta = (Carpeta) parentNode.getUserObject();
+            if (parentNode.getUserObject() instanceof Carpeta carpeta) {
                 DialogoCarpeta dialogoCarpeta = new DialogoCarpeta(this, carpeta, false);
                 dialogoCarpeta.setVisible(true);
             } else if (parentNode.getUserObject() instanceof Servidor) {

@@ -45,7 +45,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
             String usuario = "-u" + sOrigen.getServidorBBDD().getUsuario();
             String pass = "-p" + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword());
             String comando =
-                    mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + Constantes.MYSQLDUMP + " " + server + " " + port + " " + usuario + " " + pass + " --quick " +
+                    mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR + getMysqlDumpCommand() + " " + server + " " + port + " " + usuario + " " + pass + " --quick " +
                             "--max_allowed_packet=2048M --single-transaction --events --routines --triggers --databases " + esquema;
             if (limparEsquema) {
                 comando = comando + " --add-drop-database";
@@ -65,7 +65,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
                 String pass = "-p" + UtilidadesEncryptacion.decrypt(sDestino.getServidorBBDD().getPassword());
                 setProgress(count++);
                 Process p = Runtime.getRuntime().exec(mysqlCliente.getPath() + UtilidadesFichero.SEPARADOR +
-                        Constantes.MYSQL + " " + server + " " + port + " " + usuario + " " + pass + " " + esquema);
+                        getMysqlCommand() + " " + server + " " + port + " " + usuario + " " + pass + " " + esquema);
                 destinoOk = restautarBackUp(fis, p);
                 setProgress(count);
             } catch (Exception e) {
@@ -144,6 +144,14 @@ public class CopySchema extends SwingWorker<Void, Void> {
             }
         }
         return correcto;
+    }
+
+    private String getMysqlCommand() {
+        return UtilidadesSistema.isWindows() ? Constantes.MYSQL_EXE : Constantes.MYSQL;
+    }
+
+    private String getMysqlDumpCommand() {
+        return UtilidadesSistema.isWindows() ? Constantes.MYSQLDUMP_EXE : Constantes.MYSQLDUMP;
     }
 
     @Override

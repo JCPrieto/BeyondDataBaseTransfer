@@ -9,10 +9,11 @@
 
 ## Build, Test, and Development Commands
 
-- `gradle build` compiles the app and produces artifacts in `build/`.
-- `gradle run` launches the desktop application using `mainClass` from `build.gradle`.
-- `gradle test` runs JUnit 4 tests (if present).
-- `gradle distZip` creates a distributable ZIP with the application and README.
+- `./gradlew build` compiles the app and produces artifacts in `build/`.
+- `./gradlew run` launches the desktop application using `mainClass` from `build.gradle`.
+- `./gradlew test` runs JUnit 4 tests.
+- `./gradlew distZip` creates a distributable ZIP with the application and README.
+- `./gradlew sonar` runs the SonarQube analysis when `SONAR_TOKEN` is available.
 
 ## Coding Style & Naming Conventions
 
@@ -25,7 +26,8 @@
 
 - JUnit 4 is the test framework (see Gradle dependencies).
 - If adding tests, place them in `src/test/java` and name classes `*Test`.
-- Run `gradle test` before submitting PRs; note any manual UI verification in the PR.
+- Run `./gradlew test` before submitting PRs; note any manual UI verification in the PR.
+- The release workflow runs tests before SonarQube and release creation; tests are blocking, SonarQube is informational.
 
 ## Commit & Pull Request Guidelines
 
