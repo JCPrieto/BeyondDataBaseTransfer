@@ -104,8 +104,8 @@ public class UtilidadesConfiguracion {
     private static void addServidores(Configuracion configuracion, Carpeta destino, Carpeta origen) {
         origen.getServidores().forEach(s -> destino.getServidores().add(new Servidor(getIdServidor(configuracion), s)));
         for (Carpeta c : origen.getCarpetas()) {
-            Carpeta nueva = new Carpeta(getIdCarpeta(configuracion), origen);
-            destino.getCarpetas().add(c);
+            Carpeta nueva = new Carpeta(getIdCarpeta(configuracion), c);
+            destino.getCarpetas().add(nueva);
             addServidores(configuracion, nueva, c);
         }
     }
