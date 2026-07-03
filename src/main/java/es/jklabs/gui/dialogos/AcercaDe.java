@@ -2,6 +2,7 @@ package es.jklabs.gui.dialogos;
 
 import es.jklabs.gui.MainUI;
 import es.jklabs.gui.utilidades.Growls;
+import es.jklabs.gui.utilidades.IconUtils;
 import es.jklabs.gui.utilidades.listener.UrlMouseListener;
 import es.jklabs.utilidades.Constantes;
 import es.jklabs.utilidades.Mensajes;
@@ -108,12 +109,10 @@ public class AcercaDe extends JDialog {
         addPowered(panel, cns, yPosition++, "Two-Slices", "https://github.com/sshtools/two-slices");
         addPowered(panel, cns, yPosition++, "D-Bus Java", "https://github.com/hypfvieh/dbus-java");
         addPowered(panel, cns, yPosition++, "GitHub", "https://github.com");
-        JLabel jLabelLicense = new JLabel
-                ("<html><i>Esta obra está bajo una licencia de Creative Commons " +
-                        "Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional</i><html>", new ImageIcon(Objects
-                        .requireNonNull(getClass().getClassLoader().getResource
-                                ("img/icons/creative_commons.png"))), SwingConstants.TRAILING);
-        jLabelLicense.addMouseListener(new UrlMouseListener(jLabelLicense, "https://creativecommons.org/licenses/by-nc-sa/4.0/"));
+        JLabel jLabelLicense = new JLabel(
+                Mensajes.getMensaje("licencia.app"),
+                IconUtils.loadIcon("gplv3-with-text-136x68.png"), SwingConstants.CENTER);
+        jLabelLicense.addMouseListener(new UrlMouseListener(jLabelLicense, Mensajes.getMensaje("licencia.app.url")));
         cns.insets = new Insets(10, 10, 10, 10);
         cns.gridx = 0;
         cns.gridy = yPosition++;
