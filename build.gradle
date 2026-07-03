@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "application"
+    id "jacoco"
     id "org.sonarqube" version "7.3.1.8318"
 }
 
@@ -8,6 +9,8 @@ sonar {
     properties {
         property "sonar.projectKey", "JCPrieto_BeyondDataBaseTransfer"
         property "sonar.organization", "jcprieto"
+        property "sonar.coverage.jacoco.xmlReportPaths",
+                layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
     }
 }
 
@@ -18,9 +21,15 @@ if (!versionMatcher) {
     throw new GradleException("No se pudo leer VERSION desde ${constantesFile}")
 }
 version = versionMatcher[0][1]
+def linuxDesktopId = "es-jklabs-BeyondDataBaseTransfer"
+def linuxIconName = "beyonddatabasetransfer"
 
 application {
     mainClass = "es.jklabs.BeyondDataBaseTransfer"
+    applicationDefaultJvmArgs = [
+            "-Dsun.awt.X11.awtAppClassName=es-jklabs-BeyondDataBaseTransfer",
+            "-Dsun.awt.X11.XWMClass=es-jklabs-BeyondDataBaseTransfer"
+    ]
 }
 
 distributions {
@@ -29,7 +38,44 @@ distributions {
             from("README.md") {
                 into ""
             }
+            from("src/main/resources/img/icons/database.png") {
+                into ""
+                rename { "BeyondDataBaseTransfer.png" }
+            }
         }
+    }
+}
+
+tasks.register("installLinuxDesktopEntry") {
+    description = "Instala la entrada .desktop local para que GNOME asocie el icono al ejecutar desde el IDE."
+    group = "application"
+    dependsOn tasks.named("startScripts")
+    doLast {
+        def applicationsDir = new File(System.getProperty("user.home"), ".local/share/applications")
+        def iconsDir = new File(System.getProperty("user.home"), ".local/share/icons/hicolor/256x256/apps")
+        applicationsDir.mkdirs()
+        iconsDir.mkdirs()
+
+        def iconFile = new File(iconsDir, "${linuxIconName}.png")
+        copy {
+            from("src/main/resources/packaging/linux/beyonddatabasetransfer.png")
+            into iconsDir
+        }
+
+        def desktopFile = new File(applicationsDir, "${linuxDesktopId}.desktop")
+        desktopFile.text = """[Desktop Entry]
+Name=BeyondDataBaseTransfer
+Comment=Transferencia de esquemas de base de datos
+Exec=${new File(projectDir, "build/scripts/BeyondDataBaseTransfer").absolutePath}
+Icon=${iconFile.absolutePath}
+Terminal=false
+Type=Application
+Categories=Development;Database;Utility;
+StartupWMClass=${linuxDesktopId}
+StartupNotify=true
+"""
+        desktopFile.setExecutable(false, false)
+        println "Entrada de escritorio instalada en ${desktopFile.absolutePath}"
     }
 }
 
@@ -45,6 +91,9 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation 'com.sshtools:two-slices:0.9.6'
+    implementation 'com.github.hypfvieh:dbus-java-core:5.2.0'
+    implementation 'com.github.hypfvieh:dbus-java-transport-native-unixsocket:5.2.0'
 }
 
 test {
@@ -56,4 +105,20 @@ test {
         delete testConfigDir
         delete testLogsDir
     }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+tasks.named("sonar") {
+    dependsOn jacocoTestReport
 }

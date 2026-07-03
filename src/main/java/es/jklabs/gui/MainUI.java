@@ -4,6 +4,7 @@ import es.jklabs.gui.configuracion.ConfiguracionUI;
 import es.jklabs.gui.dialogos.AcercaDe;
 import es.jklabs.gui.utilidades.ArbolRendered;
 import es.jklabs.gui.utilidades.Growls;
+import es.jklabs.gui.utilidades.IconUtils;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -20,9 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.io.File;
-import java.io.Serial;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -38,22 +37,40 @@ public class MainUI extends JFrame {
     private JTree arbolOrigen;
     private DefaultMutableTreeNode raizArbolOrigen;
     private JTree arbolDestino;
-    private JTextField txEsquema;
+    private JComboBox<String> cbEsquema;
     private JProgressBar progressBar;
-    private List<String> listaEsquemas;
     private DefaultMutableTreeNode raizArbolDestino;
     private JButton btnAceptar;
     private JMenu jmArchivo;
     private JMenu jmAyuda;
     private JCheckBox cbLimpiar;
+    private int schemaLoadSequence;
 
     private MainUI() {
         super(Constantes.NOMBRE_APP);
-        super.setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
-                ("img/icons/database.png"))).getImage());
+        Image appIcon = IconUtils.loadImage("database.png");
+        if (appIcon != null) {
+            super.setIconImage(appIcon);
+            setTaskbarIcon(appIcon);
+        }
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         cargarMenu();
         super.pack();
+    }
+
+    private void setTaskbarIcon(Image appIcon) {
+        if (!Taskbar.isTaskbarSupported()) {
+            return;
+        }
+        Taskbar taskbar = Taskbar.getTaskbar();
+        if (!taskbar.isSupported(Taskbar.Feature.ICON_IMAGE)) {
+            return;
+        }
+        try {
+            taskbar.setIconImage(appIcon);
+        } catch (UnsupportedOperationException | SecurityException e) {
+            Logger.error("establecer.icono.aplicacion", e);
+        }
     }
 
     public MainUI(Configuracion configuracion) {
@@ -83,6 +100,7 @@ public class MainUI extends JFrame {
         arbolOrigen.setModel(new DefaultTreeModel(raizArbolOrigen, false));
         UtilidadesJTree.expandAllNodes(arbolOrigen, 0, arbolOrigen.getRowCount());
         SwingUtilities.updateComponentTreeUI(arbolOrigen);
+        limpiarSelectorEsquemas();
         raizArbolDestino.removeAllChildren();
         UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
         SwingUtilities.updateComponentTreeUI(arbolDestino);
@@ -221,15 +239,13 @@ public class MainUI extends JFrame {
     private JPanel getFormularioEsquema() {
         JPanel panelFormulario = new JPanel(new BorderLayout(10, 10));
         JLabel lbEsquema = new JLabel(Mensajes.getMensaje("esquema"));
-        txEsquema = new JTextField();
-        txEsquema.setColumns(10);
-        txEsquema.setFocusTraversalKeysEnabled(false);
-        listaEsquemas = new ArrayList<>();
-        AutoCompleteDecorator.decorate(txEsquema, listaEsquemas, false);
+        cbEsquema = new JComboBox<>();
+        cbEsquema.setPrototypeDisplayValue("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
+        AutoCompleteDecorator.decorate(cbEsquema);
         btnAceptar = new JButton(Mensajes.getMensaje("copiar"));
         btnAceptar.addActionListener(al -> copiarEsquema());
         panelFormulario.add(lbEsquema, BorderLayout.WEST);
-        panelFormulario.add(txEsquema, BorderLayout.CENTER);
+        panelFormulario.add(cbEsquema, BorderLayout.CENTER);
         panelFormulario.add(btnAceptar, BorderLayout.EAST);
         return panelFormulario;
     }
@@ -239,18 +255,23 @@ public class MainUI extends JFrame {
             DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
             DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
             if (origen != null && origen.getUserObject() instanceof Servidor && destino != null && destino.getUserObject
-                    () instanceof Servidor && !txEsquema.getText().trim().isEmpty()) {
+                    () instanceof Servidor && StringUtils.isNotBlank(getEsquemaSeleccionado())) {
+                String esquema = getEsquemaSeleccionado();
                 bloquearPantalla();
                 CopySchema task = new CopySchema(this, configuracion.getMysqlCliente(), (Servidor) origen
-                        .getUserObject(), (Servidor) destino.getUserObject(), txEsquema.getText().trim(),
+                        .getUserObject(), (Servidor) destino.getUserObject(), esquema,
                         cbLimpiar.isSelected());
                 task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
                 task.execute();
                 UtilidadesConfiguracion.addEsquema(configuracion, (Servidor) origen.getUserObject(),
-                        (Servidor) destino.getUserObject(), txEsquema.getText().trim());
-                listaEsquemas.add(txEsquema.getText().trim());
+                        (Servidor) destino.getUserObject(), esquema);
             }
         }
+    }
+
+    private String getEsquemaSeleccionado() {
+        Object selectedItem = cbEsquema.getSelectedItem();
+        return selectedItem != null ? selectedItem.toString().trim() : "";
     }
 
     private boolean validaCopiado() {
@@ -265,7 +286,7 @@ public class MainUI extends JFrame {
             Growls.mostrarAviso(COPIAR_ESQUEMA, "bbdd.destino.vacio");
             valido = false;
         }
-        if (UtilidadesString.isEmpty(txEsquema)) {
+        if (StringUtils.isBlank(getEsquemaSeleccionado())) {
             Growls.mostrarAviso(COPIAR_ESQUEMA, "nombre.esquema.vacio");
             valido = false;
         }
@@ -300,15 +321,22 @@ public class MainUI extends JFrame {
     }
 
     private void bloquearPantalla() {
-        jmArchivo.setEnabled(false);
-        jmAyuda.setEnabled(false);
-        arbolOrigen.setEnabled(false);
-        arbolDestino.setEnabled(false);
-        txEsquema.setEnabled(false);
-        Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-        txEsquema.setCursor(waitCursor);
-        btnAceptar.setEnabled(false);
-        this.setCursor(waitCursor);
+        setPantallaBloqueada(true);
+    }
+
+    private void setPantallaBloqueada(boolean bloqueada) {
+        Cursor cursor = bloqueada ? Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR) : null;
+        jmArchivo.setEnabled(!bloqueada);
+        jmAyuda.setEnabled(!bloqueada);
+        arbolOrigen.setEnabled(!bloqueada);
+        arbolDestino.setEnabled(!bloqueada);
+        cbEsquema.setEnabled(!bloqueada);
+        cbLimpiar.setEnabled(!bloqueada);
+        cbEsquema.setCursor(cursor);
+        btnAceptar.setEnabled(!bloqueada);
+        this.setCursor(cursor);
+        getGlassPane().setCursor(cursor);
+        getGlassPane().setVisible(bloqueada);
     }
 
     private void changeListener(String propertyName, Object newValue) {
@@ -350,6 +378,7 @@ public class MainUI extends JFrame {
     private void selecionarOrigen() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
         raizArbolDestino.removeAllChildren();
+        limpiarSelectorEsquemas();
         if (node != null && node.getUserObject() instanceof Servidor servidor) {
             cargarArbolDestino(servidor);
             cargarEsquemas(servidor);
@@ -360,9 +389,105 @@ public class MainUI extends JFrame {
     }
 
     private void cargarEsquemas(Servidor servidor) {
-        listaEsquemas.clear();
-        if (servidor.getEsquemas() != null) {
-            servidor.getEsquemas().forEach(s -> listaEsquemas.add(s.getNombre()));
+        if (!puedeConsultarEsquemas(servidor)) {
+            return;
+        }
+        int loadSequence = ++schemaLoadSequence;
+        bloquearPantalla();
+        SwingWorker<List<String>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<String> doInBackground() throws IOException, InterruptedException {
+                return consultarEsquemas(servidor);
+            }
+
+            @Override
+            protected void done() {
+                if (loadSequence != schemaLoadSequence) {
+                    return;
+                }
+                try {
+                    cargarSelectorEsquemas(get());
+                } catch (InterruptedException e) {
+                    Logger.error("consultar.esquemas", e);
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException e) {
+                    Logger.error("consultar.esquemas", e);
+                    limpiarSelectorEsquemas();
+                } finally {
+                    desbloquearPantalla();
+                }
+            }
+        };
+        worker.execute();
+    }
+
+    private boolean puedeConsultarEsquemas(Servidor servidor) {
+        return configuracion.getMysqlCliente() != null
+                && StringUtils.isNotBlank(configuracion.getMysqlCliente().getPath())
+                && servidor.getServidorBBDD() != null
+                && StringUtils.isNotBlank(servidor.getServidorBBDD().getUsuario())
+                && StringUtils.isNotBlank(servidor.getServidorBBDD().getPassword());
+    }
+
+    private List<String> consultarEsquemas(Servidor servidor) throws IOException, InterruptedException {
+        Process p = new ProcessBuilder(getMysqlArgsConsultarEsquemas(servidor)).start();
+        Thread errorReader = descartarErroresAsync(p);
+        List<String> esquemas;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            esquemas = reader.lines()
+                    .map(String::trim)
+                    .filter(StringUtils::isNotBlank)
+                    .toList();
+        }
+        int exitCode = p.waitFor();
+        errorReader.join();
+        if (exitCode != 0) {
+            throw new IOException("Consulta de esquemas finalizada con codigo " + exitCode);
+        }
+        return esquemas;
+    }
+
+    private Thread descartarErroresAsync(Process p) {
+        Thread thread = new Thread(() -> {
+            try (InputStream errorStream = p.getErrorStream()) {
+                errorStream.transferTo(OutputStream.nullOutputStream());
+            } catch (IOException e) {
+                Logger.error("consultar.esquemas", e);
+            }
+        }, "schema-list-error-reader");
+        thread.start();
+        return thread;
+    }
+
+    private List<String> getMysqlArgsConsultarEsquemas(Servidor servidor) {
+        return List.of(
+                getMysqlPath(),
+                "-h", servidor.getIp(),
+                "-P", String.valueOf(servidor.getPuerto()),
+                "-u" + servidor.getServidorBBDD().getUsuario(),
+                "-p" + UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()),
+                "--batch",
+                "--skip-column-names",
+                "-e", "SHOW DATABASES"
+        );
+    }
+
+    private String getMysqlPath() {
+        String comandoMysql = UtilidadesSistema.isWindows() ? Constantes.MYSQL_EXE : Constantes.MYSQL;
+        return configuracion.getMysqlCliente().getPath() + UtilidadesFichero.SEPARADOR + comandoMysql;
+    }
+
+    private void cargarSelectorEsquemas(List<String> esquemas) {
+        cbEsquema.removeAllItems();
+        esquemas.forEach(cbEsquema::addItem);
+        cbEsquema.setSelectedItem(null);
+    }
+
+    private void limpiarSelectorEsquemas() {
+        schemaLoadSequence++;
+        if (cbEsquema != null) {
+            cbEsquema.removeAllItems();
+            cbEsquema.setSelectedItem(null);
         }
     }
 
@@ -410,13 +535,6 @@ public class MainUI extends JFrame {
     }
 
     public void desbloquearPantalla() {
-        jmArchivo.setEnabled(true);
-        jmAyuda.setEnabled(true);
-        arbolOrigen.setEnabled(true);
-        arbolDestino.setEnabled(true);
-        txEsquema.setEnabled(true);
-        txEsquema.setCursor(null);
-        getBtnAceptar().setEnabled(true);
-        setCursor(null); //turn off the wait cursor
+        setPantallaBloqueada(false);
     }
 }

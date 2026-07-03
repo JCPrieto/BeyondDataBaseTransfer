@@ -4,6 +4,7 @@ import es.jklabs.gui.MainUI;
 import es.jklabs.gui.configuracion.ConfiguracionUI;
 import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.Configuracion;
+import es.jklabs.utilidades.Constantes;
 import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 
@@ -12,25 +13,34 @@ import javax.swing.*;
 public class BeyondDataBaseTransfer {
 
     public static void main(String[] args) {
+        setLinuxWindowClass();
+        Logger.eliminarLogsVacios();
         Logger.init();
-        try {
-            Growls.init();
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            Configuracion configuracion = UtilidadesConfiguracion.loadConfig();
-            if (configuracion == null) {
-                configuracion = new Configuracion();
-                MainUI mainUI = new MainUI(configuracion);
-                ConfiguracionUI configuracionUI = new ConfiguracionUI(mainUI, configuracion);
-                configuracionUI.setVisible(true);
-                mainUI.setVisible(true);
-            } else {
-                MainUI mainUI = new MainUI(configuracion);
-                mainUI.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            try {
+                Growls.init();
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                Configuracion configuracion = UtilidadesConfiguracion.loadConfig();
+                if (configuracion == null) {
+                    configuracion = new Configuracion();
+                    MainUI mainUI = new MainUI(configuracion);
+                    ConfiguracionUI configuracionUI = new ConfiguracionUI(mainUI, configuracion);
+                    configuracionUI.setVisible(true);
+                    mainUI.setVisible(true);
+                } else {
+                    MainUI mainUI = new MainUI(configuracion);
+                    mainUI.setVisible(true);
+                }
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                     UnsupportedLookAndFeelException e) {
+                Logger.error("Cargar el LookAndFeel del S.O", e);
             }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                UnsupportedLookAndFeelException e) {
-            Logger.error("Cargar el LookAndFeel del S.O", e);
-        }
+        });
     }
 
+    private static void setLinuxWindowClass() {
+        String windowClass = "es-jklabs-" + Constantes.NOMBRE_APP;
+        System.setProperty("sun.awt.X11.awtAppClassName", windowClass);
+        System.setProperty("sun.awt.X11.XWMClass", windowClass);
+    }
 }

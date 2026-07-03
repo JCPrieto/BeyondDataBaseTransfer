@@ -16,8 +16,8 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 * Java 21
 * Cliente Mysql
-* LibNotify opcional en Linux para notificaciones nativas (`notify-send`). Si no esta disponible, la aplicacion usa
-  dialogos Swing como fallback.
+* D-Bus disponible en Linux para notificaciones nativas. Si no esta disponible, la aplicacion usa dialogos Swing como
+  fallback.
 
 ### Ejecución ###
 
@@ -26,6 +26,8 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 * Linux:
     * Ejecutar BeyondDataBaseTransfer.sh dentro del directorio bin
+  * Opcionalmente, ejecutar `sh ./install-linux-desktop-entry.sh` desde el directorio descomprimido para registrar el
+    lanzador en GNOME y asociar correctamente el icono del dock.
 
 ### Configuracion y logs ###
 
@@ -43,13 +45,14 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
     * Jackson https://github.com/FasterXML/jackson-core/wiki
     * Apache Commons https://commons.apache.org
     * SwingX 
+  * Two-Slices https://github.com/sshtools/two-slices
+  * D-Bus Java https://github.com/hypfvieh/dbus-java
   * GitHub Releases API https://docs.github.com/en/rest/releases/releases
     
 ### ToDo ###
 
 * Crear los esquemas si no existen en la máquina de destino
 * Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
-* Buscar los esquemas disponibles en el propio servidor de orígen.
 * Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
 * Clonar esquemas en una misma máquina
 * Mostrar un texto descriptivo en la barra de progreso

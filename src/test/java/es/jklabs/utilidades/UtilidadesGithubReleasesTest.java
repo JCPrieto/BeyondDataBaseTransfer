@@ -29,9 +29,12 @@ public class UtilidadesGithubReleasesTest {
 
     @Test
     public void comparaVersiones() {
-        assertTrue(UtilidadesGithubReleases.diferenteVersion("1.4.1"));
-        assertFalse(UtilidadesGithubReleases.diferenteVersion("1.4.0"));
-        assertFalse(UtilidadesGithubReleases.diferenteVersion("1.3.9"));
+        int[] versionActual = UtilidadesGithubReleases.parseVersion(Constantes.VERSION);
+        assertTrue(UtilidadesGithubReleases.diferenteVersion(versionActual[0] + "." + versionActual[1] + "."
+                + (versionActual[2] + 1)));
+        assertFalse(UtilidadesGithubReleases.diferenteVersion(Constantes.VERSION));
+        assertFalse(UtilidadesGithubReleases.diferenteVersion(versionActual[0] + "." + Math.max(0, versionActual[1] - 1)
+                + ".9"));
     }
 
     @Test

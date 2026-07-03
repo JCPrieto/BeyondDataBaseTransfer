@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=BeyondDataBaseTransfer
+Comment=Transferencia de esquemas de base de datos
+Exec=/opt/beyonddatabasetransfer/bin/BeyondDataBaseTransfer
+Icon=/opt/beyonddatabasetransfer/lib/BeyondDataBaseTransfer.png
+Terminal=false
+Type=Application
+Categories=Development;Database;Utility;
+StartupWMClass=es-jklabs-BeyondDataBaseTransfer
+StartupNotify=true
