@@ -105,6 +105,8 @@ public class AcercaDe extends JDialog {
         addPowered(panel, cns, yPosition++, "Jackson", "https://github.com/FasterXML/jackson-core/wiki");
         addPowered(panel, cns, yPosition++, "Apache Commons", "https://commons.apache.org");
         addPowered(panel, cns, yPosition++, "SwingX", null);
+        addPowered(panel, cns, yPosition++, "Two-Slices", "https://github.com/sshtools/two-slices");
+        addPowered(panel, cns, yPosition++, "D-Bus Java", "https://github.com/hypfvieh/dbus-java");
         addPowered(panel, cns, yPosition++, "GitHub", "https://github.com");
         JLabel jLabelLicense = new JLabel
                 ("<html><i>Esta obra está bajo una licencia de Creative Commons " +
