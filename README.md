@@ -26,6 +26,8 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 * Linux:
     * Ejecutar BeyondDataBaseTransfer.sh dentro del directorio bin
+  * Opcionalmente, ejecutar `sh ./install-linux-desktop-entry.sh` desde el directorio descomprimido para registrar el
+    lanzador en GNOME y asociar correctamente el icono del dock.
 
 ### Configuracion y logs ###
 

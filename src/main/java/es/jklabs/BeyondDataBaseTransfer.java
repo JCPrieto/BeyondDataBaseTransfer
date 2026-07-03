@@ -4,6 +4,7 @@ import es.jklabs.gui.MainUI;
 import es.jklabs.gui.configuracion.ConfiguracionUI;
 import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.Configuracion;
+import es.jklabs.utilidades.Constantes;
 import es.jklabs.utilidades.Logger;
 import es.jklabs.utilidades.UtilidadesConfiguracion;
 
@@ -12,6 +13,7 @@ import javax.swing.*;
 public class BeyondDataBaseTransfer {
 
     public static void main(String[] args) {
+        setLinuxWindowClass();
         Logger.eliminarLogsVacios();
         Logger.init();
         SwingUtilities.invokeLater(() -> {
@@ -36,4 +38,9 @@ public class BeyondDataBaseTransfer {
         });
     }
 
+    private static void setLinuxWindowClass() {
+        String windowClass = "es-jklabs-" + Constantes.NOMBRE_APP;
+        System.setProperty("sun.awt.X11.awtAppClassName", windowClass);
+        System.setProperty("sun.awt.X11.XWMClass", windowClass);
+    }
 }

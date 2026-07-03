@@ -21,9 +21,15 @@ if (!versionMatcher) {
     throw new GradleException("No se pudo leer VERSION desde ${constantesFile}")
 }
 version = versionMatcher[0][1]
+def linuxDesktopId = "es-jklabs-BeyondDataBaseTransfer"
+def linuxIconName = "beyonddatabasetransfer"
 
 application {
     mainClass = "es.jklabs.BeyondDataBaseTransfer"
+    applicationDefaultJvmArgs = [
+            "-Dsun.awt.X11.awtAppClassName=es-jklabs-BeyondDataBaseTransfer",
+            "-Dsun.awt.X11.XWMClass=es-jklabs-BeyondDataBaseTransfer"
+    ]
 }
 
 distributions {
@@ -32,7 +38,44 @@ distributions {
             from("README.md") {
                 into ""
             }
+            from("src/main/resources/img/icons/database.png") {
+                into ""
+                rename { "BeyondDataBaseTransfer.png" }
+            }
         }
+    }
+}
+
+tasks.register("installLinuxDesktopEntry") {
+    description = "Instala la entrada .desktop local para que GNOME asocie el icono al ejecutar desde el IDE."
+    group = "application"
+    dependsOn tasks.named("startScripts")
+    doLast {
+        def applicationsDir = new File(System.getProperty("user.home"), ".local/share/applications")
+        def iconsDir = new File(System.getProperty("user.home"), ".local/share/icons/hicolor/256x256/apps")
+        applicationsDir.mkdirs()
+        iconsDir.mkdirs()
+
+        def iconFile = new File(iconsDir, "${linuxIconName}.png")
+        copy {
+            from("src/main/resources/packaging/linux/beyonddatabasetransfer.png")
+            into iconsDir
+        }
+
+        def desktopFile = new File(applicationsDir, "${linuxDesktopId}.desktop")
+        desktopFile.text = """[Desktop Entry]
+Name=BeyondDataBaseTransfer
+Comment=Transferencia de esquemas de base de datos
+Exec=${new File(projectDir, "build/scripts/BeyondDataBaseTransfer").absolutePath}
+Icon=${iconFile.absolutePath}
+Terminal=false
+Type=Application
+Categories=Development;Database;Utility;
+StartupWMClass=${linuxDesktopId}
+StartupNotify=true
+"""
+        desktopFile.setExecutable(false, false)
+        println "Entrada de escritorio instalada en ${desktopFile.absolutePath}"
     }
 }
 

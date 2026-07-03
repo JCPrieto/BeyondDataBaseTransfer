@@ -51,10 +51,26 @@ public class MainUI extends JFrame {
         Image appIcon = IconUtils.loadImage("database.png");
         if (appIcon != null) {
             super.setIconImage(appIcon);
+            setTaskbarIcon(appIcon);
         }
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         cargarMenu();
         super.pack();
+    }
+
+    private void setTaskbarIcon(Image appIcon) {
+        if (!Taskbar.isTaskbarSupported()) {
+            return;
+        }
+        Taskbar taskbar = Taskbar.getTaskbar();
+        if (!taskbar.isSupported(Taskbar.Feature.ICON_IMAGE)) {
+            return;
+        }
+        try {
+            taskbar.setIconImage(appIcon);
+        } catch (UnsupportedOperationException | SecurityException e) {
+            Logger.error("establecer.icono.aplicacion", e);
+        }
     }
 
     public MainUI(Configuracion configuracion) {
