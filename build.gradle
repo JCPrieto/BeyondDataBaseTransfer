@@ -49,8 +49,11 @@ dependencies {
 
 test {
     def testConfigDir = layout.buildDirectory.dir("test-config").get().asFile
+    def testLogsDir = layout.buildDirectory.dir("test-logs").get().asFile
     systemProperty "beyond.database.transfer.config.dir", testConfigDir.absolutePath
+    systemProperty "beyond.database.transfer.logs.dir", testLogsDir.absolutePath
     doFirst {
         delete testConfigDir
+        delete testLogsDir
     }
 }
