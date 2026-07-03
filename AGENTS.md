@@ -28,6 +28,8 @@
 - If adding tests, place them in `src/test/java` and name classes `*Test`.
 - Run `./gradlew test` before submitting PRs; note any manual UI verification in the PR.
 - The release workflow runs tests before SonarQube and release creation; tests are blocking, SonarQube is informational.
+- Gradle tests set `beyond.database.transfer.config.dir` and `beyond.database.transfer.logs.dir` to folders under
+  `build/`; tests must not read from or write to the user's real app configuration or logs.
 
 ## Commit & Pull Request Guidelines
 
@@ -40,3 +42,9 @@
 
 - The app depends on Java 21, MySQL client tools, and LibNotify on Linux.
 - Avoid committing real credentials in `src/main/resources/json`; use placeholders or sanitized configs when possible.
+- User configuration is stored under the app config directory, while logs use OS-specific application data folders.
+  Use the `beyond.database.transfer.config.dir` and `beyond.database.transfer.logs.dir` system properties when tests or
+  tools need isolated paths.
+- Stored server passwords use the versioned encryption format in `UtilidadesEncryptacion`; keep legacy decryption
+  support
+  when rotating keys or changing the cipher.

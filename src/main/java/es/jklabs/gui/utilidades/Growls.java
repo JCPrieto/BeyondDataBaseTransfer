@@ -28,18 +28,51 @@ public class Growls {
     }
 
     private static void mostrarGrowl(String titulo, String cuerpo, TrayIcon.MessageType type, String icon) {
+        String tituloMensaje = titulo != null ? Mensajes.getMensaje(titulo) : Constantes.NOMBRE_APP;
         if (trayIcon != null) {
-            trayIcon.displayMessage(titulo != null ? Mensajes.getMensaje(titulo) : null, cuerpo, type);
-        } else {
-            try {
-                Runtime.getRuntime().exec(new String[]{NOTIFY_SEND,
-                        titulo != null ? Mensajes.getMensaje(titulo) : Constantes.NOMBRE_APP,
-                        cuerpo,
-                        icon});
-            } catch (IOException e2) {
-                Logger.error(e2);
-            }
+            trayIcon.displayMessage(tituloMensaje, cuerpo, type);
+            return;
         }
+        if (mostrarNotifySend(tituloMensaje, cuerpo, icon)) {
+            return;
+        }
+        mostrarDialogo(tituloMensaje, cuerpo, type);
+    }
+
+    private static boolean mostrarNotifySend(String titulo, String cuerpo, String icon) {
+        if (!System.getProperty("os.name").toLowerCase().contains("linux")) {
+            return false;
+        }
+        try {
+            new ProcessBuilder(NOTIFY_SEND, titulo, cuerpo, icon).start();
+            return true;
+        } catch (IOException e) {
+            Logger.error(e);
+            return false;
+        }
+    }
+
+    private static void mostrarDialogo(String titulo, String cuerpo, TrayIcon.MessageType type) {
+        if (GraphicsEnvironment.isHeadless()) {
+            Logger.info(titulo + ": " + cuerpo);
+            return;
+        }
+        Runnable showDialog = () -> JOptionPane.showMessageDialog(null, cuerpo, titulo, getMessageType(type));
+        if (SwingUtilities.isEventDispatchThread()) {
+            showDialog.run();
+        } else {
+            SwingUtilities.invokeLater(showDialog);
+        }
+    }
+
+    private static int getMessageType(TrayIcon.MessageType type) {
+        if (type == TrayIcon.MessageType.ERROR) {
+            return JOptionPane.ERROR_MESSAGE;
+        }
+        if (type == TrayIcon.MessageType.WARNING) {
+            return JOptionPane.WARNING_MESSAGE;
+        }
+        return JOptionPane.INFORMATION_MESSAGE;
     }
 
     public static void mostrarError(String titulo, String cuerpo) {
@@ -63,7 +96,7 @@ public class Growls {
 
     public static void init() {
         trayIcon = null;
-        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+        if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
             trayIcon = new TrayIcon(new ImageIcon(Objects.requireNonNull(Growls.class.getClassLoader().getResource
                     ("img/icons/database.png"))).getImage(), Constantes.NOMBRE_APP);
@@ -71,6 +104,7 @@ public class Growls {
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
+                trayIcon = null;
                 Logger.error("establecer.icono.systray", e);
             }
         }

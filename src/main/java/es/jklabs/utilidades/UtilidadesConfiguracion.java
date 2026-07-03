@@ -12,8 +12,8 @@ import es.jklabs.json.configuracion.server.Servidor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -30,8 +30,7 @@ public class UtilidadesConfiguracion {
         if (file.exists()) {
             try {
                 UtilidadesFichero.createBaseFolder();
-                Files.move(file.toPath(), FileSystems.getDefault().getPath(UtilidadesFichero.HOME +
-                        UtilidadesFichero.SEPARADOR + UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON));
+                Files.move(file.toPath(), getConfigPath());
             } catch (IOException e) {
                 Logger.error("Mover archivo de configuracion", e);
             }
@@ -39,8 +38,7 @@ public class UtilidadesConfiguracion {
         ObjectMapper mapper = getObjectMapper();
         Configuracion configuracion = null;
         try {
-            configuracion = mapper.readValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
-                    UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON), Configuracion.class);
+            configuracion = mapper.readValue(getConfigPath().toFile(), Configuracion.class);
         } catch (FileNotFoundException e) {
             Logger.info("Fichero de configuracion no encontrado", e);
         } catch (IOException e) {
@@ -53,8 +51,7 @@ public class UtilidadesConfiguracion {
         ObjectMapper mapper = getObjectMapper();
         try {
             UtilidadesFichero.createBaseFolder();
-            mapper.writeValue(new File(UtilidadesFichero.HOME + UtilidadesFichero.SEPARADOR +
-                    UtilidadesFichero.BEYOND_DATA_BASE_TRANSFER_FOLDER + UtilidadesFichero.SEPARADOR + CONFIG_JSON), configuracion);
+            mapper.writeValue(getConfigPath().toFile(), configuracion);
         } catch (IOException e) {
             Logger.error("Guardar configuracion", e);
         }
@@ -99,6 +96,10 @@ public class UtilidadesConfiguracion {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
+    }
+
+    static Path getConfigPath() {
+        return UtilidadesFichero.getBaseFolderPath().resolve(CONFIG_JSON);
     }
 
     private static void addServidores(Configuracion configuracion, Carpeta destino, Carpeta origen) {

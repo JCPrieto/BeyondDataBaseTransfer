@@ -1,5 +1,18 @@
 # Changelog
 
+* 1.4.0
+
+    * Mejora del proceso de copia de esquemas usando `ProcessBuilder`, argumentos separados, validacion del nombre del
+      esquema y control del codigo de salida de `mysql` y `mysqldump`.
+    * Uso de archivos temporales seguros para los backups intermedios y limpieza garantizada al finalizar la copia.
+    * Nuevo cifrado de contrasenas con AES-GCM, IV aleatorio, formato versionado y compatibilidad con credenciales
+      cifradas por versiones anteriores.
+    * Comprobacion de nuevas versiones en segundo plano para evitar bloqueos de la interfaz al iniciar la aplicacion.
+    * Logs en ubicacion fija por sistema operativo, rotacion simple y eliminacion de logs vacios.
+    * Fallback de notificaciones mediante dialogos Swing cuando no estan disponibles Systray o `notify-send`.
+    * Aislamiento de configuracion y logs durante los tests para evitar modificaciones en datos reales del usuario.
+    * Nuevos tests unitarios para copia de esquemas, cifrado, configuracion y rutas de logs.
+
 * 1.3.6
 
     * Correccion al eliminar servidores y carpetas de sistema desde la configuracion para mantener sincronizados el
