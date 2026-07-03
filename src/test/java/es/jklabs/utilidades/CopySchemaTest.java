@@ -6,6 +6,8 @@ import es.jklabs.json.configuracion.server.ServidorBBDD;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -23,6 +25,12 @@ public class CopySchemaTest {
         Method method = CopySchema.class.getDeclaredMethod(methodName);
         method.setAccessible(true);
         return (List<String>) method.invoke(copySchema);
+    }
+
+    private static void eliminarBackUpTemporal(CopySchema copySchema, Path backup) throws Exception {
+        Method method = CopySchema.class.getDeclaredMethod("eliminarBackUpTemporal", Path.class);
+        method.setAccessible(true);
+        method.invoke(copySchema, backup);
     }
 
     private static CopySchema crearCopySchema(String esquema, boolean limpiarEsquema) {
@@ -93,5 +101,15 @@ public class CopySchemaTest {
         assertEquals("-uusuario_destino", args.get(5));
         assertEquals("-ppassword_destino", args.get(6));
         assertEquals("schema_01", args.get(7));
+    }
+
+    @Test
+    public void eliminaArchivoTemporalSiExiste() throws Exception {
+        CopySchema copySchema = crearCopySchema("schema_01", false);
+        Path backup = Files.createTempFile("bddt-test-", ".sql");
+
+        eliminarBackUpTemporal(copySchema, backup);
+
+        assertFalse(Files.exists(backup));
     }
 }

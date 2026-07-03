@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,44 +48,55 @@ public class CopySchema extends SwingWorker<Void, Void> {
         }
         int count = 1;
         boolean origenOk = false;
-        try (FileOutputStream fos = new FileOutputStream(UtilidadesSistema.getTmpDir() + esquema + ".sql")) {
-            setProgress(count++);
-            Process p = new ProcessBuilder(getMysqlDumpArgs()).start();
-            origenOk = crearBackUp(fos, p);
-        } catch (InterruptedException e) {
-            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.realizar.backup", e);
-            Thread.currentThread().interrupt();
-        } catch (Exception e) {
-            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.realizar.backup", e);
-        }
-        if (origenOk) {
-            String src = UtilidadesSistema.getTmpDir() + esquema + ".sql";
-            boolean destinoOk = false;
-            try (FileInputStream fis = new FileInputStream(src)) {
+        Path backup = null;
+        try {
+            backup = Files.createTempFile("bddt-" + esquema + "-", ".sql");
+            try (OutputStream fos = Files.newOutputStream(backup)) {
                 setProgress(count++);
-                Process p = new ProcessBuilder(getMysqlArgs()).start();
-                destinoOk = restautarBackUp(fis, p);
-                setProgress(count);
+                Process p = new ProcessBuilder(getMysqlDumpArgs()).start();
+                origenOk = crearBackUp(fos, p);
             } catch (InterruptedException e) {
-                Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+                Growls.mostrarError(COPIAR_ESQUEMA, "fallo.realizar.backup", e);
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
-                Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
-            } finally {
-                Path paths = Paths.get(src);
-                try {
-                    if (destinoOk) {
-                        Files.delete(paths);
-                    }
-                } catch (IOException e) {
-                    Growls.mostrarError(COPIAR_ESQUEMA, "eliminar.archivo.temporal");
-                }
+                Growls.mostrarError(COPIAR_ESQUEMA, "fallo.realizar.backup", e);
             }
+            if (origenOk) {
+                restaurarBackUp(backup, count);
+            }
+        } catch (IOException e) {
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.realizar.backup", e);
+        } finally {
+            eliminarBackUpTemporal(backup);
         }
         return null;
     }
 
-    private boolean restautarBackUp(FileInputStream fis, Process p) throws IOException, InterruptedException {
+    private void restaurarBackUp(Path backup, int count) {
+        try (InputStream fis = Files.newInputStream(backup)) {
+            setProgress(count++);
+            Process p = new ProcessBuilder(getMysqlArgs()).start();
+            restautarBackUp(fis, p);
+            setProgress(count);
+        } catch (InterruptedException e) {
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+        }
+    }
+
+    private void eliminarBackUpTemporal(Path backup) {
+        if (backup != null) {
+            try {
+                Files.deleteIfExists(backup);
+            } catch (IOException e) {
+                Growls.mostrarError(COPIAR_ESQUEMA, "eliminar.archivo.temporal");
+            }
+        }
+    }
+
+    private void restautarBackUp(InputStream fis, Process p) throws IOException, InterruptedException {
         List<String> errores = Collections.synchronizedList(new ArrayList<>());
         Thread errorReader = leerErroresAsync(p, errores);
         try (OutputStream os = p.getOutputStream()) {
@@ -100,17 +110,16 @@ public class CopySchema extends SwingWorker<Void, Void> {
         } catch (Exception e) {
             Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
             p.destroyForcibly();
-            return false;
+            return;
         }
         int exitCode = waitForProcess(p, errorReader);
         boolean correcto = procesoCorrecto(p, exitCode, errores);
         if (correcto) {
             Growls.mostrarInfo(COPIAR_ESQUEMA, "copia.realizada.exito");
         }
-        return correcto;
     }
 
-    private boolean crearBackUp(FileOutputStream fos, Process p) throws IOException, InterruptedException {
+    private boolean crearBackUp(OutputStream fos, Process p) throws IOException, InterruptedException {
         List<String> errores = Collections.synchronizedList(new ArrayList<>());
         Thread errorReader = leerErroresAsync(p, errores);
         try (InputStream is = p.getInputStream()) {
