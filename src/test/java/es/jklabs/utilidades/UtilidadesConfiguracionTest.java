@@ -3,13 +3,40 @@ package es.jklabs.utilidades;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.Assert.*;
 
 public class UtilidadesConfiguracionTest {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @Test
+    public void guardaConfiguracionEnDirectorioConfiguradoParaTests() throws Exception {
+        String configDirProperty = System.getProperty(UtilidadesFichero.CONFIG_DIR_PROPERTY);
+        Path configDir = temporaryFolder.newFolder("config").toPath();
+        try {
+            System.setProperty(UtilidadesFichero.CONFIG_DIR_PROPERTY, configDir.toString());
+
+            UtilidadesConfiguracion.guardarConfiguracion(new Configuracion());
+
+            assertTrue(Files.exists(configDir.resolve("config.json")));
+            assertEquals(configDir.resolve("config.json"), UtilidadesConfiguracion.getConfigPath());
+        } finally {
+            if (configDirProperty == null) {
+                System.clearProperty(UtilidadesFichero.CONFIG_DIR_PROPERTY);
+            } else {
+                System.setProperty(UtilidadesFichero.CONFIG_DIR_PROPERTY, configDirProperty);
+            }
+        }
+    }
 
     @Test
     public void importaServidoresCreandoCopiasConIdsNuevosYManteniendoEstructura() throws Exception {

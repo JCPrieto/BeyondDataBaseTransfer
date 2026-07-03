@@ -5,7 +5,11 @@ import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.json.configuracion.server.ServidorBBDD;
 import es.jklabs.utilidades.UtilidadesEncryptacion;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -15,6 +19,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 public class ServersConfigPanelTest {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private String configDirProperty;
+
+    @Before
+    public void setUp() throws Exception {
+        configDirProperty = System.getProperty("beyond.database.transfer.config.dir");
+        System.setProperty("beyond.database.transfer.config.dir", temporaryFolder.newFolder("config").getAbsolutePath());
+    }
+
+    @After
+    public void tearDown() {
+        if (configDirProperty == null) {
+            System.clearProperty("beyond.database.transfer.config.dir");
+        } else {
+            System.setProperty("beyond.database.transfer.config.dir", configDirProperty);
+        }
+    }
 
     @Test
     public void noEliminaCarpetaDeSistemaDelArbolSiNoSeEliminaDeLaConfiguracion() throws Exception {
@@ -29,7 +53,7 @@ public class ServersConfigPanelTest {
         invocarEliminarNodoArbol(panel);
 
         assertEquals(1, configuracion.getServerConfig().getRaiz().getCarpetas().size());
-        assertSame(carpetaSistema, configuracion.getServerConfig().getRaiz().getCarpetas().get(0));
+        assertSame(carpetaSistema, configuracion.getServerConfig().getRaiz().getCarpetas().getFirst());
         assertEquals(1, raiz.getChildCount());
         assertSame(carpetaSistema, ((DefaultMutableTreeNode) raiz.getChildAt(0)).getUserObject());
     }
