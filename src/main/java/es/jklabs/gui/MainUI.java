@@ -4,6 +4,7 @@ import es.jklabs.gui.configuracion.ConfiguracionUI;
 import es.jklabs.gui.dialogos.AcercaDe;
 import es.jklabs.gui.utilidades.ArbolRendered;
 import es.jklabs.gui.utilidades.Growls;
+import es.jklabs.gui.utilidades.IconUtils;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.JSonFilter;
 import es.jklabs.json.configuracion.Configuracion;
@@ -47,8 +48,10 @@ public class MainUI extends JFrame {
 
     private MainUI() {
         super(Constantes.NOMBRE_APP);
-        super.setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource
-                ("img/icons/database.png"))).getImage());
+        Image appIcon = IconUtils.loadImage("database.png");
+        if (appIcon != null) {
+            super.setIconImage(appIcon);
+        }
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         cargarMenu();
         super.pack();
