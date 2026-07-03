@@ -16,7 +16,8 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 * Java 21
 * Cliente Mysql
-* LibNotify (Para las notificaciones en Linux)
+* LibNotify opcional en Linux para notificaciones nativas (`notify-send`). Si no esta disponible, la aplicacion usa
+  dialogos Swing como fallback.
 
 ### Ejecución ###
 
@@ -25,6 +26,15 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 * Linux:
     * Ejecutar BeyondDataBaseTransfer.sh dentro del directorio bin
+
+### Configuracion y logs ###
+
+* La configuracion de usuario se guarda en `~/.BeyondDataBaseTransfer/config.json` por defecto.
+* Los logs se escriben en una carpeta fija segun el sistema operativo:
+  * Windows: `%LOCALAPPDATA%/BeyondDataBaseTransfer/logs`
+  * macOS: `~/Library/Application Support/BeyondDataBaseTransfer/logs`
+  * Linux: `~/.local/share/BeyondDataBaseTransfer/logs`
+* Los logs tienen rotacion simple por tamano y se eliminan los archivos vacios al iniciar.
 
 ### Tecnologías utilizadas ###
 
@@ -41,7 +51,6 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 * Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
 * Buscar los esquemas disponibles en el propio servidor de orígen.
 * Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
-* Eliminar logs vacíos
 * Clonar esquemas en una misma máquina
 * Mostrar un texto descriptivo en la barra de progreso
 
