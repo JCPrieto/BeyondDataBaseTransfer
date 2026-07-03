@@ -28,6 +28,7 @@
 - If adding tests, place them in `src/test/java` and name classes `*Test`.
 - Run `./gradlew test` before submitting PRs; note any manual UI verification in the PR.
 - The release workflow runs tests before SonarQube and release creation; tests are blocking, SonarQube is informational.
+- SonarQube coverage comes from JaCoCo XML (`jacocoTestReport`); keep XML reporting enabled when changing Gradle or CI.
 - Gradle tests set `beyond.database.transfer.config.dir` and `beyond.database.transfer.logs.dir` to folders under
   `build/`; tests must not read from or write to the user's real app configuration or logs.
 

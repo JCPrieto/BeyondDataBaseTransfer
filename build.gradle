@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "application"
+    id "jacoco"
     id "org.sonarqube" version "7.3.1.8318"
 }
 
@@ -8,6 +9,8 @@ sonar {
     properties {
         property "sonar.projectKey", "JCPrieto_BeyondDataBaseTransfer"
         property "sonar.organization", "jcprieto"
+        property "sonar.coverage.jacoco.xmlReportPaths",
+                layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
     }
 }
 
@@ -56,4 +59,20 @@ test {
         delete testConfigDir
         delete testLogsDir
     }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+tasks.named("sonar") {
+    dependsOn jacocoTestReport
 }
