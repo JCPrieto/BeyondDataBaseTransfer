@@ -1,5 +1,19 @@
 # Changelog
 
+* 1.5.0
+
+    * Sustitucion del campo manual de esquema por un selector que consulta los esquemas disponibles en el servidor de
+      origen mediante el cliente `mysql`.
+    * Recarga asincrona del selector de esquemas al cambiar el servidor de origen, limpiando la seleccion anterior y
+      bloqueando la interfaz mientras finaliza la consulta.
+    * Notificaciones nativas mediante Two-Slices y D-Bus, eliminando el uso de Systray y `notify-send`, con dialogos
+      Swing como fallback.
+    * Mejoras de integracion en Linux/GNOME para asociar el icono de la aplicacion en el dock, incluyendo `WM_CLASS`,
+      icono de Taskbar y script de registro de lanzador en la distribucion.
+    * Inicializacion de la interfaz en el EDT de Swing y carga centralizada de iconos mediante `IconUtils`.
+    * Actualizacion del dialogo "Acerca de" con licencia GPL-3.0 y listado de librerias actualizado.
+    * Configuracion de JaCoCo para generar cobertura XML usada por SonarQube en el workflow de release.
+
 * 1.4.0
 
     * Mejora del proceso de copia de esquemas usando `ProcessBuilder`, argumentos separados, validacion del nombre del

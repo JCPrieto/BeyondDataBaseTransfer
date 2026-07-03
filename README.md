@@ -53,7 +53,6 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
 
 * Crear los esquemas si no existen en la máquina de destino
 * Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
-* Buscar los esquemas disponibles en el propio servidor de orígen.
 * Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
 * Clonar esquemas en una misma máquina
 * Mostrar un texto descriptivo en la barra de progreso

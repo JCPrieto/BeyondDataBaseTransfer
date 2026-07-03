@@ -3,7 +3,7 @@ package es.jklabs.utilidades;
 public class Constantes {
 
     public static final String NOMBRE_APP = "BeyondDataBaseTransfer";
-    public static final String VERSION = "1.4.0";
+    public static final String VERSION = "1.5.0";
     public static final String GITHUB_OWNER = "JCPrieto";
     public static final String GITHUB_REPO = "BeyondDataBaseTransfer";
     public static final String GITHUB_API_BASE = "https://api.github.com";

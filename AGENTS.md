@@ -13,6 +13,7 @@
 - `./gradlew run` launches the desktop application using `mainClass` from `build.gradle`.
 - `./gradlew test` runs JUnit 4 tests.
 - `./gradlew distZip` creates a distributable ZIP with the application and README.
+- `./gradlew installLinuxDesktopEntry` registers a local GNOME desktop entry for IDE/manual Linux testing.
 - `./gradlew sonar` runs the SonarQube analysis when `SONAR_TOKEN` is available.
 
 ## Coding Style & Naming Conventions
@@ -41,7 +42,7 @@
 
 ## Configuration & Security Notes
 
-- The app depends on Java 21, MySQL client tools, and LibNotify on Linux.
+- The app depends on Java 21, MySQL client tools, and D-Bus on Linux for native notifications.
 - Avoid committing real credentials in `src/main/resources/json`; use placeholders or sanitized configs when possible.
 - User configuration is stored under the app config directory, while logs use OS-specific application data folders.
   Use the `beyond.database.transfer.config.dir` and `beyond.database.transfer.logs.dir` system properties when tests or
