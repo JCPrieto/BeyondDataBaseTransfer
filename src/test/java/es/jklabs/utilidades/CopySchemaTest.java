@@ -85,6 +85,7 @@ public class CopySchemaTest {
         assertTrue(args.contains("--databases"));
         assertTrue(args.contains("schema_01"));
         assertTrue(args.contains("--add-drop-database"));
+        assertFalse(args.contains("--events"));
     }
 
     @Test
@@ -101,6 +102,23 @@ public class CopySchemaTest {
         assertEquals("-uusuario_destino", args.get(5));
         assertEquals("-ppassword_destino", args.get(6));
         assertEquals("schema_01", args.get(7));
+    }
+
+    @Test
+    public void construyeArgumentosMysqlParaCrearEsquemaDestinoSiNoExiste() throws Exception {
+        CopySchema copySchema = crearCopySchema("schema_01", false);
+
+        List<String> args = getArgs(copySchema, "getCrearEsquemaArgs");
+
+        assertTrue(args.get(0).endsWith(UtilidadesFichero.SEPARADOR + getMysqlCommand()));
+        assertEquals("-h", args.get(1));
+        assertEquals("destino.local", args.get(2));
+        assertEquals("-P", args.get(3));
+        assertEquals("3307", args.get(4));
+        assertEquals("-uusuario_destino", args.get(5));
+        assertEquals("-ppassword_destino", args.get(6));
+        assertEquals("-e", args.get(7));
+        assertEquals("CREATE DATABASE IF NOT EXISTS `schema_01`", args.get(8));
     }
 
     @Test

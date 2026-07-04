@@ -22,6 +22,8 @@
 - Packages follow `es.jklabs.*`; classes use `PascalCase`, methods/fields use `camelCase`.
 - Keep UI strings in resource bundles under `src/main/resources/i18n`.
 - Prefer `final` for constants in `es.jklabs.utilidades.Constantes` and similar utility classes.
+- Swing workers that execute `mysql` or `mysqldump` should extend `AbstractMysqlWorker`, reuse its common connection
+  argument helper, and publish progress descriptions for the main progress bar.
 
 ## Testing Guidelines
 

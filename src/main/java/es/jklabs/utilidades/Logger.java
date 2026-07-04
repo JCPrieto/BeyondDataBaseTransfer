@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
@@ -27,11 +28,15 @@ public class Logger {
             eliminarLogsVacios();
             fh = new FileHandler(UtilidadesFichero.getLogDir().resolve(LOG_PATTERN).toString(),
                     LOG_ROTATION_SIZE_BYTES, LOG_ROTATION_COUNT, true);
-            LOG.addHandler(fh);
             LOG.setUseParentHandlers(false);
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
             fh.setLevel(Level.ALL);
+            LOG.addHandler(fh);
+            ConsoleHandler ch = new ConsoleHandler();
+            ch.setFormatter(formatter);
+            ch.setLevel(Level.ALL);
+            LOG.addHandler(ch);
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "Crear archivo logs", e);
         }

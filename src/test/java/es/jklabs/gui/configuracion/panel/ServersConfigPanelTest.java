@@ -11,12 +11,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 public class ServersConfigPanelTest {
 
@@ -79,9 +80,43 @@ public class ServersConfigPanelTest {
         assertEquals(0, raiz.getChildCount());
     }
 
+    @Test
+    public void guardaServidorMarcadoComoSoloOrigenDesdeElFormulario() throws Exception {
+        Configuracion configuracion = new Configuracion();
+        Servidor servidor = new Servidor(10);
+        ServidorBBDD servidorBBDD = new ServidorBBDD();
+        servidor.setNombre("Servidor");
+        servidor.setIp("localhost");
+        servidor.setPuerto(3306);
+        servidorBBDD.setUsuario("usuario");
+        servidorBBDD.setPassword(UtilidadesEncryptacion.encrypt("password"));
+        servidor.setServidorBBDD(servidorBBDD);
+        configuracion.getServerConfig().getRaiz().getServidores().add(servidor);
+        ServersConfigPanel panel = new ServersConfigPanel(null, configuracion);
+        DefaultMutableTreeNode nodoServidor = (DefaultMutableTreeNode) panel.getRaizArbol().getChildAt(0);
+
+        panel.getArbol().setSelectionPath(new TreePath(nodoServidor.getPath()));
+        getCheckBox(panel, "cbSoloOrigen").setSelected(true);
+        invocarGuardarServidor2(panel);
+
+        assertTrue(servidor.isSoloOrigen());
+    }
+
     private void invocarEliminarNodoArbol(ServersConfigPanel panel) throws Exception {
         Method eliminarNodoArbol = ServersConfigPanel.class.getDeclaredMethod("eliminarNodoArbol");
         eliminarNodoArbol.setAccessible(true);
         eliminarNodoArbol.invoke(panel);
+    }
+
+    private void invocarGuardarServidor2(ServersConfigPanel panel) throws Exception {
+        Method guardarServidor2 = ServersConfigPanel.class.getDeclaredMethod("guardarServidor2");
+        guardarServidor2.setAccessible(true);
+        guardarServidor2.invoke(panel);
+    }
+
+    private JCheckBox getCheckBox(ServersConfigPanel panel, String fieldName) throws Exception {
+        Field field = ServersConfigPanel.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return (JCheckBox) field.get(panel);
     }
 }

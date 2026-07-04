@@ -47,6 +47,7 @@ public class ServersConfigPanel extends JPanel {
     private JTextField txPuerto;
     private JTextField txBbddUser;
     private JPasswordField txBbddPasword;
+    private JCheckBox cbSoloOrigen;
 
     public ServersConfigPanel(ConfiguracionUI dialogo, Configuracion configuracion) {
         super();
@@ -125,6 +126,7 @@ public class ServersConfigPanel extends JPanel {
             servidor.setNombre(txNombre.getText());
             servidor.setIp(txIp.getText());
             servidor.setPuerto(Integer.valueOf(txPuerto.getText()));
+            servidor.setSoloOrigen(cbSoloOrigen.isSelected());
             ServidorBBDD servidorBBDD;
             if (servidor.getServidorBBDD() != null) {
                 servidorBBDD = servidor.getServidorBBDD();
@@ -204,23 +206,28 @@ public class ServersConfigPanel extends JPanel {
         panelFormularioServidor.add(txPuerto, c);
         JLabel lbBbddUser = new JLabel(Mensajes.getMensaje("usuario"));
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 3;
         c.anchor = GridBagConstraints.LINE_START;
         panelFormularioServidor.add(lbBbddUser, c);
         txBbddUser = new JTextField();
         txBbddUser.setColumns(10);
         c.gridx = 1;
-        c.gridy = 6;
+        c.gridy = 3;
         panelFormularioServidor.add(txBbddUser, c);
         JLabel lbBbddPassword = new JLabel(Mensajes.getMensaje("contrasena"));
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 4;
         panelFormularioServidor.add(lbBbddPassword, c);
         txBbddPasword = new JPasswordField();
         txBbddPasword.setColumns(10);
         c.gridx = 1;
-        c.gridy = 7;
+        c.gridy = 4;
         panelFormularioServidor.add(txBbddPasword, c);
+        cbSoloOrigen = new JCheckBox(Mensajes.getMensaje("solo.origen"));
+        c.gridx = 0;
+        c.gridy = 5;
+        c.gridwidth = 2;
+        panelFormularioServidor.add(cbSoloOrigen, c);
         return panelFormularioServidor;
     }
 
@@ -354,6 +361,7 @@ public class ServersConfigPanel extends JPanel {
         txPuerto.setText(String.valueOf(servidor.getPuerto()));
         txBbddUser.setText(servidor.getServidorBBDD().getUsuario());
         txBbddPasword.setText(UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
+        cbSoloOrigen.setSelected(servidor.isSoloOrigen());
     }
 
     private void addServidorToArbol() {
@@ -420,6 +428,7 @@ public class ServersConfigPanel extends JPanel {
         txPuerto.setText(null);
         txBbddUser.setText(null);
         txBbddPasword.setText(null);
+        cbSoloOrigen.setSelected(false);
     }
 
     private void cargarArbol() {
