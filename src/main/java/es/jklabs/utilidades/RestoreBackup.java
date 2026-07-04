@@ -5,13 +5,12 @@ import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.mysql.MysqlCliente;
 import es.jklabs.json.configuracion.server.Servidor;
 
-import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RestoreBackup extends SwingWorker<Void, Void> {
+public class RestoreBackup extends AbstractMysqlWorker {
 
     private static final String RESTAURAR_BACKUP = "restaurar.backup";
     private final MainUI parent;
@@ -45,7 +44,7 @@ public class RestoreBackup extends SwingWorker<Void, Void> {
         return null;
     }
 
-    private boolean restaurarBackUp(InputStream fis, Process p) throws IOException, InterruptedException {
+    private boolean restaurarBackUp(InputStream fis, Process p) throws InterruptedException {
         List<String> errores = Collections.synchronizedList(new ArrayList<>());
         Thread errorReader = leerErroresAsync(p, errores);
         try (OutputStream os = p.getOutputStream()) {
@@ -123,12 +122,7 @@ public class RestoreBackup extends SwingWorker<Void, Void> {
     private List<String> getMysqlArgs() {
         List<String> args = new ArrayList<>();
         args.add(getMysqlPath());
-        args.add("-h");
-        args.add(servidor.getIp());
-        args.add("-P");
-        args.add(String.valueOf(servidor.getPuerto()));
-        args.add("-u" + servidor.getServidorBBDD().getUsuario());
-        args.add("-p" + UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
+        addCommonsArguments(args, servidor);
         return args;
     }
 

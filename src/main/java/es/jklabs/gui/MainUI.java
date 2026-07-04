@@ -14,6 +14,7 @@ import es.jklabs.json.configuracion.server.Servidor;
 import es.jklabs.utilidades.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import javax.swing.*;
@@ -47,6 +48,7 @@ public class MainUI extends JFrame {
     private JCheckBox cbLimpiar;
     private JButton btnCrearBackup;
     private JButton btnRestaurarBackup;
+    private JButton btnClonarEsquema;
     private int schemaLoadSequence;
 
     private MainUI() {
@@ -247,14 +249,17 @@ public class MainUI extends JFrame {
         cbEsquema = new JComboBox<>();
         cbEsquema.setPrototypeDisplayValue("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
         AutoCompleteDecorator.decorate(cbEsquema);
-        JPanel panelAcciones = new JPanel(new GridLayout(1, 3, 5, 0));
+        JPanel panelAcciones = new JPanel(new GridLayout(1, 4, 5, 0));
         btnAceptar = new JButton(Mensajes.getMensaje("copiar"));
         btnAceptar.addActionListener(al -> copiarEsquema());
+        btnClonarEsquema = new JButton(Mensajes.getMensaje("clonar.esquema"));
+        btnClonarEsquema.addActionListener(al -> clonarEsquema());
         btnCrearBackup = new JButton(Mensajes.getMensaje("crear.backup"));
         btnCrearBackup.addActionListener(al -> crearBackup());
         btnRestaurarBackup = new JButton(Mensajes.getMensaje("restaurar.backup"));
         btnRestaurarBackup.addActionListener(al -> restaurarBackup());
         panelAcciones.add(btnAceptar);
+        panelAcciones.add(btnClonarEsquema);
         panelAcciones.add(btnCrearBackup);
         panelAcciones.add(btnRestaurarBackup);
         panelFormulario.add(lbEsquema, BorderLayout.WEST);
@@ -281,6 +286,36 @@ public class MainUI extends JFrame {
                         (Servidor) destino.getUserObject(), esquema);
             }
         }
+    }
+
+    private void clonarEsquema() {
+        if (validaClonarEsquema()) {
+            DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
+            String esquemaOrigen = getEsquemaSeleccionado();
+            String esquemaDestino = solicitarNombreEsquemaDestino(esquemaOrigen);
+            if (StringUtils.isNotBlank(esquemaDestino)) {
+                bloquearPantalla();
+                prepararProgressBar(3);
+                CloneSchema task = new CloneSchema(this, configuracion.getMysqlCliente(), (Servidor) origen
+                        .getUserObject(), esquemaOrigen, esquemaDestino);
+                task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
+                task.execute();
+            }
+        }
+    }
+
+    private String solicitarNombreEsquemaDestino(String esquemaOrigen) {
+        String esquemaDestino = JOptionPane.showInputDialog(this, Mensajes.getMensaje("nombre.esquema.destino"),
+                esquemaOrigen + "_copia");
+        if (esquemaDestino == null) {
+            return "";
+        }
+        esquemaDestino = esquemaDestino.trim();
+        if (Strings.CS.equals(esquemaOrigen, esquemaDestino)) {
+            Growls.mostrarAviso("clonar.esquema", "nombre.esquema.destino.igual.origen");
+            return "";
+        }
+        return esquemaDestino;
     }
 
     private void crearBackup() {
@@ -372,6 +407,20 @@ public class MainUI extends JFrame {
         return validarClienteMysql(COPIAR_ESQUEMA, valido, true, true);
     }
 
+    private boolean validaClonarEsquema() {
+        boolean valido = true;
+        DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
+        if (origen == null || !(origen.getUserObject() instanceof Servidor)) {
+            Growls.mostrarAviso("clonar.esquema", "bbdd.origen.vacio");
+            valido = false;
+        }
+        if (StringUtils.isBlank(getEsquemaSeleccionado())) {
+            Growls.mostrarAviso("clonar.esquema", "nombre.esquema.vacio");
+            valido = false;
+        }
+        return validarClienteMysql("clonar.esquema", valido, true, true);
+    }
+
     private boolean validaCrearBackup() {
         boolean valido = true;
         DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
@@ -441,6 +490,7 @@ public class MainUI extends JFrame {
         cbLimpiar.setEnabled(!bloqueada);
         cbEsquema.setCursor(cursor);
         btnAceptar.setEnabled(!bloqueada);
+        btnClonarEsquema.setEnabled(!bloqueada);
         btnCrearBackup.setEnabled(!bloqueada);
         btnRestaurarBackup.setEnabled(!bloqueada);
         this.setCursor(cursor);

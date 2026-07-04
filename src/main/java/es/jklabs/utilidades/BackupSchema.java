@@ -5,14 +5,13 @@ import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.mysql.MysqlCliente;
 import es.jklabs.json.configuracion.server.Servidor;
 
-import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class BackupSchema extends SwingWorker<Void, Void> {
+public class BackupSchema extends AbstractMysqlWorker {
 
     private static final String CREAR_BACKUP = "crear.backup";
     private static final Pattern NOMBRE_ESQUEMA_VALIDO = Pattern.compile("[A-Za-z0-9_$]+");
@@ -57,7 +56,7 @@ public class BackupSchema extends SwingWorker<Void, Void> {
         return null;
     }
 
-    private boolean crearBackUp(OutputStream fos, Process p) throws IOException, InterruptedException {
+    private boolean crearBackUp(OutputStream fos, Process p) throws InterruptedException {
         List<String> errores = Collections.synchronizedList(new ArrayList<>());
         Thread errorReader = leerErroresAsync(p, errores);
         try (InputStream is = p.getInputStream()) {
@@ -123,12 +122,7 @@ public class BackupSchema extends SwingWorker<Void, Void> {
     private List<String> getMysqlDumpArgs() {
         List<String> args = new ArrayList<>();
         args.add(getMysqlDumpPath());
-        args.add("-h");
-        args.add(servidor.getIp());
-        args.add("-P");
-        args.add(String.valueOf(servidor.getPuerto()));
-        args.add("-u" + servidor.getServidorBBDD().getUsuario());
-        args.add("-p" + UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
+        addCommonsArguments(args, servidor);
         args.add("--quick");
         args.add("--max_allowed_packet=2048M");
         args.add("--single-transaction");

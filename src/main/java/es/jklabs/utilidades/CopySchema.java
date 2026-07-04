@@ -5,7 +5,6 @@ import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.json.configuracion.mysql.MysqlCliente;
 import es.jklabs.json.configuracion.server.Servidor;
 
-import javax.swing.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class CopySchema extends SwingWorker<Void, Void> {
+public class CopySchema extends AbstractMysqlWorker {
 
     private static final String COPIAR_ESQUEMA = "copiar.esquema";
     private static final Pattern NOMBRE_ESQUEMA_VALIDO = Pattern.compile("[A-Za-z0-9_$]+");
@@ -222,15 +221,6 @@ public class CopySchema extends SwingWorker<Void, Void> {
             args.add("--add-drop-database");
         }
         return args;
-    }
-
-    private void addCommonsArguments(List<String> args, Servidor servidor) {
-        args.add("-h");
-        args.add(servidor.getIp());
-        args.add("-P");
-        args.add(String.valueOf(servidor.getPuerto()));
-        args.add("-u" + servidor.getServidorBBDD().getUsuario());
-        args.add("-p" + UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
     }
 
     private List<String> getMysqlArgs() {
