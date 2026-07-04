@@ -188,7 +188,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
     private boolean procesoCorrecto(Process p, int exitCode, List<String> errores) {
         boolean correcto = true;
         for (String s : errores) {
-            if (s.contains("[Warning]")) {
+            if (isWarning(s)) {
                 Logger.aviso(s);
             } else {
                 Growls.mostrarError(COPIAR_ESQUEMA, s, true);
@@ -203,6 +203,10 @@ public class CopySchema extends SwingWorker<Void, Void> {
         return correcto;
     }
 
+    private boolean isWarning(String salidaError) {
+        return salidaError.contains("[Warning]") || salidaError.startsWith("-- Warning:");
+    }
+
     private List<String> getMysqlDumpArgs() {
         List<String> args = new ArrayList<>();
         args.add(getMysqlDumpPath());
@@ -210,7 +214,6 @@ public class CopySchema extends SwingWorker<Void, Void> {
         args.add("--quick");
         args.add("--max_allowed_packet=2048M");
         args.add("--single-transaction");
-        args.add("--events");
         args.add("--routines");
         args.add("--triggers");
         args.add("--databases");

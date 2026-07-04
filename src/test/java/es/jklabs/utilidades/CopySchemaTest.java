@@ -85,6 +85,7 @@ public class CopySchemaTest {
         assertTrue(args.contains("--databases"));
         assertTrue(args.contains("schema_01"));
         assertTrue(args.contains("--add-drop-database"));
+        assertFalse(args.contains("--events"));
     }
 
     @Test

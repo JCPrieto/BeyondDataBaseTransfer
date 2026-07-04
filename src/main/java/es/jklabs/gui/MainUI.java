@@ -7,6 +7,7 @@ import es.jklabs.gui.utilidades.Growls;
 import es.jklabs.gui.utilidades.IconUtils;
 import es.jklabs.gui.utilidades.UtilidadesJTree;
 import es.jklabs.gui.utilidades.filtro.JSonFilter;
+import es.jklabs.gui.utilidades.filtro.SqlFilter;
 import es.jklabs.json.configuracion.Configuracion;
 import es.jklabs.json.configuracion.server.Carpeta;
 import es.jklabs.json.configuracion.server.Servidor;
@@ -44,6 +45,8 @@ public class MainUI extends JFrame {
     private JMenu jmArchivo;
     private JMenu jmAyuda;
     private JCheckBox cbLimpiar;
+    private JButton btnCrearBackup;
+    private JButton btnRestaurarBackup;
     private int schemaLoadSequence;
 
     private MainUI() {
@@ -102,6 +105,8 @@ public class MainUI extends JFrame {
         SwingUtilities.updateComponentTreeUI(arbolOrigen);
         limpiarSelectorEsquemas();
         raizArbolDestino.removeAllChildren();
+        addElementos(carpetaRaiz, raizArbolDestino);
+        arbolDestino.setModel(new DefaultTreeModel(raizArbolDestino, false));
         UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
         SwingUtilities.updateComponentTreeUI(arbolDestino);
     }
@@ -242,11 +247,19 @@ public class MainUI extends JFrame {
         cbEsquema = new JComboBox<>();
         cbEsquema.setPrototypeDisplayValue("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
         AutoCompleteDecorator.decorate(cbEsquema);
+        JPanel panelAcciones = new JPanel(new GridLayout(1, 3, 5, 0));
         btnAceptar = new JButton(Mensajes.getMensaje("copiar"));
         btnAceptar.addActionListener(al -> copiarEsquema());
+        btnCrearBackup = new JButton(Mensajes.getMensaje("crear.backup"));
+        btnCrearBackup.addActionListener(al -> crearBackup());
+        btnRestaurarBackup = new JButton(Mensajes.getMensaje("restaurar.backup"));
+        btnRestaurarBackup.addActionListener(al -> restaurarBackup());
+        panelAcciones.add(btnAceptar);
+        panelAcciones.add(btnCrearBackup);
+        panelAcciones.add(btnRestaurarBackup);
         panelFormulario.add(lbEsquema, BorderLayout.WEST);
         panelFormulario.add(cbEsquema, BorderLayout.CENTER);
-        panelFormulario.add(btnAceptar, BorderLayout.EAST);
+        panelFormulario.add(panelAcciones, BorderLayout.EAST);
         return panelFormulario;
     }
 
@@ -258,6 +271,7 @@ public class MainUI extends JFrame {
                     () instanceof Servidor && StringUtils.isNotBlank(getEsquemaSeleccionado())) {
                 String esquema = getEsquemaSeleccionado();
                 bloquearPantalla();
+                prepararProgressBar(3);
                 CopySchema task = new CopySchema(this, configuracion.getMysqlCliente(), (Servidor) origen
                         .getUserObject(), (Servidor) destino.getUserObject(), esquema,
                         cbLimpiar.isSelected());
@@ -267,6 +281,71 @@ public class MainUI extends JFrame {
                         (Servidor) destino.getUserObject(), esquema);
             }
         }
+    }
+
+    private void crearBackup() {
+        if (validaCrearBackup()) {
+            DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
+            String esquema = getEsquemaSeleccionado();
+            File backup = seleccionarArchivoBackupParaGuardar(esquema);
+            if (backup != null) {
+                bloquearPantalla();
+                prepararProgressBar(2);
+                BackupSchema task = new BackupSchema(this, configuracion.getMysqlCliente(), (Servidor) origen
+                        .getUserObject(), esquema, backup);
+                task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
+                task.execute();
+            }
+        }
+    }
+
+    private void restaurarBackup() {
+        if (validaRestaurarBackup()) {
+            DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
+            File backup = seleccionarArchivoBackupParaAbrir();
+            if (backup != null) {
+                bloquearPantalla();
+                prepararProgressBar(2);
+                RestoreBackup task = new RestoreBackup(this, configuracion.getMysqlCliente(), (Servidor) destino
+                        .getUserObject(), backup);
+                task.addPropertyChangeListener(pcl -> changeListener(pcl.getPropertyName(), pcl.getNewValue()));
+                task.execute();
+            }
+        }
+    }
+
+    private File seleccionarArchivoBackupParaGuardar(String esquema) {
+        JFileChooser fc = new JFileChooser();
+        fc.addChoosableFileFilter(new SqlFilter());
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setSelectedFile(new File(esquema + ".sql"));
+        int retorno = fc.showSaveDialog(this);
+        if (retorno == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            if (!Objects.equals(FilenameUtils.getExtension(file.getName()), "sql")) {
+                file = new File(file + ".sql");
+            }
+            return file;
+        }
+        return null;
+    }
+
+    private File seleccionarArchivoBackupParaAbrir() {
+        JFileChooser fc = new JFileChooser();
+        fc.addChoosableFileFilter(new SqlFilter());
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int retorno = fc.showOpenDialog(this);
+        if (retorno == JFileChooser.APPROVE_OPTION) {
+            return fc.getSelectedFile();
+        }
+        return null;
+    }
+
+    private void prepararProgressBar(int maximo) {
+        progressBar.setMaximum(maximo);
+        progressBar.setValue(0);
     }
 
     private String getEsquemaSeleccionado() {
@@ -290,9 +369,37 @@ public class MainUI extends JFrame {
             Growls.mostrarAviso(COPIAR_ESQUEMA, "nombre.esquema.vacio");
             valido = false;
         }
+        return validarClienteMysql(COPIAR_ESQUEMA, valido, true, true);
+    }
+
+    private boolean validaCrearBackup() {
+        boolean valido = true;
+        DefaultMutableTreeNode origen = (DefaultMutableTreeNode) arbolOrigen.getLastSelectedPathComponent();
+        if (origen == null || !(origen.getUserObject() instanceof Servidor)) {
+            Growls.mostrarAviso("crear.backup", "bbdd.origen.vacio");
+            valido = false;
+        }
+        if (StringUtils.isBlank(getEsquemaSeleccionado())) {
+            Growls.mostrarAviso("crear.backup", "nombre.esquema.vacio");
+            valido = false;
+        }
+        return validarClienteMysql("crear.backup", valido, false, true);
+    }
+
+    private boolean validaRestaurarBackup() {
+        boolean valido = true;
+        DefaultMutableTreeNode destino = (DefaultMutableTreeNode) arbolDestino.getLastSelectedPathComponent();
+        if (destino == null || !(destino.getUserObject() instanceof Servidor)) {
+            Growls.mostrarAviso("restaurar.backup", "bbdd.destino.vacio");
+            valido = false;
+        }
+        return validarClienteMysql("restaurar.backup", valido, true, false);
+    }
+
+    private boolean validarClienteMysql(String titulo, boolean valido, boolean requiereMysql, boolean requiereMysqlDump) {
         if (configuracion.getMysqlCliente() == null ||
                 StringUtils.isEmpty(configuracion.getMysqlCliente().getPath())) {
-            Growls.mostrarAviso(COPIAR_ESQUEMA, "ruta.instalacion.mysql.no.configurada");
+            Growls.mostrarAviso(titulo, "ruta.instalacion.mysql.no.configurada");
             valido = false;
         } else {
             String comandoMysql;
@@ -308,12 +415,12 @@ public class MainUI extends JFrame {
                     comandoMysql);
             File mysqlDump = new File(configuracion.getMysqlCliente().getPath() + UtilidadesFichero.SEPARADOR +
                     comandoMysqlDump);
-            if (!mysql.exists()) {
-                Growls.mostrarAviso(COPIAR_ESQUEMA, "orden.mysql.no.encontrado");
+            if (requiereMysql && !mysql.exists()) {
+                Growls.mostrarAviso(titulo, "orden.mysql.no.encontrado");
                 valido = false;
             }
-            if (!mysqlDump.exists()) {
-                Growls.mostrarAviso(COPIAR_ESQUEMA, "orden.mysqldump.no.encontrado");
+            if (requiereMysqlDump && !mysqlDump.exists()) {
+                Growls.mostrarAviso(titulo, "orden.mysqldump.no.encontrado");
                 valido = false;
             }
         }
@@ -334,6 +441,8 @@ public class MainUI extends JFrame {
         cbLimpiar.setEnabled(!bloqueada);
         cbEsquema.setCursor(cursor);
         btnAceptar.setEnabled(!bloqueada);
+        btnCrearBackup.setEnabled(!bloqueada);
+        btnRestaurarBackup.setEnabled(!bloqueada);
         this.setCursor(cursor);
         getGlassPane().setCursor(cursor);
         getGlassPane().setVisible(bloqueada);
@@ -348,6 +457,7 @@ public class MainUI extends JFrame {
     private JScrollPane cargarPanelArbolDestino() {
         Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
         raizArbolDestino = new DefaultMutableTreeNode(carpetaRaiz);
+        addElementos(carpetaRaiz, raizArbolDestino);
         arbolDestino = new JTree(raizArbolDestino);
         arbolDestino.setCellRenderer(new ArbolRendered());
         arbolDestino.getSelectionModel().setSelectionMode
