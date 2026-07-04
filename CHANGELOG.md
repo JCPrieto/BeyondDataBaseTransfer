@@ -1,5 +1,20 @@
 # Changelog
 
+* 1.6.0
+
+    * Creacion automatica del esquema en el servidor destino antes de restaurar una copia directa si no existe.
+    * Nuevas acciones para crear backups SQL locales y restaurar backups desde el equipo del usuario.
+    * Nuevo filtro de archivos SQL en los dialogos de seleccion de backups.
+    * Nueva opcion para marcar servidores como "Solo origen", evitando que aparezcan como posibles destinos.
+    * Nueva accion para clonar un esquema dentro del mismo servidor usando un nuevo nombre de esquema.
+    * Mensajes de error mas claros para fallos de permisos al restaurar backups o clonar esquemas, manteniendo el
+      detalle tecnico en logs.
+    * La barra de progreso muestra ahora el porcentaje junto con la descripcion de la fase en ejecucion.
+    * Los logs se escriben tanto en archivo como en la consola del IDE.
+    * Ajuste de `mysqldump` para no solicitar eventos por defecto, evitando errores de permisos en alojamientos
+      compartidos.
+    * Actualizacion de `slf4j-simple` a una version compatible con SLF4J 2.x.
+
 * 1.5.0
 
     * Sustitucion del campo manual de esquema por un selector que consulta los esquemas disponibles en el servidor de

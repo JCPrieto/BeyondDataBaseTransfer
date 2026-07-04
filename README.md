@@ -5,12 +5,18 @@
 Aplicación de uso interno de la empresa BeBeyond para realizar transferencias de esquemas de base de datos entre las 
 distintas máquinas de producción, preproducción y desarrollo.
 
-El funcionamiento es el siguiente:
+La aplicacion permite:
 
-* Se genera un dump del esquema indicado utilizando el comando mysqldump del cliente Mysql instalado en el equipo.
-  Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --single-transaction --routines
- --triggers'
-* Se restaura el dump en la maquina remota mediante el comando mysql del cliente Mysql instalado en el equipo.
+* Copiar un esquema desde un servidor origen a un servidor destino. Si el esquema no existe en destino, se crea antes
+  de restaurar el backup.
+* Crear un backup SQL local de un esquema del servidor origen.
+* Restaurar un backup SQL local en un servidor destino.
+* Clonar un esquema dentro del mismo servidor usando un nuevo nombre de esquema.
+* Marcar servidores como "Solo origen" para evitar que aparezcan como posibles destinos.
+
+Para las operaciones de backup se utiliza `mysqldump` del cliente Mysql instalado en el equipo con los parametros:
+`--max_allowed_packet=2048M --quick --single-transaction --routines --triggers`. La restauracion se realiza mediante
+el comando `mysql` del mismo cliente.
 
 ### Requisitos ###
 
