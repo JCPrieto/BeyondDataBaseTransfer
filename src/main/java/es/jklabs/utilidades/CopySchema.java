@@ -51,6 +51,7 @@ public class CopySchema extends AbstractMysqlWorker {
         try {
             backup = Files.createTempFile("bddt-" + esquema + "-", ".sql");
             try (OutputStream fos = Files.newOutputStream(backup)) {
+                setProgressDescription(Mensajes.getMensaje("progreso.creando.backup"));
                 setProgress(count++);
                 Process p = new ProcessBuilder(getMysqlDumpArgs()).start();
                 origenOk = crearBackUp(fos, p);
@@ -76,6 +77,7 @@ public class CopySchema extends AbstractMysqlWorker {
             return;
         }
         try (InputStream fis = Files.newInputStream(backup)) {
+            setProgressDescription(Mensajes.getMensaje("progreso.restaurando.backup"));
             setProgress(count++);
             Process p = new ProcessBuilder(getMysqlArgs()).start();
             restautarBackUp(fis, p);
@@ -90,6 +92,7 @@ public class CopySchema extends AbstractMysqlWorker {
 
     private boolean crearEsquemaDestino(int count) {
         try {
+            setProgressDescription(Mensajes.getMensaje("progreso.creando.esquema"));
             setProgress(count);
             Process p = new ProcessBuilder(getCrearEsquemaArgs()).start();
             List<String> errores = Collections.synchronizedList(new ArrayList<>());

@@ -41,6 +41,7 @@ public class BackupSchema extends AbstractMysqlWorker {
             return null;
         }
         try (OutputStream fos = new FileOutputStream(backup)) {
+            setProgressDescription(Mensajes.getMensaje("progreso.creando.backup"));
             setProgress(1);
             Process p = new ProcessBuilder(getMysqlDumpArgs()).start();
             if (crearBackUp(fos, p)) {

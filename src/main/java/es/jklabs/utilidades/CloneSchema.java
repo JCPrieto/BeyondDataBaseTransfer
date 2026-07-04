@@ -47,6 +47,7 @@ public class CloneSchema extends AbstractMysqlWorker {
         try {
             backup = Files.createTempFile("bddt-clone-" + esquemaOrigen + "-", ".sql");
             try (OutputStream fos = Files.newOutputStream(backup)) {
+                setProgressDescription(Mensajes.getMensaje("progreso.creando.backup"));
                 setProgress(1);
                 Process p = new ProcessBuilder(getMysqlDumpArgs()).start();
                 if (!crearBackUp(fos, p)) {
@@ -85,6 +86,7 @@ public class CloneSchema extends AbstractMysqlWorker {
     }
 
     private boolean crearEsquemaDestino() throws IOException, InterruptedException {
+        setProgressDescription(Mensajes.getMensaje("progreso.creando.esquema"));
         setProgress(2);
         Process p = new ProcessBuilder(getCrearEsquemaArgs()).start();
         List<String> errores = Collections.synchronizedList(new ArrayList<>());
@@ -94,6 +96,7 @@ public class CloneSchema extends AbstractMysqlWorker {
     }
 
     private boolean restaurarBackUp(Path backup) throws IOException, InterruptedException {
+        setProgressDescription(Mensajes.getMensaje("progreso.restaurando.backup"));
         Process p = new ProcessBuilder(getMysqlArgs()).start();
         List<String> errores = Collections.synchronizedList(new ArrayList<>());
         Thread errorReader = leerErroresAsync(p, errores);

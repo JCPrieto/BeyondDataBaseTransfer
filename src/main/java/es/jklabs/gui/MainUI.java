@@ -49,6 +49,7 @@ public class MainUI extends JFrame {
     private JButton btnCrearBackup;
     private JButton btnRestaurarBackup;
     private JButton btnClonarEsquema;
+    private String descripcionProgreso;
     private int schemaLoadSequence;
 
     private MainUI() {
@@ -381,6 +382,8 @@ public class MainUI extends JFrame {
     private void prepararProgressBar(int maximo) {
         progressBar.setMaximum(maximo);
         progressBar.setValue(0);
+        descripcionProgreso = Mensajes.getMensaje("progreso.preparando");
+        actualizarTextoProgressBar();
     }
 
     private String getEsquemaSeleccionado() {
@@ -501,7 +504,19 @@ public class MainUI extends JFrame {
     private void changeListener(String propertyName, Object newValue) {
         if (Objects.equals(propertyName, "progress")) {
             progressBar.setValue((Integer) newValue);
+            actualizarTextoProgressBar();
+        } else if (Objects.equals(propertyName, AbstractMysqlWorker.PROGRESS_DESCRIPTION_PROPERTY)) {
+            descripcionProgreso = (String) newValue;
+            actualizarTextoProgressBar();
         }
+    }
+
+    private void actualizarTextoProgressBar() {
+        int porcentaje = progressBar.getMaximum() > 0
+                ? progressBar.getValue() * 100 / progressBar.getMaximum()
+                : 0;
+        String descripcion = StringUtils.defaultIfBlank(descripcionProgreso, Mensajes.getMensaje("progreso.preparando"));
+        progressBar.setString(porcentaje + "% - " + descripcion);
     }
 
     private JScrollPane cargarPanelArbolDestino() {

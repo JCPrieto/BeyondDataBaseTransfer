@@ -8,7 +8,7 @@ distintas máquinas de producción, preproducción y desarrollo.
 El funcionamiento es el siguiente:
 
 * Se genera un dump del esquema indicado utilizando el comando mysqldump del cliente Mysql instalado en el equipo.
-Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --single-transaction --events --routines
+  Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --single-transaction --routines
  --triggers'
 * Se restaura el dump en la maquina remota mediante el comando mysql del cliente Mysql instalado en el equipo.
 
@@ -49,14 +49,6 @@ Para el dump se utilizan los parametros: '--max_allowed_packet=2048M --quick --s
   * D-Bus Java https://github.com/hypfvieh/dbus-java
   * GitHub Releases API https://docs.github.com/en/rest/releases/releases
     
-### ToDo ###
-
-* Crear los esquemas si no existen en la máquina de destino
-* Crear solamente un backup, sin necesidad de transferirlo a ninguna máquina.
-* Permitir marcar un servidor como sólo de orígen de datos, nunca como destino.
-* Clonar esquemas en una misma máquina
-* Mostrar un texto descriptivo en la barra de progreso
-
 ### Changelog ###
 
 Consulta el historial de cambios en [CHANGELOG.md](CHANGELOG.md).

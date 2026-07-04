@@ -29,6 +29,7 @@ public class RestoreBackup extends AbstractMysqlWorker {
     protected Void doInBackground() {
         setProgress(0);
         try (InputStream fis = new FileInputStream(backup)) {
+            setProgressDescription(Mensajes.getMensaje("progreso.restaurando.backup"));
             setProgress(1);
             Process p = new ProcessBuilder(getMysqlArgs()).start();
             if (restaurarBackUp(fis, p)) {
