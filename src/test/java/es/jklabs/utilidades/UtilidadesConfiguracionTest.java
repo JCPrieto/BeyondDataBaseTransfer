@@ -69,6 +69,7 @@ public class UtilidadesConfiguracionTest {
         Servidor servidorSubcarpeta = new Servidor(91);
 
         servidorRaiz.setNombre("Servidor raiz");
+        servidorRaiz.setSoloOrigen(true);
         servidorSubcarpeta.setNombre("Servidor subcarpeta");
         origen.getServidores().add(servidorRaiz);
         subcarpetaImportada.getServidores().add(servidorSubcarpeta);
@@ -82,6 +83,7 @@ public class UtilidadesConfiguracionTest {
 
         assertEquals(1, destino.getServidores().size());
         assertEquals("Servidor raiz", destino.getServidores().getFirst().getNombre());
+        assertTrue(destino.getServidores().getFirst().isSoloOrigen());
         assertNotEquals(90, destino.getServidores().getFirst().getId());
         assertEquals(1, destino.getCarpetas().size());
 

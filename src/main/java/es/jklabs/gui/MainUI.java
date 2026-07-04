@@ -105,7 +105,7 @@ public class MainUI extends JFrame {
         SwingUtilities.updateComponentTreeUI(arbolOrigen);
         limpiarSelectorEsquemas();
         raizArbolDestino.removeAllChildren();
-        addElementos(carpetaRaiz, raizArbolDestino);
+        addElementosDestino(carpetaRaiz, raizArbolDestino);
         arbolDestino.setModel(new DefaultTreeModel(raizArbolDestino, false));
         UtilidadesJTree.expandAllNodes(arbolDestino, 0, arbolDestino.getRowCount());
         SwingUtilities.updateComponentTreeUI(arbolDestino);
@@ -457,7 +457,7 @@ public class MainUI extends JFrame {
     private JScrollPane cargarPanelArbolDestino() {
         Carpeta carpetaRaiz = configuracion.getServerConfig().getRaiz();
         raizArbolDestino = new DefaultMutableTreeNode(carpetaRaiz);
-        addElementos(carpetaRaiz, raizArbolDestino);
+        addElementosDestino(carpetaRaiz, raizArbolDestino);
         arbolDestino = new JTree(raizArbolDestino);
         arbolDestino.setCellRenderer(new ArbolRendered());
         arbolDestino.getSelectionModel().setSelectionMode
@@ -608,9 +608,10 @@ public class MainUI extends JFrame {
 
     private void addElementos(Carpeta carpeta, DefaultMutableTreeNode padre, Servidor servidorDescartable) {
         carpeta.getCarpetas().forEach(c -> addCarpeta(padre, c, servidorDescartable));
-        carpeta.getServidores().stream().filter(s -> !Objects.equals(s, servidorDescartable)).forEach(s -> padre.add
-                (new
-                        DefaultMutableTreeNode(s)));
+        carpeta.getServidores().stream()
+                .filter(s -> !s.isSoloOrigen())
+                .filter(s -> !Objects.equals(s, servidorDescartable))
+                .forEach(s -> padre.add(new DefaultMutableTreeNode(s)));
     }
 
     private void addCarpeta(DefaultMutableTreeNode padre, Carpeta carpeta, Servidor servidorDescartable) {
@@ -630,6 +631,19 @@ public class MainUI extends JFrame {
         carpetaRaiz.getServidores().forEach(s -> padre.add(new DefaultMutableTreeNode(s)));
     }
 
+    private void addElementosDestino(Carpeta carpetaRaiz, DefaultMutableTreeNode padre) {
+        carpetaRaiz.getCarpetas().forEach(c -> addCarpetaDestino(padre, c));
+        carpetaRaiz.getServidores().stream()
+                .filter(s -> !s.isSoloOrigen())
+                .forEach(s -> padre.add(new DefaultMutableTreeNode(s)));
+    }
+
+    private void addCarpetaDestino(DefaultMutableTreeNode padre, Carpeta carpeta) {
+        DefaultMutableTreeNode hijo = new DefaultMutableTreeNode(carpeta);
+        padre.add(hijo);
+        addElementosDestino(carpeta, hijo);
+    }
+
     private void addCarpeta(DefaultMutableTreeNode padre, Carpeta carpeta) {
         DefaultMutableTreeNode hijo = new DefaultMutableTreeNode(carpeta);
         padre.add(hijo);
@@ -638,10 +652,6 @@ public class MainUI extends JFrame {
 
     public Configuracion getConfiguracion() {
         return configuracion;
-    }
-
-    private JButton getBtnAceptar() {
-        return btnAceptar;
     }
 
     public void desbloquearPantalla() {
