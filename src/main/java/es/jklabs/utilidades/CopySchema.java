@@ -73,6 +73,9 @@ public class CopySchema extends SwingWorker<Void, Void> {
     }
 
     private void restaurarBackUp(Path backup, int count) {
+        if (!crearEsquemaDestino(count++)) {
+            return;
+        }
         try (InputStream fis = Files.newInputStream(backup)) {
             setProgress(count++);
             Process p = new ProcessBuilder(getMysqlArgs()).start();
@@ -86,6 +89,23 @@ public class CopySchema extends SwingWorker<Void, Void> {
         }
     }
 
+    private boolean crearEsquemaDestino(int count) {
+        try {
+            setProgress(count);
+            Process p = new ProcessBuilder(getCrearEsquemaArgs()).start();
+            List<String> errores = Collections.synchronizedList(new ArrayList<>());
+            Thread errorReader = leerErroresAsync(p, errores);
+            int exitCode = waitForProcess(p, errorReader);
+            return procesoCorrecto(p, exitCode, errores);
+        } catch (InterruptedException e) {
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            Growls.mostrarError(COPIAR_ESQUEMA, "fallo.restaurar.backup", e);
+        }
+        return false;
+    }
+
     private void eliminarBackUpTemporal(Path backup) {
         if (backup != null) {
             try {
@@ -96,7 +116,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
         }
     }
 
-    private void restautarBackUp(InputStream fis, Process p) throws IOException, InterruptedException {
+    private void restautarBackUp(InputStream fis, Process p) throws InterruptedException {
         List<String> errores = Collections.synchronizedList(new ArrayList<>());
         Thread errorReader = leerErroresAsync(p, errores);
         try (OutputStream os = p.getOutputStream()) {
@@ -186,12 +206,7 @@ public class CopySchema extends SwingWorker<Void, Void> {
     private List<String> getMysqlDumpArgs() {
         List<String> args = new ArrayList<>();
         args.add(getMysqlDumpPath());
-        args.add("-h");
-        args.add(sOrigen.getIp());
-        args.add("-P");
-        args.add(String.valueOf(sOrigen.getPuerto()));
-        args.add("-u" + sOrigen.getServidorBBDD().getUsuario());
-        args.add("-p" + UtilidadesEncryptacion.decrypt(sOrigen.getServidorBBDD().getPassword()));
+        addCommonsArguments(args, sOrigen);
         args.add("--quick");
         args.add("--max_allowed_packet=2048M");
         args.add("--single-transaction");
@@ -206,16 +221,29 @@ public class CopySchema extends SwingWorker<Void, Void> {
         return args;
     }
 
+    private void addCommonsArguments(List<String> args, Servidor servidor) {
+        args.add("-h");
+        args.add(servidor.getIp());
+        args.add("-P");
+        args.add(String.valueOf(servidor.getPuerto()));
+        args.add("-u" + servidor.getServidorBBDD().getUsuario());
+        args.add("-p" + UtilidadesEncryptacion.decrypt(servidor.getServidorBBDD().getPassword()));
+    }
+
     private List<String> getMysqlArgs() {
         List<String> args = new ArrayList<>();
         args.add(getMysqlPath());
-        args.add("-h");
-        args.add(sDestino.getIp());
-        args.add("-P");
-        args.add(String.valueOf(sDestino.getPuerto()));
-        args.add("-u" + sDestino.getServidorBBDD().getUsuario());
-        args.add("-p" + UtilidadesEncryptacion.decrypt(sDestino.getServidorBBDD().getPassword()));
+        addCommonsArguments(args, sDestino);
         args.add(esquema);
+        return args;
+    }
+
+    private List<String> getCrearEsquemaArgs() {
+        List<String> args = new ArrayList<>();
+        args.add(getMysqlPath());
+        addCommonsArguments(args, sDestino);
+        args.add("-e");
+        args.add("CREATE DATABASE IF NOT EXISTS `" + esquema + "`");
         return args;
     }
 
